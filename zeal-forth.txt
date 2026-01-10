@@ -1,0 +1,13 @@
+.TH zeal-forth 1 "08 Jan 2026" zeal-forth "zeal-forth manual"
+.SH NAME
+zeal-forth \- Short description of the project
+.SH SYNOPSIS
+zeal-forth
+.SH DESCRIPTION
+Short description of the project
+.SH OPTIONS
+
+.SH SEE ALSO
+
+.SH BUGS
+No known bugs.
