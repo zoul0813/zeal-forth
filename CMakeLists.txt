@@ -10,7 +10,7 @@ set(target_name "forth")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/debug)
 
 # Ensure the bin directory exists
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -23,7 +23,18 @@ add_executable(${target_name}
     src/main.asm
 )
 
-target_link_options(${target_name} PRIVATE -s -l -m -g)
+target_link_options(${target_name} PRIVATE -v -mz80 -s -l -m -g)
 target_link_libraries(${target_name} -L$ENV{ZOS_PATH}/kernel_headers/z88dk-z80asm/lib -lstrutils)
+
+set(OUTPUT_BIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<TARGET_FILE_BASE_NAME:${target_name}>_TEXT.bin")
+set(FINAL_BIN  "${CMAKE_CURRENT_LIST_DIR}/bin/$<TARGET_FILE_BASE_NAME:${target_name}>")
+
+add_custom_command(
+    TARGET ${target_name} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${OUTPUT_BIN}" "${FINAL_BIN}"
+    COMMENT "Fixing z88dk output filename"
+)
+
+
 
 zos_add_outputs(${target_name})

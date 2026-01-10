@@ -6,3 +6,5 @@ release/
 *.zip
 assets/*.zt[spm]
 *.tiled-session
+*.lis
+*.sym
