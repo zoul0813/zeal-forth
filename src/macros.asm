@@ -58,3 +58,17 @@
     IOCTL()
     ERROR_CHECK()
   ENDM
+
+  ; @ brief Macro for strutils memset
+  ; Initialize the memory pointed by HL with the byte given in E.
+  ;
+  ; Parameters:
+  ;       HL - Memory address to initialize
+  ;       BC - Size of the memory to initialize
+  ;       E  - Byte to initialize the memory with
+  MACRO MEMSET addr, size, value
+    ld hl, addr
+    ld bc, size
+    ld e, value
+    call memset
+  ENDM
