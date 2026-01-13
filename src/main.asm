@@ -35,7 +35,7 @@ _start:
     call strlen ; returns BC = len (alters: A, BC)
     ld a, b
     or c
-    jp z, @prompt
+    jp z, @print_ok
 
     ld (_curr_word), hl
     ex de, hl
@@ -54,37 +54,38 @@ _start:
     or a
     jp z, _exit_code
 
-
-    PRINT(_str_is_word, _str_is_word_end)
-    jr @print_input
-
-@is_number:
     ld hl, (_curr_word)
-    ;; convert ascii decimal to 16-bit
-    call parse_int
-    ex de, hl ; put 16-bit value in DE
-    ld hl, (data_sp)
-    ld (hl), d
-    dec hl
-    ld (hl), e
-    dec hl
-    ld (data_sp), hl
+    ld de, _dict_dot
+    call strcmp
+    or a
+    jp nz, @word_not_found
+    ld hl, @next_word
+    push hl
+    ld hl, (_dict_dot + 2)
+    jp (hl)
 
-    jp @next_word
+@word_not_found:
+    PRINT(_str_is_word, _str_is_word_end)
 
-@print_input:
     ld de, (_curr_word)
     ld bc, (_curr_len)
     S_WRITE1(DEV_STDOUT) ; DE = buffer, BC = len, A = err, returns BC = len
     PRINT(_str_newline, _str_newline_end)
-    ; jr @next_word
+
+    jp @next_word
+
+@is_number:
+    PARSEINT(_curr_word)
+    PUSHDATA()
 
 @next_word:
     ld hl, (_next_word)
     jp @process_word
 
-_empty_string:
-    ld a, 0 ; this is not an error
+@print_ok:
+    PRINT(_str_ok, _str_ok_end)
+    jp @prompt
+
 _exit_code:
     ld h, a
     EXIT()

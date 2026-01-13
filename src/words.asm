@@ -7,14 +7,28 @@ word_bye:
 
 ; ( n -- ) Display n in free field format.
 word_dot:
-    push hl
-    ld hl, (data_sp)
-    ld d, (hl)
+    POPDATA()
+    ; store the 16-bit value in a 32-bit memory location
+    ld hl, _dword_num
+    ld (hl), e
     inc hl
-    ld e, (hl)
+    ld (hl), d
     inc hl
+    ld (hl), 0
+    inc hl
+    ld (hl), 0
 
+    ld hl, _dword_num
+    ld de, _dword_ascii
+    call dword_to_ascii_dec
+
+    ld hl, _dword_ascii
+    call strlen
+    ld de, _dword_ascii
     S_WRITE1(DEV_STDOUT)
+
+    PRINT(_str_newline, _str_newline_end)
+
     ret
 
 word_plus:
@@ -53,5 +67,5 @@ _dict_drop:
   ; a place to store dword numbers for conversion
 _dword_num:
     DEFB 0, 0, 0, 0
-_dict_table:
-    DEFW _dict_bye, _dict_dot, _dict_plus, _dict_minus, _dict_dup, _dict_drop
+_dword_ascii:
+    DEFS 12, 0

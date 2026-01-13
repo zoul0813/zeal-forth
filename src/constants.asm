@@ -11,11 +11,11 @@ _str_project_name:
 _str_project_name_end:
 
 _str_newline:
-    DEFB 0x0A, 0x00
+    DEFB '\n', 0
 _str_newline_end:
 
 _str_ok:
-    DEFB "OK.", 0
+    DEFB "  ok\n", 0
 _str_ok_end:
 
 _str_prompt:

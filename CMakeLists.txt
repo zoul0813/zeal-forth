@@ -19,8 +19,18 @@ set(ZOS_TOOLCHAIN z88dk)
 include($ENV{ZOS_PATH}/cmake/zos_init.cmake)
 
 project(${target_name} ASM)
+
+file(GLOB ASM_INCLUDES
+    src/words.asm
+    src/constants.asm
+    src/macros.asm
+)
+
 add_executable(${target_name}
     src/main.asm
+)
+set_source_files_properties(src/main.asm PROPERTIES
+    OBJECT_DEPENDS "${ASM_INCLUDES}"
 )
 
 target_link_options(${target_name} PRIVATE -v -mz80 -s -l -m -g)
@@ -34,7 +44,5 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${OUTPUT_BIN}" "${FINAL_BIN}"
     COMMENT "Fixing z88dk output filename"
 )
-
-
 
 zos_add_outputs(${target_name})

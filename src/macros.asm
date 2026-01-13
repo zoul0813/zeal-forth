@@ -50,7 +50,7 @@
   ; @brief Switch to Block/Cooked KB Mode
   ;
   ; Alters:
-  ;  H, C, DE, A
+  ;   H, C, DE, A
   MACRO KB_MODE_COOKED _
     ld h, DEV_STDIN
     ld c, KB_CMD_SET_MODE
@@ -71,4 +71,56 @@
     ld bc, size
     ld e, value
     call memset
+  ENDM
+
+  ; @brief Parse string in HL into a 16-bit value and return in DE
+  ;
+  ; Parameters:
+  ;       HL - Address of string to parse
+  ;
+  ; Returns:
+  ;       HL - Address of string
+  ;       DE - 16-bit value
+  ;        A - 0=success, 1=too large, 2=non-digit
+  MACRO PARSEINT str
+    push hl
+    ld hl, (str)
+    ;; convert ascii decimal to 16-bit
+    call parse_int
+    ex de, hl ; put 16-bit value in DE
+    pop hl
+  ENDM
+
+  ; @brief Push 16-bit value onto data stack
+  ;
+  ; Parameters:
+  ;       DE - 16-bit value
+  ;
+  ; Alters:
+  ;   HL
+  MACRO PUSHDATA _
+    push hl
+    ld hl, (data_sp)
+    dec hl
+    ld (hl), d
+    dec hl
+    ld (hl), e
+    ld (data_sp), hl
+    pop hl
+  ENDM
+
+  ; @brief Pop top data stack into DE
+  ;
+  ; Alters:
+  ;   DE
+  MACRO POPDATA _
+    push hl
+    ld hl, (data_sp)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld (data_sp), hl
+
+    pop hl
   ENDM
