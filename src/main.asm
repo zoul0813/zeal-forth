@@ -19,9 +19,9 @@ _start:
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
 
-    MEMSET(data_stack, DATA_STACK_SIZE, 0x00
-    MEMSET(return_stack, DATA_STACK_SIZE, 0x00
-    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
+    MEMSET(data_stack, DATA_STACK_SIZE, 0x00)
+    MEMSET(return_stack, DATA_STACK_SIZE, 0x00)
+    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00)
 
     PRINT(_str_project_name, _str_project_name_end)
 
@@ -37,14 +37,20 @@ _start:
     or c
     jp z, @print_ok
 
+    ; Next word is in DE
     ld (_curr_word), hl
-    ex de, hl
     ld (_curr_len), bc
-    ld (_next_word), hl
-    ex de, hl
+    ld (_next_word), de
 
-    call is_digit
-    jr nc, @is_number
+    ; Try to parse the input as a number
+    call parse_dec
+    ; If A is 0, the current word is a number
+    or a
+    jr z, @is_number
+    ; If A is 1, the value is bigger than 16-bit, so skip this word
+    dec a
+    jr z, @next_word
+    ; Non-decimal value, fall-through
 
 @is_word:
     ; go through built-in dictionary
@@ -72,14 +78,14 @@ _start:
     S_WRITE1(DEV_STDOUT) ; DE = buffer, BC = len, A = err, returns BC = len
     PRINT(_str_newline, _str_newline_end)
 
-    jp @next_word
-
-@is_number:
-    PARSEINT(_curr_word)
-    PUSHDATA()
-
 @next_word:
     ld hl, (_next_word)
+    jp @process_word
+
+@is_number:
+    ; The value is in HL, next word is in DE, swap them as needed by PUSHDATA
+    ex de, hl
+    PUSHDATA()
     jp @process_word
 
 @print_ok:
@@ -91,11 +97,11 @@ _exit_code:
     EXIT()
 
 
-; @brief Checks if HL is a word
+; @brief Checks if HL is a digit
 ;
 ; Returns:
-;   carry - not a word
-;   not carry - is a word
+;   carry - not a digit
+;   not carry - is a digit
 is_digit:
     push bc
     push hl
@@ -116,8 +122,9 @@ is_digit:
     jr nz, @loop
     or a
     jr @return
-@not_a_digit:
     scf
+@not_a_digit:
+    ; Carry flag is set when
 @return:
     pop hl
     pop bc

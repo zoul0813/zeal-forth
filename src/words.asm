@@ -9,22 +9,19 @@ word_bye:
 word_dot:
     POPDATA()
     ; store the 16-bit value in a 32-bit memory location
-    ld hl, _dword_num
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-    ld (hl), 0
-    inc hl
-    ld (hl), 0
+    ld (_dword_num), de
+    ld hl, 0
+    ld (_dword_num + 2), hl
 
     ld hl, _dword_num
     ld de, _dword_ascii
     call dword_to_ascii_dec
 
+    ; Set both HL and DE to _dword_ascii
     ld hl, _dword_ascii
+    ld d, h
+    ld e, l
     call strlen
-    ld de, _dword_ascii
     S_WRITE1(DEV_STDOUT)
 
     PRINT(_str_newline, _str_newline_end)
