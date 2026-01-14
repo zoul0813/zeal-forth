@@ -80,15 +80,59 @@ word_dot:
     ret
 
 word_plus:
+    ; Pop first word in HL
+    POPDATA()
+    ex de, hl
+    ; Pop second word in DE
+    POPDATA()
+    add hl, de
+    ; Put result in DE and push it
+    ex de, hl
+    PUSHDATA()
     ret
 
 word_minus:
+    POPDATA()
+    ex de, hl
+    POPDATA()
+    ; Put hte first word back in HL
+    ex de, hl
+    ; Clear flag
+    or a
+    sbc hl, de
+    ex de, hl
+    PUSHDATA()
     ret
 
 word_dup:
+    PEEKDATA()
+    PUSHDATA()
     ret
 
 word_drop:
+    ; Increment the data stack twice, no need to get the data
+    ld hl, (data_sp)
+    inc hl
+    inc hl
+    ld (data_sp), hl
+    ret
+
+word_abs:
+    PEEKDATA()
+    bit 7, d
+    ret z
+    ; Fall-through
+word_neg:
+    POPDATA()
+    ; -DE = ~DE + 1
+    ld a, d
+    cpl
+    ld d, a
+    ld a, e
+    cpl
+    ld e, a
+    inc de
+    PUSHDATA()
     ret
 
 
@@ -108,6 +152,12 @@ builtin_words:
     DEFW word_minus
     DEFW _minus_str
 
+    DEFW word_neg
+    DEFW _neg_str
+
+    DEFW word_abs
+    DEFW _abs_str
+
     DEFW word_dup
     DEFW _dup_str
 
@@ -125,6 +175,10 @@ _plus_str:
     DEFM "+", 0
 _minus_str:
     DEFM "-", 0
+_neg_str:
+    DEFM "negate", 0
+_abs_str:
+    DEFM "abs", 0
 _dup_str:
     DEFM "dup", 0
 _drop_str:

@@ -121,6 +121,18 @@
     ld d, (hl)
     inc hl
     ld (data_sp), hl
+    pop hl
+  ENDM
 
+  ; @brief Peek top data stack into DE
+  ;
+  ; Alters:
+  ;   DE
+  MACRO PEEKDATA _
+    push hl
+    ld hl, (data_sp)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
     pop hl
   ENDM
