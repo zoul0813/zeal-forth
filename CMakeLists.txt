@@ -28,6 +28,7 @@ file(GLOB ASM_INCLUDES
 
 add_executable(${target_name}
     src/main.asm
+    src/hshtbl.asm
 )
 set_source_files_properties(src/main.asm PROPERTIES
     OBJECT_DEPENDS "${ASM_INCLUDES}"

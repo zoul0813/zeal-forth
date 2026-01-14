@@ -25,6 +25,8 @@ _start:
 
     PRINT(_str_project_name, _str_project_name_end)
 
+    call words_init
+
 @prompt:
     GET_INPUT()
 
@@ -55,29 +57,22 @@ _start:
 @is_word:
     ; go through built-in dictionary
     ld hl, (_curr_word)
-    ld de, _dict_builtin
-    call strcmp
+    call words_search
     or a
-    jp z, _exit_code
-
-    ld hl, (_curr_word)
-    ld de, _dict_dot
-    call strcmp
-    or a
-    jp nz, @word_not_found
+    ; If A is not 0, the word was not found
+    jr nz, @word_not_found
+    ; Word was found, simulate a call to the function pointed by DE
+    ; that will reurn to @next_word
     ld hl, @next_word
     push hl
-    ld hl, (_dict_dot + 2)
+    ex de, hl
     jp (hl)
-
 @word_not_found:
     PRINT(_str_is_word, _str_is_word_end)
-
     ld de, (_curr_word)
     ld bc, (_curr_len)
     S_WRITE1(DEV_STDOUT) ; DE = buffer, BC = len, A = err, returns BC = len
     PRINT(_str_newline, _str_newline_end)
-
 @next_word:
     ld hl, (_next_word)
     jp @process_word
@@ -95,40 +90,6 @@ _start:
 _exit_code:
     ld h, a
     EXIT()
-
-
-; @brief Checks if HL is a digit
-;
-; Returns:
-;   carry - not a digit
-;   not carry - is a digit
-is_digit:
-    push bc
-    push hl
-
-    call strlen ; get len in BC
-
-    ld a, b
-    or c
-    jr z, @not_a_digit
-@loop:
-    ld a, (hl)
-    call is_dec_digit ; it's not a word if it only contains digits
-    jr c, @not_a_digit
-    inc hl
-    dec bc
-    ld a, b
-    or c
-    jr nz, @loop
-    or a
-    jr @return
-    scf
-@not_a_digit:
-    ; Carry flag is set when
-@return:
-    pop hl
-    pop bc
-    ret
 
     INCLUDE "words.asm"
 
