@@ -1,4 +1,4 @@
-    SECTION TEXT
+  SECTION TEXT
 
     EXTERN hshtbl_insert
     EXTERN hshtbl_get
@@ -79,6 +79,7 @@ word_dot:
 
     ret
 
+; ( n n -- n+n ) Add top two stack items
 word_plus:
     ; Pop first word in HL
     POPDATA()
@@ -91,6 +92,7 @@ word_plus:
     PUSHDATA()
     ret
 
+; ( n n -- n-n ) Subtract top two stack items
 word_minus:
     POPDATA()
     ex de, hl
@@ -104,11 +106,13 @@ word_minus:
     PUSHDATA()
     ret
 
+; ( n -- n n ) Duplicate top stack item
 word_dup:
     PEEKDATA()
     PUSHDATA()
     ret
 
+; ( n -- ) Drop top stack item
 word_drop:
     ; Increment the data stack twice, no need to get the data
     ld hl, (data_sp)
@@ -117,11 +121,14 @@ word_drop:
     ld (data_sp), hl
     ret
 
+; ( n -- u ) abs(n)
 word_abs:
     PEEKDATA()
     bit 7, d
     ret z
     ; Fall-through
+
+; ( n -- -n ) neg(n)
 word_neg:
     POPDATA()
     ; -DE = ~DE + 1
@@ -136,7 +143,7 @@ word_neg:
     ret
 
 
-    SECTION DATA
+  SECTION DATA
 
     ; Associative table that will be added to the words hashtable on boot
 builtin_words:
@@ -165,6 +172,7 @@ builtin_words:
     DEFW _drop_str
 
     ; End of table
+_buildin_words_end:
     DEFW 0
 
 _bye_str:

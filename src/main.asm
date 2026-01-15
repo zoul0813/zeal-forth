@@ -1,6 +1,7 @@
     INCLUDE "zos_sys.asm"
     INCLUDE "zos_keyboard.asm"
     INCLUDE "include/strutils_h.asm"
+    INCLUDE "constants.asm"
     INCLUDE "macros.asm"
 
   SECTION TEXT
@@ -19,9 +20,9 @@ _start:
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
 
-    MEMSET(data_stack, DATA_STACK_SIZE, 0x00)
-    MEMSET(return_stack, DATA_STACK_SIZE, 0x00)
-    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00)
+    MEMSET(data_stack, DATA_STACK_SIZE, 0x00
+    MEMSET(return_stack, DATA_STACK_SIZE, 0x00
+    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
 
     PRINT(_str_project_name, _str_project_name_end)
 
@@ -51,7 +52,7 @@ _start:
     jr z, @is_number
     ; If A is 1, the value is bigger than 16-bit, so skip this word
     dec a
-    jr z, @next_word
+    jr z, @numeric_overflow
     ; Non-decimal value, fall-through
 
 @is_word:
@@ -62,7 +63,7 @@ _start:
     ; If A is not 0, the word was not found
     jr nz, @word_not_found
     ; Word was found, simulate a call to the function pointed by DE
-    ; that will reurn to @next_word
+    ; that will return to @next_word
     ld hl, @next_word
     push hl
     ex de, hl
@@ -83,8 +84,19 @@ _start:
     PUSHDATA()
     jp @process_word
 
+
 @print_ok:
     PRINT(_str_ok, _str_ok_end)
+    jp @prompt
+
+@numeric_overflow:
+    ld a, ERR_NUMERIC_OVERFLOW
+@print_error: ; TODO: implement error lookup
+    cp ERR_NUMERIC_OVERFLOW ; numeric overflow
+    jr nz, @print_error_msg
+    PRINT(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
+@print_error_msg:
+    PRINT(_str_error, _str_error_end)
     jp @prompt
 
 _exit_code:
@@ -93,4 +105,4 @@ _exit_code:
 
     INCLUDE "words.asm"
 
-    INCLUDE "constants.asm"
+    INCLUDE "data.asm"

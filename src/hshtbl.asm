@@ -3,12 +3,13 @@
 ; SPDX-License-Identifier: Apache-2.0
 
     INCLUDE "zos_err.asm"
+    INCLUDE "constants.asm"
 
     ; Make the assumption that the stack will be set to 0xFFFF
-    DEFC PROGRAM_STACK_ADDRESS = 0xFFFF
+    ; DEFC PROGRAM_STACK_ADDRESS = 0xFFFF
 
     ; Allocate 1024 bytes for the stack, it should be enough
-    DEFC DATA_ALLOCATED_STACK = 1024
+    ; DEFC DATA_ALLOCATED_STACK = 1024
 
     ; Bottom of the heap, if the head reaches this value, return no more memory error
     DEFC DATA_BOTTOM_HEAP_MSB = 0xC0
@@ -16,21 +17,21 @@
 
     ; Define the list entry format
     DEFVARS 0 {
-        list_entry_content_t      DS.B 0
-        list_entry_key_t          DS.B 16
-        list_entry_value_t        DS.B 2  ; resulted binary should not exceed 64KB
-        list_entry_content_end_t  DS.B 0
-        list_entry_next_t         DS.B 2
-        list_entry_end_t          DS.B 0
+    list_entry_content_t DS.B 0
+    list_entry_key_t DS.B 16
+    list_entry_value_t DS.B 2  ; resulted binary should not exceed 64KB
+    list_entry_content_end_t DS.B 0
+    list_entry_next_t DS.B 2
+    list_entry_end_t DS.B 0
     }
 
-    DEFC LIST_ENTRY_KEY_SIZE     =  list_entry_value_t - list_entry_key_t
+    DEFC LIST_ENTRY_KEY_SIZE = list_entry_value_t - list_entry_key_t
     DEFC LIST_ENTRY_CONTENT_SIZE = list_entry_content_end_t - list_entry_content_t
-    DEFC LIST_ENTRY_SIZE         = list_entry_end_t
+    DEFC LIST_ENTRY_SIZE = list_entry_end_t
 
     EXTERN strncpy
 
-    SECTION TEXT
+  SECTION TEXT
 
 ;******************************************************************************
 ;*                            PUBLIC  ROUTINES                                *
@@ -413,12 +414,12 @@ _hshtbl_hash_str_loop:
     jp _hshtbl_hash_str_loop
 
 
-    SECTION DATA
+  SECTION DATA
     ; The heap is implemented very simply with a pointer to the end of the memory that will decrease
 hshtbl_heap_head:
-    DEFW PROGRAM_STACK_ADDRESS + 1 - DATA_ALLOCATED_STACK
+    DEFW Z80_STACK + 1 - Z80_STACK_SIZE
 
-    SECTION BSS
+  SECTION BSS
     ; The hashmap is composed of 256 2-byte entries, these entries are lists, in C it would give us:
     ; struct hashmap_t {
     ;   list_entry_t* entries[256];
