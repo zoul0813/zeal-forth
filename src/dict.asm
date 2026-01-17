@@ -37,7 +37,7 @@ dict_init:
     or a
     jp z, @dict_loop
     ; An error occurred!
-    PRINT(_init_str, _init_str_end)
+    PUTS(_init_str, _init_str_end)
     ret
 
 _init_str:

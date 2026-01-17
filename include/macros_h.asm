@@ -24,7 +24,7 @@
   ; Alters:
   ;   A, H, DE, BC
   MACRO GET_INPUT _
-    PRINT(_str_prompt, _str_prompt_end)
+    PUTS(_str_prompt, _str_prompt_end)
     ld h, DEV_STDIN
     ld de, _input_buffer
     ld bc, BUFFER_SIZE
@@ -36,19 +36,6 @@
     ld l, 0x00
     call memrep
     ld hl, _input_buffer
-  ENDM
-
-  ; @brief Print str until str_end
-  ;
-  ; Returns:
-  ;   A  - ERR_SUCCESS on success, error value else
-  ;   BC - Number of bytes filled in DE.
-  ;
-  ; Alters:
-  ;   A, H, DE, BC
-  MACRO PRINT str, str_end
-    S_WRITE3(DEV_STDOUT, str, str_end - str)
-    ERROR_CHECK()
   ENDM
 
   ; @brief Switch to Block/Cooked KB Mode
@@ -115,8 +102,9 @@
 
   ; @brief Pop top data stack into DE
   ;
-  ; Alters:
-  ;   DE
+  ;
+  ; Returns:
+  ;   DE  - Value popped
   MACRO POPDATA _
     push hl
     ld hl, (data_sp)
@@ -139,4 +127,53 @@
     inc hl
     ld d, (hl)
     pop hl
+  ENDM
+
+
+  ; @brief Print str until str_end
+  ;
+  ; Returns:
+  ;   A  - ERR_SUCCESS on success, error value else
+  ;   BC - Number of bytes written
+  ;
+  ; Alters:
+  ;   A, H, DE, BC
+  MACRO PUTS str, str_end
+    S_WRITE3(DEV_STDOUT, str, str_end - str)
+    ERROR_CHECK()
+  ENDM
+
+  ; @brief Print c
+  ;
+  ; Returns:
+  ;   A   - ERR_SUCCES on success, error value else
+  ;   BC  - Number of bytes written
+  MACRO PUTC chr
+    ld a, chr
+    ld (_str_buffer), a
+    S_WRITE3(DEV_STDOUT, _str_buffer, 1)
+    ERROR_CHECK()
+  ENDM
+
+  ; @brief Print the number in DE
+  ;
+  ; Alters:
+  ;   A, BC, DE, HL
+  MACRO PUTI _
+    ; store the 16-bit value in a 32-bit memory location
+    ld (_dword_num), de
+    ld hl, 0
+    ld (_dword_num + 2), hl
+
+    ld hl, _dword_num
+    ld de, _str_buffer
+    call dword_to_ascii_dec
+
+    ; Set both HL and DE to _str_buffer
+    ld hl, _str_buffer
+    ld d, h
+    ld e, l
+    call strlen
+    S_WRITE1(DEV_STDOUT)
+    ERROR_CHECK()
   ENDM

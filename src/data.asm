@@ -48,6 +48,13 @@ _next_word:
 _input_buffer:
     DEFS BUFFER_SIZE
 
+  ; a place to store dword numbers for conversion
+_dword_num:
+    DEFB 0, 0, 0, 0
+_str_buffer:
+    DEFS 32, 0
+
+
 data_stack:
     DEFS DATA_STACK_SIZE
 _data_stack_end:

@@ -3,14 +3,19 @@
     DEFC RETURN_STACK_SIZE = 2048
     DEFC Z80_STACK = 0xFFFF
     DEFC Z80_STACK_SIZE = 2048
-    DEFC __Z80_STACK_TAIL = Z80_STACK - Z80_STACK_SIZE
+    DEFC __Z80_STACK_tail = Z80_STACK - Z80_STACK_SIZE
 
     ; Bottom of the heap, if the head reaches this value, return no more memory error
     DEFC DATA_BOTTOM_HEAP_MSB = 0xC0
     DEFC DATA_BOTTOM_HEAP = DATA_BOTTOM_HEAP_MSB << 8
 
+    DEFC CELL_SIZE = 2
 
     DEFC ERR_NUMERIC_OVERFLOW = -13
+
+    EXTERN __BSS_head
+    EXTERN __BSS_tail
+    EXTERN __BSS_size
 
     EXTERN _exit_code
 
@@ -20,6 +25,8 @@
     EXTERN _curr_len
     EXTERN _next_word
     EXTERN _input_buffer
+    EXTERN _dword_num
+    EXTERN _str_buffer
     EXTERN data_stack
     EXTERN return_stack
     EXTERN heap

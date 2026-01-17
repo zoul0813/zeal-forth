@@ -19,11 +19,9 @@ _start:
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
 
-    MEMSET(data_stack, DATA_STACK_SIZE, 0x00
-    MEMSET(return_stack, DATA_STACK_SIZE, 0x00
-    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
+    MEMSET __BSS_head, __Z80_STACK_tail - __BSS_head, 0x00
 
-    PRINT(_str_project_name, _str_project_name_end)
+    PUTS(_str_project_name, _str_project_name_end)
 
     call dict_init
 
@@ -68,11 +66,11 @@ _start:
     ex de, hl
     jp (hl)
 @word_not_found:
-    PRINT(_str_is_word, _str_is_word_end)
+    PUTS(_str_is_word, _str_is_word_end)
     ld de, (_curr_word)
     ld bc, (_curr_len)
     S_WRITE1(DEV_STDOUT) ; DE = buffer, BC = len, A = err, returns BC = len
-    PRINT(_str_newline, _str_newline_end)
+    PUTS(_str_newline, _str_newline_end)
 @next_word:
     ld hl, (_next_word)
     jp @process_word
@@ -85,7 +83,7 @@ _start:
 
 
 @print_ok:
-    PRINT(_str_ok, _str_ok_end)
+    PUTS(_str_ok, _str_ok_end)
     jp @prompt
 
 @numeric_overflow:
@@ -93,9 +91,9 @@ _start:
 @print_error: ; TODO: implement error lookup
     cp ERR_NUMERIC_OVERFLOW ; numeric overflow
     jr nz, @print_error_msg
-    PRINT(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
+    PUTS(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
 @print_error_msg:
-    PRINT(_str_error, _str_error_end)
+    PUTS(_str_error, _str_error_end)
     jp @prompt
 
 _exit_code:
