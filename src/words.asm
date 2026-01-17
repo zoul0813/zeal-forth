@@ -1,21 +1,53 @@
     INCLUDE "macros_h.asm"
     INCLUDE "constants_h.asm"
 
+;
+; EXAMPLE:
+;
+;  ; bye (-- --) exit
+;  WORD "bye", word_bye, word_bye_str
+;      ld a, 0
+;      jp _exit_code
+;  ENDWORD "bye", word_bye, word_bye_str
+;
+
+  MACRO WORD name, label, str_label
+  SECTION TEXT
+label:
+  ENDM
+
+  MACRO ENDWORD name, label, str_label
+    PUBLIC str_label
+str_label:
+    DEFM name, 0
+  SECTION DATA
+    DEFW label
+    DEFW str_label
+  SECTION TEXT
+  ENDM
+
+  SECTION DATA
+    ; Associative table that will be added to the words hashtable on boot
+    PUBLIC builtin_words
+builtin_words:
+
   SECTION TEXT
 
 ; bye (-- --) exit
-word_bye:
+WORD "bye", word_bye, word_bye_str
     ld a, 0
     jp _exit_code
+ENDWORD "bye", word_bye, word_bye_str
 
 ; ( n -- ) Display n in free field format.
-word_dot:
+WORD ".", word_dot, word_dot_str
     POPDATA()
     PUTI()
     PUTS(_str_newline, _str_newline_end)
     ret
+ENDWORD ".", word_dot, word_dot_str
 
-word_dot_s:
+WORD ".s", word_dot_s, word_dot_s_str
     PUTC('<')
     ; calculate number of items
     ld hl, data_stack + DATA_STACK_SIZE
@@ -63,9 +95,10 @@ word_dot_s:
 
 @done:
     ret
+ENDWORD ".s", word_dot_s, word_dot_s_str
 
 ; ( n n -- n+n ) Add top two stack items
-word_plus:
+WORD "+", word_plus, word_plus_str
     ; Pop first word in HL
     POPDATA()
     ex de, hl
@@ -76,9 +109,10 @@ word_plus:
     ex de, hl
     PUSHDATA()
     ret
+ENDWORD "+", word_plus, word_plus_str
 
 ; ( n n -- n-n ) Subtract top two stack items
-word_minus:
+WORD "-", word_minus, word_minus_str
     POPDATA()
     ex de, hl
     POPDATA()
@@ -90,31 +124,36 @@ word_minus:
     ex de, hl
     PUSHDATA()
     ret
+ENDWORD "-", word_minus, word_minus_str
 
 ; ( n -- n n ) Duplicate top stack item
-word_dup:
+WORD "dup", word_dup, word_dup_str
     PEEKDATA()
     PUSHDATA()
     ret
+ENDWORD "dup", word_dup, word_dup_str
 
 ; ( n -- ) Drop top stack item
-word_drop:
+WORD "drop", word_drop, word_drop_str
     ; Increment the data stack twice, no need to get the data
     ld hl, (data_sp)
     inc hl
     inc hl
     ld (data_sp), hl
     ret
+ENDWORD "drop", word_drop, word_drop_str
 
 ; ( n -- u ) abs(n)
-word_abs:
+WORD "abs", word_abs, word_abs_str
     PEEKDATA()
     bit 7, d
     ret z
-    ; Fall-through to word_negate
+    jp word_negate_impl
+ENDWORD "abs", word_abs, word_abs_str
 
 ; ( n -- -n ) neg(n)
-word_negate:
+WORD "negate", word_negate, word_negate_str
+word_negate_impl:
     POPDATA()
     ; -DE = ~DE + 1
     ld a, d
@@ -126,9 +165,10 @@ word_negate:
     inc de
     PUSHDATA()
     ret
+ENDWORD "negate", word_negate, word_negate_str
 
 ; ( a-addr -- x )
-word_fetch:
+WORD "@", word_fetch, word_fetch_str
     POPDATA()
 
     ld a, (de)
@@ -141,9 +181,10 @@ word_fetch:
     PUSHDATA()
 
     ret
+ENDWORD "@", word_fetch, word_fetch_str
 
 ; (x a-addr -- )
-word_store:
+WORD "!", word_store, word_store_str
     POPDATA()
     ex de, hl ; HL has address
     POPDATA() ; DE has value
@@ -153,108 +194,36 @@ word_store:
     ld (hl), d
 
     ret
+ENDWORD "!", word_store, word_store_str
 
 ; ( -- a-addr )
-word_here:
+WORD "here", word_here, word_here_str
     ld hl, (here_sp)
     ex de, hl
     PUSHDATA()
     ret
+ENDWORD "here", word_here, word_here_str
 
 ; ( -- c-addr )
-word_pad:
+WORD "pad", word_pad, word_pad_str
     ld hl, (here_sp)
     ld de, PAD_OFFSET
     add hl, de
     ex de, hl
     PUSHDATA()
     ret
+ENDWORD "pad", word_pad, word_pad_str
 
 ; ( c -- )
-word_emit:
+WORD "emit", word_emit, word_emit_str
     POPDATA()
     ld a, e
     ld (_str_buffer), a
     PUTS(_str_buffer, _str_buffer + 1)
     ret
+ENDWORD "emit", word_emit, word_emit_str
 
   SECTION DATA
-_bye_str:
-    DEFM "bye", 0
-_dot_str:
-    DEFM ".", 0
-_dot_s_str:
-    DEFM ".s", 0
-_plus_str:
-    DEFM "+", 0
-_minus_str:
-    DEFM "-", 0
-_negate_str:
-    DEFM "negate", 0
-_abs_str:
-    DEFM "abs", 0
-_dup_str:
-    DEFM "dup", 0
-_drop_str:
-    DEFM "drop", 0
-_fetch_str:
-    DEFM "@", 0
-_store_str:
-    DEFM "!", 0
-_here_str:
-    DEFM "here", 0
-_pad_str:
-    DEFM "pad", 0
-_emit_str:
-    DEFM "emit", 0
-
-
-
-    ; Associative table that will be added to the words hashtable on boot
-    PUBLIC builtin_words
-builtin_words:
-    DEFW word_bye
-    DEFW _bye_str
-
-    DEFW word_dot
-    DEFW _dot_str
-
-    DEFW word_dot_s
-    DEFW _dot_s_str
-
-    DEFW word_plus
-    DEFW _plus_str
-
-    DEFW word_minus
-    DEFW _minus_str
-
-    DEFW word_negate
-    DEFW _negate_str
-
-    DEFW word_abs
-    DEFW _abs_str
-
-    DEFW word_dup
-    DEFW _dup_str
-
-    DEFW word_drop
-    DEFW _drop_str
-
-    DEFW word_fetch
-    DEFW _fetch_str
-
-    DEFW word_store
-    DEFW _store_str
-
-    DEFW word_here
-    DEFW _here_str
-
-    DEFW word_pad
-    DEFW _pad_str
-
-    DEFW word_emit
-    DEFW _emit_str
-
     ; End of table
 _buildin_words_end:
     DEFW 0

@@ -1,6 +1,7 @@
     INCLUDE "constants_h.asm"
     INCLUDE "zos_sys.asm"
     INCLUDE "include/strutils_h.asm"
+    INCLUDE "macros_h.asm"
 
   SECTION TEXT
 
