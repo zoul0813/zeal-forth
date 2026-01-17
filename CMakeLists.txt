@@ -28,10 +28,11 @@ file(GLOB ASM_INCLUDES CONFIGURE_DEPENDS
 
 add_executable(${target_name}
     src/main.asm
-    src/words.asm
     src/hshtbl.asm
+    src/dict.asm
     src/data.asm
-)
+    src/words.asm
+  )
 set_source_files_properties(src/main.asm PROPERTIES
     OBJECT_DEPENDS "${ASM_INCLUDES}"
 )

@@ -5,16 +5,6 @@
     INCLUDE "zos_err.asm"
     INCLUDE "constants_h.asm"
 
-    ; Make the assumption that the stack will be set to 0xFFFF
-    ; DEFC PROGRAM_STACK_ADDRESS = 0xFFFF
-
-    ; Allocate 1024 bytes for the stack, it should be enough
-    ; DEFC DATA_ALLOCATED_STACK = 1024
-
-    ; Bottom of the heap, if the head reaches this value, return no more memory error
-    DEFC DATA_BOTTOM_HEAP_MSB = 0xC0
-    DEFC DATA_BOTTOM_HEAP = DATA_BOTTOM_HEAP_MSB << 8
-
     ; Define the list entry format
     DEFVARS 0 {
     list_entry_content_t DS.B 0
@@ -54,12 +44,12 @@ hshtbl_get:
     call hshtbl_hashmap_get_list
     ld a, h
     or l
-    jr z, _hshtbl_get_not_found
+    jr z, @not_found
     ; Search for the index where the key (string) should be placed in the list
     call hshtbl_list_search
     ; If A is 0, the string was found
     or a
-    jr nz, _hshtbl_get_not_found
+    jr nz, @not_found
     ; HL contains the entry structure, retrieve the value
     ld de, list_entry_value_t
     add hl, de
@@ -69,7 +59,7 @@ hshtbl_get:
     ld d, (hl)
     xor a
     ret
-_hshtbl_get_not_found:
+@not_found:
     ld a, ERR_NO_SUCH_ENTRY
     ret
 
@@ -91,7 +81,7 @@ hshtbl_insert:
     ; Check if the list is empty
     ld a, h
     or l
-    jr z, _hshtbl_store_str_first
+    jr z, @store_str_first
     ; Allocate a new entry. Retrieve the string from the stack and save the
     ; returned list address.
     ex (sp), hl
@@ -104,7 +94,7 @@ hshtbl_insert:
     call hshtbl_list_search
     or a
     ; If A is 0, the entry was found, this is an error
-    jr z, _hshtbl_insert_already_exist
+    jr z, @insert_already_exist
     ; Entry was not found, we can insert it by putting its address (DE) in the
     ; previous nodes' next field (BC).
     ld a, e
@@ -123,7 +113,7 @@ hshtbl_insert:
     ; Success!
     xor a
     ret
-_hshtbl_store_str_first:
+@store_str_first:
     ; Retrieve the string from the stack
     pop hl
     ; Allocate a new node and store it as the first list entry
@@ -137,7 +127,7 @@ _hshtbl_store_str_first:
     ; Return success
     xor a
     ret
-_hshtbl_insert_already_exist:
+@insert_already_exist:
     ld a, ERR_ALREADY_EXIST
     ret
 
@@ -225,20 +215,20 @@ strncmp_opt:
     push de
     push bc
     ld b, a
-_strncmp_opt_compare:
+@compare:
     ld a, (de)
     sub (hl)
-    jr nz, _strncmp_opt_end
+    jr nz, @end
     ; Check if we still have bytes to test
     dec b
-    jr z, _strncmp_opt_end
+    jr z, @end
     ; Check if both strings have reached the end
     ; A is 0 here, check if (HL) is also 0
     or (hl)
     inc de
     inc hl
-    jp nz, _strncmp_opt_compare
-_strncmp_opt_end:
+    jp nz, @compare
+@end:
     pop bc
     pop de
     pop hl
@@ -259,7 +249,7 @@ _strncmp_opt_end:
     ;   A, BC, HL
 hshtbl_list_search:
     ; HL points to the first entry's key (string), we can compared it with DE.
-_hshtbl_list_search_loop:
+@search_loop:
     ld a, LIST_ENTRY_KEY_SIZE
     ; Routine strncmp doesn't alter BC
     call strncmp_opt
@@ -267,7 +257,7 @@ _hshtbl_list_search_loop:
     or a
     ret z
     ; If A is negative, then DE is smaller than HL, so we found its place!
-    jp m, _hshtbl_list_search_place_here
+    jp m, @search_place_here
     ; Else, HL is smaller, we have to go to the next node, HL += list_entry_next_t
     ; We can re-use BC since we will overwrite it right after
     ld bc, list_entry_next_t
@@ -282,10 +272,10 @@ _hshtbl_list_search_loop:
     ld l, a
     ; If HL is not 0, we can continue going through the list
     or h
-    jp nz, _hshtbl_list_search_loop
+    jp nz, @search_loop
     ; Fall-through
     ; We couldn't find the entry but we've found where to place it
-_hshtbl_list_search_place_here:
+@search_place_here:
     ; HL already points to the entry that would be the "next" entry of the one
     ; pointed by DE.
     ; BC is also pointing to the previous entry's "next node", so we can return
@@ -321,7 +311,7 @@ hshtbl_list_allocate_entry:
     ; It is faster to directly check the value of H (which is also in A).
     ; A must be bigger or equal to DATA_BOTTOM_HEAP_MSB, so A - DATA_BOTTOM_HEAP_MSB >= 0
     cp DATA_BOTTOM_HEAP_MSB
-    jr c, _hshtbl_list_allocate_entry_no_mem
+    jr c, @entry_no_mem
     ; HL is valid, we can populate the structure and return a positive value
     ; Save the new heap head
     ld (hshtbl_heap_head), hl
@@ -352,7 +342,7 @@ hshtbl_list_allocate_entry:
     pop de
     xor a
     ret
-_hshtbl_list_allocate_entry_no_mem:
+@entry_no_mem:
     pop hl
     ld a, ERR_NO_MORE_MEMORY
     or a
@@ -399,7 +389,7 @@ hshtbl_hash_str:
     ; Result will be stored in B
     ; C contains the mask to use with A at each iteration
     ld bc, 0x0580
-_hshtbl_hash_str_loop:
+@loop:
     ld a, (hl)
     or a
     ret z
@@ -411,7 +401,7 @@ _hshtbl_hash_str_loop:
     add (hl)
     inc hl
     ld b, a
-    jp _hshtbl_hash_str_loop
+    jp @loop
 
 
   SECTION DATA

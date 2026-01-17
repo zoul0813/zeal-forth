@@ -5,6 +5,10 @@
     DEFC Z80_STACK_SIZE = 2048
     DEFC __Z80_STACK_TAIL = Z80_STACK - Z80_STACK_SIZE
 
+    ; Bottom of the heap, if the head reaches this value, return no more memory error
+    DEFC DATA_BOTTOM_HEAP_MSB = 0xC0
+    DEFC DATA_BOTTOM_HEAP = DATA_BOTTOM_HEAP_MSB << 8
+
 
     DEFC ERR_NUMERIC_OVERFLOW = -13
 

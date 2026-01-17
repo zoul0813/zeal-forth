@@ -1,6 +1,6 @@
     INCLUDE "constants_h.asm"
     INCLUDE "macros_h.asm"
-    INCLUDE "words_h.asm"
+    INCLUDE "dict_h.asm"
 
   SECTION TEXT
     ORG 0x4000  ; put the TEXT and DATA together in forth_TEXT.bin
@@ -19,13 +19,13 @@ _start:
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
 
-    MEMSET data_stack, DATA_STACK_SIZE, 0x00
-    MEMSET return_stack, DATA_STACK_SIZE, 0x00
-    MEMSET heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
+    MEMSET(data_stack, DATA_STACK_SIZE, 0x00
+    MEMSET(return_stack, DATA_STACK_SIZE, 0x00
+    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
 
     PRINT(_str_project_name, _str_project_name_end)
 
-    call words_init
+    call dict_init
 
 @prompt:
     GET_INPUT()
@@ -57,7 +57,7 @@ _start:
 @is_word:
     ; go through built-in dictionary
     ld hl, (_curr_word)
-    call words_search
+    call dict_search
     or a
     ; If A is not 0, the word was not found
     jr nz, @word_not_found
