@@ -154,6 +154,30 @@ word_store:
 
     ret
 
+; ( -- a-addr )
+word_here:
+    ld hl, (here_sp)
+    ex de, hl
+    PUSHDATA()
+    ret
+
+; ( -- c-addr )
+word_pad:
+    ld hl, (here_sp)
+    ld de, PAD_OFFSET
+    add hl, de
+    ex de, hl
+    PUSHDATA()
+    ret
+
+; ( c -- )
+word_emit:
+    POPDATA()
+    ld a, e
+    ld (_str_buffer), a
+    S_WRITE3(DEV_STDOUT, _str_buffer, 1)
+    ERROR_CHECK()
+    ret
 
   SECTION DATA
 _bye_str:
@@ -178,6 +202,12 @@ _fetch_str:
     DEFM "@", 0
 _store_str:
     DEFM "!", 0
+_here_str:
+    DEFM "here", 0
+_pad_str:
+    DEFM "pad", 0
+_emit_str:
+    DEFM "emit", 0
 
 
 
@@ -216,6 +246,15 @@ builtin_words:
 
     DEFW word_store
     DEFW _store_str
+
+    DEFW word_here
+    DEFW _here_str
+
+    DEFW word_pad
+    DEFW _pad_str
+
+    DEFW word_emit
+    DEFW _emit_str
 
     ; End of table
 _buildin_words_end:

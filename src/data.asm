@@ -25,18 +25,17 @@ _str_prompt:
     DEFB "> ", 0
 _str_prompt_end:
 
-_str_is_word:
-    DEFB "WORD: ", 0
-_str_is_word_end:
+_str_unknown:
+    DEFB "UNKNOWN: ", 0
+_str_unknown_end:
 
-_str_is_number:
-    DEFB "NUMBER: ", 0
-_str_is_number_end:
 
 data_sp:
     DEFW data_stack + DATA_STACK_SIZE
 return_sp:
     DEFW return_stack + RETURN_STACK_SIZE
+here_sp:
+    DEFW here
 
   SECTION BSS
 _curr_word:
@@ -61,4 +60,4 @@ _data_stack_end:
 return_stack:
     DEFS RETURN_STACK_SIZE
 _return_stack_end:
-heap:
+here:

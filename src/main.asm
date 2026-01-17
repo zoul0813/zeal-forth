@@ -66,7 +66,7 @@ _start:
     ex de, hl
     jp (hl)
 @word_not_found:
-    PUTS(_str_is_word, _str_is_word_end)
+    PUTS(_str_unknown, _str_unknown_end)
     ld de, (_curr_word)
     ld bc, (_curr_len)
     S_WRITE1(DEV_STDOUT) ; DE = buffer, BC = len, A = err, returns BC = len

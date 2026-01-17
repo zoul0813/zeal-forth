@@ -10,6 +10,8 @@
     DEFC DATA_BOTTOM_HEAP = DATA_BOTTOM_HEAP_MSB << 8
 
     DEFC CELL_SIZE = 2
+    DEFC PAD_SIZE = 128
+    DEFC PAD_OFFSET = 256
 
     DEFC ERR_NUMERIC_OVERFLOW = -13
 
@@ -19,19 +21,26 @@
 
     EXTERN _exit_code
 
+    ; stacks
     EXTERN data_sp
+    EXTERN data_stack
     EXTERN return_sp
+    EXTERN return_stack
+
+    ; HERE
+    EXTERN here_sp
+    EXTERN here
+
+    ; string buffers
     EXTERN _curr_word
     EXTERN _curr_len
     EXTERN _next_word
     EXTERN _input_buffer
     EXTERN _dword_num
     EXTERN _str_buffer
-    EXTERN data_stack
-    EXTERN return_stack
-    EXTERN heap
 
 
+    ; common string consts
     EXTERN _str_project_name
     EXTERN _str_project_name_end
     EXTERN _str_newline
@@ -44,7 +53,5 @@
     EXTERN _str_error_numeric_overflow_end
     EXTERN _str_prompt
     EXTERN _str_prompt_end
-    EXTERN _str_is_word
-    EXTERN _str_is_word_end
-    EXTERN _str_is_number
-    EXTERN _str_is_number_end
+    EXTERN _str_unknown
+    EXTERN _str_unknown_end
