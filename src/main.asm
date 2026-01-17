@@ -69,7 +69,7 @@ _start:
     PUTS(_str_unknown, _str_unknown_end)
     ld de, (_curr_word)
     ld bc, (_curr_len)
-    S_WRITE1(DEV_STDOUT) ; DE = buffer, BC = len, A = err, returns BC = len
+    call puts ; DE = buffer, BC = len, A = err, returns BC = len
     PUTS(_str_newline, _str_newline_end)
 @next_word:
     ld hl, (_next_word)

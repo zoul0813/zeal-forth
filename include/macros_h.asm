@@ -1,6 +1,9 @@
     INCLUDE "zos_sys.asm"
     INCLUDE "zos_keyboard.asm"
     INCLUDE "include/strutils_h.asm"
+    INCLUDE "common_h.asm"
+
+
 
   ; @brief Jumps to _exit_code on error
   ;
@@ -90,14 +93,7 @@
   ; Alters:
   ;   HL
   MACRO PUSHDATA _
-    push hl
-    ld hl, (data_sp)
-    dec hl
-    ld (hl), d
-    dec hl
-    ld (hl), e
-    ld (data_sp), hl
-    pop hl
+    call pushdata
   ENDM
 
   ; @brief Pop top data stack into DE
@@ -106,14 +102,7 @@
   ; Returns:
   ;   DE  - Value popped
   MACRO POPDATA _
-    push hl
-    ld hl, (data_sp)
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    inc hl
-    ld (data_sp), hl
-    pop hl
+    call popdata
   ENDM
 
   ; @brief Peek top data stack into DE
@@ -121,12 +110,7 @@
   ; Alters:
   ;   DE
   MACRO PEEKDATA _
-    push hl
-    ld hl, (data_sp)
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    pop hl
+    call peekdata
   ENDM
 
 
@@ -139,8 +123,9 @@
   ; Alters:
   ;   A, H, DE, BC
   MACRO PUTS str, str_end
-    S_WRITE3(DEV_STDOUT, str, str_end - str)
-    ERROR_CHECK()
+    ld de, str
+    ld bc, str_end - str
+    call puts
   ENDM
 
   ; @brief Print c
@@ -150,9 +135,7 @@
   ;   BC  - Number of bytes written
   MACRO PUTC chr
     ld a, chr
-    ld (_str_buffer), a
-    S_WRITE3(DEV_STDOUT, _str_buffer, 1)
-    ERROR_CHECK()
+    call putc
   ENDM
 
   ; @brief Print the number in DE
@@ -160,20 +143,5 @@
   ; Alters:
   ;   A, BC, DE, HL
   MACRO PUTI _
-    ; store the 16-bit value in a 32-bit memory location
-    ld (_dword_num), de
-    ld hl, 0
-    ld (_dword_num + 2), hl
-
-    ld hl, _dword_num
-    ld de, _str_buffer
-    call dword_to_ascii_dec
-
-    ; Set both HL and DE to _str_buffer
-    ld hl, _str_buffer
-    ld d, h
-    ld e, l
-    call strlen
-    S_WRITE1(DEV_STDOUT)
-    ERROR_CHECK()
+    call puti
   ENDM

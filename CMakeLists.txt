@@ -29,6 +29,7 @@ file(GLOB ASM_INCLUDES CONFIGURE_DEPENDS
 add_executable(${target_name}
     src/main.asm
     src/hshtbl.asm
+    src/common.asm
     src/dict.asm
     src/data.asm
     src/words.asm

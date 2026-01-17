@@ -175,8 +175,7 @@ word_emit:
     POPDATA()
     ld a, e
     ld (_str_buffer), a
-    S_WRITE3(DEV_STDOUT, _str_buffer, 1)
-    ERROR_CHECK()
+    PUTS(_str_buffer, _str_buffer + 1)
     ret
 
   SECTION DATA
