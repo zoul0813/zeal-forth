@@ -71,6 +71,7 @@ _start:
     ld bc, (_curr_len)
     call puts ; DE = buffer, BC = len, A = err, returns BC = len
     PUTS(_str_newline, _str_newline_end)
+    jp @prompt ; skip remaining words
 @next_word:
     ld hl, (_next_word)
     jp @process_word

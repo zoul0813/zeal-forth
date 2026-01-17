@@ -30,6 +30,8 @@ add_executable(${target_name}
     src/main.asm
     src/hshtbl.asm
     src/common.asm
+    src/math_8.asm
+    src/math_16.asm
     src/dict.asm
     src/data.asm
     src/words.asm
