@@ -7,6 +7,7 @@ set(APP_VERSION_PATCH 1)
 set(APP_NAME "Zeal Forth")
 set(target_name "forth")
 
+set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "" FORCE)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -20,15 +21,16 @@ include($ENV{ZOS_PATH}/cmake/zos_init.cmake)
 
 project(${target_name} ASM)
 
-file(GLOB ASM_INCLUDES
-    src/words.asm
-    src/constants.asm
-    src/macros.asm
+file(GLOB ASM_INCLUDES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_LIST_DIR}/include/*.asm"
 )
+
 
 add_executable(${target_name}
     src/main.asm
+    src/words.asm
     src/hshtbl.asm
+    src/data.asm
 )
 set_source_files_properties(src/main.asm PROPERTIES
     OBJECT_DEPENDS "${ASM_INCLUDES}"
@@ -36,6 +38,7 @@ set_source_files_properties(src/main.asm PROPERTIES
 
 target_link_options(${target_name} PRIVATE -v -mz80 -s -l -m -g)
 target_link_libraries(${target_name} -L$ENV{ZOS_PATH}/kernel_headers/z88dk-z80asm/lib -lstrutils)
+target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 set(OUTPUT_BIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<TARGET_FILE_BASE_NAME:${target_name}>_TEXT.bin")
 set(FINAL_BIN  "${CMAKE_CURRENT_LIST_DIR}/bin/$<TARGET_FILE_BASE_NAME:${target_name}>")

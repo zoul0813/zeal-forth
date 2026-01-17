@@ -3,7 +3,7 @@
 ; SPDX-License-Identifier: Apache-2.0
 
     INCLUDE "zos_err.asm"
-    INCLUDE "constants.asm"
+    INCLUDE "constants_h.asm"
 
     ; Make the assumption that the stack will be set to 0xFFFF
     ; DEFC PROGRAM_STACK_ADDRESS = 0xFFFF

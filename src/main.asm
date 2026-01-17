@@ -1,8 +1,6 @@
-    INCLUDE "zos_sys.asm"
-    INCLUDE "zos_keyboard.asm"
-    INCLUDE "include/strutils_h.asm"
-    INCLUDE "constants.asm"
-    INCLUDE "macros.asm"
+    INCLUDE "constants_h.asm"
+    INCLUDE "macros_h.asm"
+    INCLUDE "words_h.asm"
 
   SECTION TEXT
     ORG 0x4000  ; put the TEXT and DATA together in forth_TEXT.bin
@@ -12,6 +10,7 @@
 
     EXTERN is_alpha ; strutils
     EXTERN is_dec_digit ; strutils
+
     EXTERN __BSS_tail
     EXTERN _dict_builtin
 
@@ -20,9 +19,9 @@ _start:
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
 
-    MEMSET(data_stack, DATA_STACK_SIZE, 0x00
-    MEMSET(return_stack, DATA_STACK_SIZE, 0x00
-    MEMSET(heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
+    MEMSET data_stack, DATA_STACK_SIZE, 0x00
+    MEMSET return_stack, DATA_STACK_SIZE, 0x00
+    MEMSET heap, __Z80_STACK_TAIL - __BSS_tail, 0x00
 
     PRINT(_str_project_name, _str_project_name_end)
 
@@ -103,6 +102,3 @@ _exit_code:
     ld h, a
     EXIT()
 
-    INCLUDE "words.asm"
-
-    INCLUDE "data.asm"

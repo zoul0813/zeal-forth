@@ -1,3 +1,7 @@
+    INCLUDE "zos_sys.asm"
+    INCLUDE "zos_keyboard.asm"
+    INCLUDE "include/strutils_h.asm"
+
   ; @brief Jumps to _exit_code on error
   ;
   ; Parameters:

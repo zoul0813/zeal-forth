@@ -1,9 +1,11 @@
+    INCLUDE "macros_h.asm"
+    INCLUDE "constants_h.asm"
+    INCLUDE "hashtbl_h.asm"
+
   SECTION TEXT
 
-    EXTERN hshtbl_insert
-    EXTERN hshtbl_get
-
 ; Put all the words in the hashtable
+    PUBLIC words_init
 words_init:
     ; NULL marks the end of the table
     ld hl, builtin_words
@@ -47,6 +49,7 @@ _init_str_end:
     ;   DE - Address of the routine to execute
     ;   A - ERR_SUCCESS if the entry was found
     ;       ERR_NO_SUCH_ENTRY if the entry was not found
+    PUBLIC words_search
 words_search:
     jp hshtbl_get
 

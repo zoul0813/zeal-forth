@@ -1,0 +1,39 @@
+    DEFC BUFFER_SIZE = 256
+    DEFC DATA_STACK_SIZE = 2048
+    DEFC RETURN_STACK_SIZE = 2048
+    DEFC Z80_STACK = 0xFFFF
+    DEFC Z80_STACK_SIZE = 2048
+    DEFC __Z80_STACK_TAIL = Z80_STACK - Z80_STACK_SIZE
+
+
+    DEFC ERR_NUMERIC_OVERFLOW = -13
+
+    EXTERN _exit_code
+
+    EXTERN data_sp
+    EXTERN return_sp
+    EXTERN _curr_word
+    EXTERN _curr_len
+    EXTERN _next_word
+    EXTERN _input_buffer
+    EXTERN data_stack
+    EXTERN return_stack
+    EXTERN heap
+
+
+    EXTERN _str_project_name
+    EXTERN _str_project_name_end
+    EXTERN _str_newline
+    EXTERN _str_newline_end
+    EXTERN _str_ok
+    EXTERN _str_ok_end
+    EXTERN _str_error
+    EXTERN _str_error_end
+    EXTERN _str_error_numeric_overflow
+    EXTERN _str_error_numeric_overflow_end
+    EXTERN _str_prompt
+    EXTERN _str_prompt_end
+    EXTERN _str_is_word
+    EXTERN _str_is_word_end
+    EXTERN _str_is_number
+    EXTERN _str_is_number_end

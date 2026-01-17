@@ -1,3 +1,4 @@
+    INCLUDE "constants_h.asm"
 
   SECTION DATA
 _str_project_name:
