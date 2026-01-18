@@ -7,6 +7,7 @@
   SECTION DATA
   SECTION BSS
     ORG -1  ; make forth_BSS.bin and just don't merge it
+  SECTION HERE
 
     EXTERN is_alpha ; strutils
     EXTERN is_dec_digit ; strutils
@@ -16,10 +17,11 @@
 
   SECTION TEXT
 _start:
+    MEMSET(__BSS_head, __BSS_size, 0x00)
+
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
 
-    MEMSET __BSS_head, __Z80_STACK_tail - __BSS_head, 0x00
 
     PUTS(_str_project_name, _str_project_name_end)
 

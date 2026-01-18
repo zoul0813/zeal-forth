@@ -1,6 +1,6 @@
     DEFC BUFFER_SIZE = 256
     DEFC DATA_STACK_SIZE = 2048
-    DEFC RETURN_STACK_SIZE = 2048
+    DEFC RETURN_STACK_SIZE = 1024
     DEFC Z80_STACK = 0xFFFF
     DEFC Z80_STACK_SIZE = 2048
     DEFC __Z80_STACK_tail = Z80_STACK - Z80_STACK_SIZE
@@ -17,21 +17,29 @@
 
     DEFC ERR_NUMERIC_OVERFLOW = -13
 
+    EXTERN __TEXT_head
+    EXTERN __TEXT_tail
+    EXTERN __TEXT_size
+    EXTERN __DATA_head
+    EXTERN __DATA_tail
+    EXTERN __DATA_size
     EXTERN __BSS_head
     EXTERN __BSS_tail
     EXTERN __BSS_size
+    EXTERN __HERE_head
+    EXTERN __HERE_tail
+    EXTERN __HERE_size
 
     EXTERN _exit_code
 
     ; stacks
-    EXTERN data_sp
-    EXTERN data_stack
-    EXTERN return_sp
-    EXTERN return_stack
+    EXTERN data_sp        ;; stack pointer
+    EXTERN data_stack     ;; stack data
+    EXTERN return_sp      ;; return stack pointer
+    EXTERN return_stack   ;; return stack data
 
     ; HERE
-    EXTERN here_sp
-    EXTERN here
+    EXTERN here_sp        ;; here pointer
 
     ; string buffers
     EXTERN _curr_word

@@ -340,6 +340,13 @@ hshtbl_list_allocate_entry:
     ld (hl), d
     ; Success, we can return the newly allocated pointer
     pop de
+    ld hl, de
+    ld bc, list_entry_next_t
+    add hl, bc
+    xor a
+    ld (hl), a
+    inc hl
+    ld (hl), a
     xor a
     ret
 @entry_no_mem:

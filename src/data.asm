@@ -35,7 +35,7 @@ data_sp:
 return_sp:
     DEFW return_stack + RETURN_STACK_SIZE
 here_sp:
-    DEFW here
+    DEFW __HERE_head
 
   SECTION BSS
 _curr_word:
@@ -60,4 +60,6 @@ _data_stack_end:
 return_stack:
     DEFS RETURN_STACK_SIZE
 _return_stack_end:
-here:
+
+  SECTION HERE
+
