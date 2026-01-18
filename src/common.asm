@@ -9,9 +9,6 @@
   ;
   ; Parameters:
   ;       DE - 16-bit value
-  ;
-  ; Alters:
-  ;   HL
     PUBLIC pushdata
 pushdata:
     push hl

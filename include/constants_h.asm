@@ -1,6 +1,10 @@
     DEFC BUFFER_SIZE = 256
-    DEFC DATA_STACK_SIZE = 2048
-    DEFC RETURN_STACK_SIZE = 1024
+    DEFC DATA_STACK_size = 2048
+    DEFC DATA_STACK_head = data_stack + DATA_STACK_size
+    DEFC DATA_STACK_tail = data_stack
+    DEFC RETURN_STACK_size = 1024
+    DEFC RETURN_STACK_head = data_stack + RETURN_STACK_size
+    DEFC RETURN_STACK_tail = data_stack
     DEFC Z80_STACK = 0xFFFF
     DEFC Z80_STACK_SIZE = 2048
     DEFC __Z80_STACK_tail = Z80_STACK - Z80_STACK_SIZE

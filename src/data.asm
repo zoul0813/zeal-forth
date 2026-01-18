@@ -31,9 +31,9 @@ _str_unknown_end:
 
 
 data_sp:
-    DEFW data_stack + DATA_STACK_SIZE
+    DEFW DATA_STACK_head
 return_sp:
-    DEFW return_stack + RETURN_STACK_SIZE
+    DEFW RETURN_STACK_head
 here_sp:
     DEFW __HERE_head
 
@@ -55,10 +55,10 @@ _str_buffer:
 
 
 data_stack:
-    DEFS DATA_STACK_SIZE
+    DEFS DATA_STACK_size
 _data_stack_end:
 return_stack:
-    DEFS RETURN_STACK_SIZE
+    DEFS RETURN_STACK_size
 _return_stack_end:
 
   SECTION HERE
