@@ -16,7 +16,7 @@
     EXTERN _dict_builtin
 
   SECTION TEXT
-_start:
+main:
     MEMSET(__BSS_head, __BSS_size, 0x00)
 
     ; set the kb mode to block/cooked for now
@@ -32,17 +32,7 @@ _start:
 
     ld hl, _input_buffer
 @process_word:
-    ld a, ' '
-    call strsep ; returns HL = str, DE = next, A = found (alters: DE, A)
-    call strlen ; returns BC = len (alters: A, BC)
-    ld a, b
-    or c
-    jp z, @print_ok
-
-    ; Next word is in DE
-    ld (_curr_word), hl
-    ld (_curr_len), bc
-    ld (_next_word), de
+    call current_word
 
     ; Try to parse the input as a number
     call parse_dec
@@ -75,7 +65,7 @@ _start:
     PUTS(_str_newline, _str_newline_end)
     jp @prompt ; skip remaining words
 @next_word:
-    ld hl, (_next_word)
+    call next_word
     jp @process_word
 
 @is_number:
@@ -98,6 +88,24 @@ _start:
 @print_error_msg:
     PUTS(_str_error, _str_error_end)
     jp @prompt
+
+
+next_word:
+    ld hl, (_next_word)
+current_word:
+    ld a, ' '
+    call strsep ; returns HL = str, DE = next, A = found (alters: DE, A)
+    call strlen ; returns BC = len (alters: A, BC)
+    ld a, b
+    or c
+    jp z, main@print_ok
+
+    ; Next word is in DE
+    ld (_curr_word), hl
+    ld (_curr_len), bc
+    ld (_next_word), de
+    ret
+
 
 _exit_code:
     ld h, a

@@ -58,3 +58,9 @@ WORD "rot", word_rot
     PUSHDATA()  ; push n1
     ret
 ENDWORD "rot", word_rot
+
+WORD "wipe", word_wipe
+    ld hl, DATA_STACK_head
+    ld (data_sp), hl
+    ret
+ENDWORD "wipe", word_wipe
