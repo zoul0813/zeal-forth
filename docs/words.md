@@ -12,6 +12,7 @@ use the Forth convention `( before -- after )`.
 | `-` | `( n1 n2 -- n1-n2 )` | Subtract the top two stack items (16-bit wraparound). |
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (16-bit wraparound). |
 | `/` | `( n1 n2 -- n3 )` | Divide `n1` by `n2` (unsigned), returns the quotient. |
+| `mod` | `( n1 n2 -- n3 )` | Divide `n1` by `n2` (unsigned), returns the remainder. |
 | `swap` | `( n1 n2 -- n2 n1 )` | Swap the top two stack items. |
 | `over` | `( n1 n2 -- n1 n2 n1 )` | Copy the second item to the top. |
 | `rot` | `( n1 n2 n3 -- n2 n3 n1 )` | Rotate the top three items. |
@@ -26,11 +27,17 @@ use the Forth convention `( before -- after )`.
 | `abs` | `( n -- u )` | Absolute value. |
 | `dup` | `( n -- n n )` | Duplicate the top stack item. |
 | `drop` | `( n -- )` | Drop the top stack item. |
+| `wipe` | `( -- )` | Reset the data stack pointer. |
 | `@` | `( a-addr -- x )` | Fetch a 16-bit cell from memory. |
 | `!` | `( x a-addr -- )` | Store a 16-bit cell to memory. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256`. |
+| `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (n * cell size). |
+| `allot` | `( n -- )` | Reserve `n` bytes starting at HERE. |
+| `variable` | `( "name" -- )` | Define a word that pushes its storage address and allocates 1 cell. |
+| `create` | `( "name" -- )` | Define a word that pushes its storage address. |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
+| `words` | `( -- )` | Print all words in the dictionary. |
 
 ## Stack Effect Symbols
 

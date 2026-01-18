@@ -1,4 +1,12 @@
+# TODO List
+
 Here are high‑value core words (grouped) that make a Forth feel “complete” fast. I’d start with the top block, then branch based on your goals.
+
+## Notes
+
+Items marked with `-` will be implemented in Forth, and not defined as built-in words.
+
+Items marked with `?` may or may not be defined
 
 ## Data stack basics
 
@@ -14,9 +22,9 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 * [x] <>
 * [x] <
 * [x] >
-* [ ] 0=
-* [ ] 0<
-* [ ] 0>
+* [-] 0=
+* [-] 0<
+* [-] 0>
 * [x] and ( n1 n2 -- n3 )
 * [x] or  ( n1 n2 -- n3 )
 * [x] xor ( n1 n2 -- n3 )
@@ -42,7 +50,7 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 * [ ] ;
 * [ ] constant
 * [x] variable
-* [ ] create
+* [x] create
 * [ ] does> (later; powerful but more complex)
 * [x] allot
 
@@ -51,9 +59,9 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 * [ ] c@
 * [ ] c! (byte fetch/store)
 * [x] cells
-* [ ] cell+
-* [ ] cell-
-* [ ] char+
+* [-] cell+
+* [-] cell-
+* [-] char+
 * [ ] move
 * [ ] fill
 * [ ] erase
@@ -63,8 +71,8 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 * [x] * ( n n -- n)
 * [x] / ( n n -- n )
 * [x] mod ( n n -- n )
-* [ ] */
-* [ ] */mod
+* [?] */
+* [?] */mod
 * [ ] /mod
 * [ ] u<
 * [ ] u>
@@ -80,9 +88,9 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 
 * [ ] .\" (print string literal), type (print buffer)
 * [ ] key
-* [ ] /emit
+* [x] emit
 
 ## Dictionary/introspection
 
-* [ ] words (list dictionary)
+* [x] words (list dictionary)
 * [ ] ' (tick: get execution token)

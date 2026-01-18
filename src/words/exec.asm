@@ -16,9 +16,9 @@
 ;     ret
 ; ENDWORD "r>", word_return_pop
 
-
-WORD "variable", word_variable
+WORD "create", word_create
     ld bc, (here_sp)  ; BC = HERE
+    push bc
     ld hl, 7
     or a
     adc hl, bc        ; HL = HERE + 7 (size of this definition)
@@ -61,14 +61,24 @@ WORD "variable", word_variable
     call next_word    ; _current_word == "varName"
 
     ld hl, (_curr_word)
-    ld de, bc
+    pop de            ; HERE
     call hshtbl_insert
     or a
     jr z, @done
     ; print an error ... something bad happened?
     PUTS(_str_error, _str_error_end)
 @done:
+    ret
+ENDWORD "create", word_create
 
+WORD "variable", word_variable
+    call word_create
+    ld hl, (here_sp)
+    ld (hl), 0      ; initialize with 0
+    inc hl
+    ld (hl), 0      ; initialize with 0
+    ld de, CELL_SIZE
+    call _word_allot_de
     ret
 ENDWORD "variable", word_variable
 
@@ -83,6 +93,7 @@ ENDWORD "cells", word_cells
 ; (n -- ) Reserve n bytes of data space (from `here`)
 WORD "allot", word_allot
     POPDATA()           ; DE = n
+_word_allot_de:
     ld hl, (here_sp)
     or a
     adc hl, de          ; HL = HERE + n
