@@ -2,6 +2,7 @@
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
     INCLUDE "hashtbl_h.asm"
+    INCLUDE "compiler_h.asm"
 
 ; TODO - implement return stack manipulation
 ; WORD ">r", word_return_push
@@ -16,52 +17,28 @@
 ;     ret
 ; ENDWORD "r>", word_return_pop
 
+
+
+template_create:
+@ldde:
+    ld de, 0x0000
+    call pushdata
+    ret
+@end:
+@patches:
+    db @ldde + 1 - template_create, TEMPLATE_END
+    db 0
+
 WORD "create", word_create
-    ld bc, (here_sp)  ; BC = HERE
-    push bc
-    ld hl, 7
-    or a
-    adc hl, bc        ; HL = HERE + 7 (size of this definition)
-    ld b, h
-    ld c, l           ; BC = HERE + 7
-    ld hl, (here_sp)  ; HL = HERE
-
-    ; LD DE, HERE+7
-    ld a, 0x11          ; LD DE, CB
-    ld (hl), a
-    inc hl
-    ld a, c          ; C
-    ld (hl), a
-    inc hl
-    ld a, b          ; B
-    ld (hl), a
-    inc hl
-
-    ; CALL pushdata
-    ld a, 0xCD          ; CALL ED
-    ld (hl), a
-    inc hl
-    ld de, pushdata   ; BC = addr of pushdata
-    ld a, e          ; C
-    ld (hl), a
-    inc hl
-    ld a, d          ; B
-    ld (hl), a
-    inc hl
-
-    ; RET
-    ld a, 0xC9        ; RET
-    ld (hl), a
-    inc hl
-
-    ld (here_sp), hl  ; update HERE
-
+    TEMPLATE_INIT
+    TEMPLATE_APPLY template_create, template_create@end
+    push hl           ; save base for dictionary insert
 
     ; advance the input buffer, consume the next word
     call next_word    ; _current_word == "varName"
 
     ld hl, (_curr_word)
-    pop de            ; HERE
+    pop de            ; HERE (base)
     call hshtbl_insert
     or a
     jr z, @done

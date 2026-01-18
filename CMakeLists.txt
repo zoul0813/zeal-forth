@@ -33,6 +33,7 @@ add_executable(${target_name}
     src/math_8.asm
     src/math_16.asm
     src/dict.asm
+    src/compiler.asm
     src/data.asm
     src/words.asm
   )
