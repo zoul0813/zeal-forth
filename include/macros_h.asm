@@ -1,3 +1,6 @@
+#ifndef _MACROS_H_ASM
+#define _MACROS_H_ASM
+
     INCLUDE "zos_sys.asm"
     INCLUDE "zos_keyboard.asm"
     INCLUDE "include/strutils_h.asm"
@@ -145,3 +148,5 @@
   MACRO PUTI _
     call puti
   ENDM
+
+#endif

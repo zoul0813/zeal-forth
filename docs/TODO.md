@@ -41,15 +41,16 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 * [ ] :
 * [ ] ;
 * [ ] constant
-* [ ] variable
+* [x] variable
 * [ ] create
 * [ ] does> (later; powerful but more complex)
+* [x] allot
 
 ## Memory + bytes
 
 * [ ] c@
 * [ ] c! (byte fetch/store)
-* [ ] cells
+* [x] cells
 * [ ] cell+
 * [ ] cell-
 * [ ] char+

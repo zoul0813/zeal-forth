@@ -1,6 +1,9 @@
 #ifndef _WORDS_H_ASM_
 #define _WORDS_H_ASM_
 
+    EXTERN next_word
+    EXTERN current_word
+
 ;
 ; EXAMPLE:
 ;

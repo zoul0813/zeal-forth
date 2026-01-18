@@ -1,5 +1,7 @@
+    INCLUDE "constants_h.asm"
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
+    INCLUDE "hashtbl_h.asm"
 
 ; TODO - implement return stack manipulation
 ; WORD ">r", word_return_push
@@ -53,6 +55,19 @@ WORD "variable", word_variable
     inc hl
 
     ld (here_sp), hl  ; update HERE
+
+
+    ; advance the input buffer, consume the next word
+    call next_word    ; _current_word == "varName"
+
+    ld hl, (_curr_word)
+    ld de, bc
+    call hshtbl_insert
+    or a
+    jr z, @done
+    ; print an error ... something bad happened?
+    PUTS(_str_error, _str_error_end)
+@done:
 
     ret
 ENDWORD "variable", word_variable

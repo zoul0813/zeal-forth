@@ -1,3 +1,6 @@
+#ifndef _CONSTANTS_H_ASM
+#define _CONSTANTS_H_ASM
+
     DEFC BUFFER_SIZE = 256
     DEFC DATA_STACK_size = 2048
     DEFC DATA_STACK_head = data_stack + DATA_STACK_size
@@ -69,3 +72,5 @@
     EXTERN _str_prompt_end
     EXTERN _str_unknown
     EXTERN _str_unknown_end
+
+#endif

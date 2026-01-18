@@ -428,5 +428,6 @@ hshtbl_heap_head:
     ;   uint8_t  content[LIST_ENTRY_CONTENT_SIZE];
     ;   uint16_t next;
     ; }
+    PUBLIC hshtbl_hashmap
 hshtbl_hashmap:
     DEFS 256 * 2

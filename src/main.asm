@@ -1,6 +1,7 @@
     INCLUDE "constants_h.asm"
     INCLUDE "macros_h.asm"
     INCLUDE "dict_h.asm"
+    INCLUDE "words_h.asm"
 
   SECTION TEXT
     ORG 0x4000  ; put the TEXT and DATA together in forth_TEXT.bin
@@ -31,8 +32,10 @@ main:
     GET_INPUT()
 
     ld hl, _input_buffer
+    ld (_next_word), hl
 @process_word:
-    call current_word
+    call next_word
+    jr z, @print_ok
 
     ; Try to parse the input as a number
     call parse_dec
@@ -53,7 +56,7 @@ main:
     jr nz, @word_not_found
     ; Word was found, simulate a call to the function pointed by DE
     ; that will return to @next_word
-    ld hl, @next_word
+    ld hl, @process_word
     push hl
     ex de, hl
     jp (hl)
@@ -64,8 +67,7 @@ main:
     call puts ; DE = buffer, BC = len, A = err, returns BC = len
     PUTS(_str_newline, _str_newline_end)
     jp @prompt ; skip remaining words
-@next_word:
-    call next_word
+; @next_word:
     jp @process_word
 
 @is_number:
@@ -88,23 +90,6 @@ main:
 @print_error_msg:
     PUTS(_str_error, _str_error_end)
     jp @prompt
-
-
-next_word:
-    ld hl, (_next_word)
-current_word:
-    ld a, ' '
-    call strsep ; returns HL = str, DE = next, A = found (alters: DE, A)
-    call strlen ; returns BC = len (alters: A, BC)
-    ld a, b
-    or c
-    jp z, main@print_ok
-
-    ; Next word is in DE
-    ld (_curr_word), hl
-    ld (_curr_len), bc
-    ld (_next_word), de
-    ret
 
 
 _exit_code:
