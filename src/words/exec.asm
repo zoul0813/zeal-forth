@@ -55,16 +55,16 @@ WORD "variable", word_variable
     inc hl
     ld (hl), 0      ; initialize with 0
     ld de, CELL_SIZE
-    call _word_allot_de
-    ret
+    ; Tail-call
+    jp _word_allot_de
 ENDWORD "variable", word_variable
 
 ; ( n1 -- n2 )  n2 is the size in address units of n1 cells.
 WORD "cells", word_cells
     ld de, CELL_SIZE
     call pushdata
-    call word_mul
-    ret
+    ; Tail-call
+    jp word_mul
 ENDWORD "cells", word_cells
 
 ; (n -- ) Reserve n bytes of data space (from `here`)
@@ -72,8 +72,7 @@ WORD "allot", word_allot
     POPDATA()           ; DE = n
 _word_allot_de:
     ld hl, (here_sp)
-    or a
-    adc hl, de          ; HL = HERE + n
+    add hl, de          ; HL = HERE + n
     ld (here_sp), hl
     ret
 ENDWORD "allot", word_allot

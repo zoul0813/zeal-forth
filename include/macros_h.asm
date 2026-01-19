@@ -99,6 +99,10 @@
     call pushdata
   ENDM
 
+  MACRO JP_PUSHDATA _
+    jp pushdata
+  ENDM
+
   ; @brief Pop top data stack into DE
   ;
   ;

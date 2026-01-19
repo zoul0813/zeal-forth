@@ -31,18 +31,16 @@ ENDWORD "!", word_store
 
 ; ( -- a-addr )
 WORD "here", word_here
-    ld hl, (here_sp)
-    ex de, hl
+    ld de, (here_sp)
     PUSHDATA()
     ret
 ENDWORD "here", word_here
 
 ; ( -- c-addr )
 WORD "pad", word_pad
-    ld hl, (here_sp)
-    ld de, PAD_OFFSET
-    add hl, de
-    ex de, hl
+    ld de, (here_sp)
+    ; DE += 256
+    inc d
     PUSHDATA()
     ret
 ENDWORD "pad", word_pad

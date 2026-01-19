@@ -1,26 +1,22 @@
     INCLUDE "words_h.asm"
 
+de_false:
+    ld de, FALSE
+    JP_PUSHDATA()
+de_true:
+    ld de, TRUE
+    JP_PUSHDATA()
+
 ; ( n1 n2 -- flag )
 WORD "=", word_equal
     POPDATA()   ; DE = n2
     ex de, hl   ; HL = n2
     POPDATA()   ; DE = n1
 
-    ld a, h
-    cp d
-    jr nz, @not_equal
-    ld a, l
-    cp e
-    jr z, @equal
-
-@not_equal:
-    ld de, FALSE
-    PUSHDATA()
-    ret
-@equal:
-    ld de, TRUE
-    PUSHDATA()
-    ret
+    or a
+    sbc hl, de
+    jr z, de_true
+    jr de_false
 ENDWORD "=", word_equal
 
 ; ( n1 n2 -- flag )
@@ -32,38 +28,20 @@ WORD "<", word_lessthan
 
     or a
     sbc hl, de
-    jr c, @true
-
-@false:
-    ld de, FALSE
-    PUSHDATA()
-    ret
-
-@true:
-    ld de, TRUE
-    PUSHDATA()
-    ret
+    jr c, de_true
+    jr de_false
 ENDWORD "<", word_lessthan
 
 WORD ">", word_greaterthan
     POPDATA()   ; DE = n2
     ex de, hl   ; HL = n2
     POPDATA()   ; DE = n1
-    ex de, hl   ; DE = n2, HL = n1
 
+    ; Instead of checking if n1 > n2, let's check if n2 >= n1
     or a
     sbc hl, de
-    jr z, @false
-    jr nc, @true
-
-@false:
-    ld de, FALSE
-    PUSHDATA()
-    ret
-@true:
-    ld de, TRUE
-    PUSHDATA()
-    ret
+    jr nc, de_false
+    jr de_true
 
 ENDWORD ">", word_greaterthan
 
@@ -81,8 +59,7 @@ WORD "and", word_and
     and l
     ld e, a
 
-    PUSHDATA()  ; push n3
-    ret
+    JP_PUSHDATA()  ; push n3
 ENDWORD "and", word_and
 
 ; ( n1 n2 -- n3 )
@@ -99,8 +76,7 @@ WORD "or", word_or
     or l
     ld e, a
 
-    PUSHDATA()  ; push n3
-    ret
+    JP_PUSHDATA()  ; push n3
 ENDWORD "or", word_or
 
 WORD "xor", word_xor
@@ -116,8 +92,7 @@ WORD "xor", word_xor
     xor l
     ld e, a
 
-    PUSHDATA()  ; push n3
-    ret
+    JP_PUSHDATA()  ; push n3
 ENDWORD "xor", word_xor
 
 ; ( n1 -- n2 )
@@ -132,6 +107,5 @@ WORD "invert", word_invert
     cpl
     ld e, a
 
-    PUSHDATA()
-    ret
+    JP_PUSHDATA()
 ENDWORD "invert", word_invert
