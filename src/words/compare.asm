@@ -2,16 +2,16 @@
 
 de_false:
     ld de, FALSE
-    JP_PUSHDATA()
+    JP_PUSH()
 de_true:
     ld de, TRUE
-    JP_PUSHDATA()
+    JP_PUSH()
 
 ; ( n1 n2 -- flag )
 WORD "=", word_equal
-    POPDATA()   ; DE = n2
+    POP()   ; DE = n2
     ex de, hl   ; HL = n2
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
 
     or a
     sbc hl, de
@@ -21,9 +21,9 @@ ENDWORD "=", word_equal
 
 ; ( n1 n2 -- flag )
 WORD "<", word_lessthan
-    POPDATA()   ; DE = n2
+    POP()   ; DE = n2
     ex de, hl   ; HL = n2
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
 
     or a
@@ -33,9 +33,9 @@ WORD "<", word_lessthan
 ENDWORD "<", word_lessthan
 
 WORD ">", word_greaterthan
-    POPDATA()   ; DE = n2
+    POP()   ; DE = n2
     ex de, hl   ; HL = n2
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
 
     ; Instead of checking if n1 > n2, let's check if n2 >= n1
     or a
@@ -47,9 +47,9 @@ ENDWORD ">", word_greaterthan
 
 ; ( n1 n2 -- n3 )
 WORD "and", word_and
-    POPDATA()   ; DE = n2
+    POP()   ; DE = n2
     ex de, hl   ; HL = n2
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
 
     ld a, d
     and h
@@ -59,14 +59,14 @@ WORD "and", word_and
     and l
     ld e, a
 
-    JP_PUSHDATA()  ; push n3
+    JP_PUSH()  ; push n3
 ENDWORD "and", word_and
 
 ; ( n1 n2 -- n3 )
 WORD "or", word_or
-    POPDATA()   ; DE = n2
+    POP()   ; DE = n2
     ex de, hl   ; HL = n2
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
 
     ld a, d
     or h
@@ -76,13 +76,13 @@ WORD "or", word_or
     or l
     ld e, a
 
-    JP_PUSHDATA()  ; push n3
+    JP_PUSH()  ; push n3
 ENDWORD "or", word_or
 
 WORD "xor", word_xor
-    POPDATA()   ; DE = n2
+    POP()   ; DE = n2
     ex de, hl   ; HL = n2
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
 
     ld a, d
     xor h
@@ -92,12 +92,12 @@ WORD "xor", word_xor
     xor l
     ld e, a
 
-    JP_PUSHDATA()  ; push n3
+    JP_PUSH()  ; push n3
 ENDWORD "xor", word_xor
 
 ; ( n1 -- n2 )
 WORD "invert", word_invert
-    POPDATA()   ; DE = n1
+    POP()   ; DE = n1
 
     ld a, d
     cpl
@@ -107,5 +107,5 @@ WORD "invert", word_invert
     cpl
     ld e, a
 
-    JP_PUSHDATA()
+    JP_PUSH()
 ENDWORD "invert", word_invert

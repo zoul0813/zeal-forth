@@ -1,8 +1,8 @@
     INCLUDE "words_h.asm"
 
-; ( a-addr -- x )
+; ( a-addr -- x ) Fetch a cell from a-addr
 WORD "@", word_fetch
-    POPDATA()
+    POP()
 
     ld a, (de)
     ld l, a
@@ -11,16 +11,24 @@ WORD "@", word_fetch
     ld h, a
     ex de, hl
 
-    PUSHDATA()
-
-    ret
+    JP_PUSH()
 ENDWORD "@", word_fetch
 
-; (x a-addr -- )
+; ( c-addr -- c ) Fetch a char from c-addr
+WORD "c@", word_fetch_char
+    POP()
+    ld a, (de)
+    ld l, a
+    ld h, 0
+    ex de, hl
+    JP_PUSH()
+ENDWORD "c@", word_fetch_char
+
+; ( x a-addr -- ) Store x in cell a-addr
 WORD "!", word_store
-    POPDATA()
+    POP()
     ex de, hl ; HL has address
-    POPDATA() ; DE has value
+    POP() ; DE has value
 
     ld (hl), e
     inc hl
@@ -29,18 +37,25 @@ WORD "!", word_store
     ret
 ENDWORD "!", word_store
 
-; ( -- a-addr )
+; ( n c-addr -- ) Store char n in a-addr
+WORD "c!", word_store_char
+    POP()
+    ex de, hl ; HL has address
+    POP() ; DE has value
+    ld (hl), e
+    ret
+ENDWORD "c!", word_store_char
+
+; ( -- a-addr ) Put addr-of HERE on stack
 WORD "here", word_here
     ld de, (here_sp)
-    PUSHDATA()
-    ret
+    JP_PUSH()
 ENDWORD "here", word_here
 
-; ( -- c-addr )
+; ( -- c-addr ) Put addr-of PAD on stack
 WORD "pad", word_pad
     ld de, (here_sp)
     ; DE += 256
     inc d
-    PUSHDATA()
-    ret
+    JP_PUSH()
 ENDWORD "pad", word_pad

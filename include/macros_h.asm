@@ -95,11 +95,11 @@
   ;
   ; Alters:
   ;   HL
-  MACRO PUSHDATA _
+  MACRO PUSH _
     call pushdata
   ENDM
 
-  MACRO JP_PUSHDATA _
+  MACRO JP_PUSH _
     jp pushdata
   ENDM
 
@@ -108,7 +108,7 @@
   ;
   ; Returns:
   ;   DE  - Value popped
-  MACRO POPDATA _
+  MACRO POP _
     call popdata
   ENDM
 
@@ -116,7 +116,7 @@
   ;
   ; Alters:
   ;   DE
-  MACRO PEEKDATA _
+  MACRO PEEK _
     call peekdata
   ENDM
 

@@ -73,7 +73,7 @@ main:
 @is_number:
     ; The value is in HL, next word is in DE, swap them as needed by PUSHDATA
     ex de, hl
-    PUSHDATA()
+    PUSH()
     jp @process_word
 
 

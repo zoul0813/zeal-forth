@@ -10,18 +10,18 @@ template_create:
     ld de, 0x0000
     jp pushdata
 @end:
-@reloc:
-    RELOC(@ldde + 1, RELOC_IMM16)
-    RELOC_END()
+@params:
+    PARAM(@ldde + 1, PARAM_IMM16)
+    PARAM_END()
 
 WORD "create", word_create
     ; We want to put the value of `HERE` after compiling and allocated the
     ; template, so we need to create a 2-byte big buffer containing that value.
     ld hl, (here_sp)
-    CALC_SIZE(@params, template_create, template_create@end) ; get the template size
+    OFFSET_HL(template_create, template_create@end) ; get the template size
     STORE_HL(@params) ; store the size
     ; The word we are creating will point to that value, pass the address
-    RELOC_TEMPLATE(template_create, template_create@end, @params)
+    APPLY_TEMPLATE(template_create, template_create@end, @params)
     ; Returns the address where the word is stored
     push hl           ; save base for dictionary insert
 
@@ -38,7 +38,7 @@ WORD "create", word_create
 @done:
     ret
 @params:
-    DEFW 0
+    DEFW 0  ; location of HERE after template is applied
 ENDWORD "create", word_create
 
 WORD "variable", word_variable
@@ -48,21 +48,19 @@ WORD "variable", word_variable
     inc hl
     ld (hl), 0      ; initialize with 0
     ld de, CELL_SIZE
-    ; Tail-call
-    jp _word_allot_de
+    jp _word_allot_de ; Tail-call
 ENDWORD "variable", word_variable
 
 ; ( n1 -- n2 )  n2 is the size in address units of n1 cells.
 WORD "cells", word_cells
     ld de, CELL_SIZE
-    call pushdata
-    ; Tail-call
-    jp word_mul
+    PUSH()
+    jp word_mul ; Tail-call
 ENDWORD "cells", word_cells
 
 ; (n -- ) Reserve n bytes of data space (from `here`)
 WORD "allot", word_allot
-    POPDATA()           ; DE = n
+    POP()           ; DE = n
 _word_allot_de:
     ld hl, (here_sp)
     add hl, de          ; HL = HERE + n
@@ -74,13 +72,13 @@ ENDWORD "allot", word_allot
 
 ; TODO - implement return stack manipulation
 ; WORD ">r", word_return_push
-;     POPDATA()
+;     POP()
 ;     push de
 ;     ret
 ; ENDWORD ">r", word_return_push
 
 ; WORD "r>", word_return_pop
 ;     pop de
-;     PUSHDATA()
+;     PUSH()
 ;     ret
 ; ENDWORD "r>", word_return_pop

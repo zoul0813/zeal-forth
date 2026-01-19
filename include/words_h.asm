@@ -4,8 +4,9 @@
     EXTERN next_word
     EXTERN current_word
 
+; Create a new word
 ;
-; EXAMPLE:
+; Example:
 ;
 ;  ; bye (-- --) exit
 ;  WORD "bye", word_bye
@@ -13,7 +14,6 @@
 ;      jp _exit_code
 ;  ENDWORD "bye", word_bye
 ;
-
   MACRO WORD name, label
     SECTION TEXT
 label:

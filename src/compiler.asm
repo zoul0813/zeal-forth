@@ -20,8 +20,8 @@
     ;
     ; Alters:
     ;   A, BC, DE, HL
-    PUBLIC reloc_apply_and_store
-reloc_apply_and_store:
+    PUBLIC apply_template
+apply_template:
     ; Calculate the relocation array address
     push hl
     push bc
@@ -44,6 +44,9 @@ reloc_apply_and_store:
     pop hl
     ret
 
+;******************************************************************************
+;*                            PRIVATE ROUTINES                                *
+;******************************************************************************
 
     ; Apply relocations array with the given parameters.
     ;
@@ -66,9 +69,9 @@ reloc_apply:
     ; BC contains the address to patch, HL points to the type of relocation
     ld a, (hl)
     inc hl
-    cp RELOC_IMM8
+    cp PARAM_IMM8
     jr z, @imm8
-    cp RELOC_IMM16
+    cp PARAM_IMM16
     jr z, @imm16
     ; TODO: add more relocations type here
     ; Unknown relocation type, ignore
