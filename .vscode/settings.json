@@ -25,6 +25,7 @@
   "z80-macroasm.format.hexaNumberCase": true,
   "z80-macroasm.format.splitInstructionsByColon": true,
   "z80-macroasm.suggestOnInstructions": false,
+  "z80-macroasm.files.include": "**/*.asm",
   "workbench.editorAssociations": {
     "*.ztp": "hexEditor.hexedit",
     "*.zts": "hexEditor.hexedit",
@@ -39,9 +40,6 @@
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
   "files.associations": {
-    "*.asm": "z80-macroasm",
-    "*.ans": "ansi",
-    "*.vt": "ansi",
-    "*.asc": "ansi"
+    "*.asm": "z80-macroasm"
   }
 }

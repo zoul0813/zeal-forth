@@ -4,23 +4,8 @@
     INCLUDE "hashtbl_h.asm"
     INCLUDE "compiler_h.asm"
 
-; TODO - implement return stack manipulation
-; WORD ">r", word_return_push
-;     POPDATA()
-;     push de
-;     ret
-; ENDWORD ">r", word_return_push
-
-; WORD "r>", word_return_pop
-;     pop de
-;     PUSHDATA()
-;     ret
-; ENDWORD "r>", word_return_pop
-
-
-; 2244 bytes BEFORE
-
-load_imm_temp:
+; @brief Template for "create" word
+template_create:
 @ldde:
     ld de, 0x0000
     jp pushdata
@@ -33,11 +18,10 @@ WORD "create", word_create
     ; We want to put the value of `HERE` after compiling and allocated the
     ; template, so we need to create a 2-byte big buffer containing that value.
     ld hl, (here_sp)
-    ld de, load_imm_temp@end - load_imm_temp
-    add hl, de          ; `HERE` after allocating the template
-    ld (@word_buf), hl
+    CALC_SIZE(@params, template_create, template_create@end) ; get the template size
+    STORE_HL(@params) ; store the size
     ; The word we are creating will point to that value, pass the address
-    RELOC_TEMPLATE(load_imm_temp, load_imm_temp@end, @word_buf)
+    RELOC_TEMPLATE(template_create, template_create@end, @params)
     ; Returns the address where the word is stored
     push hl           ; save base for dictionary insert
 
@@ -53,7 +37,7 @@ WORD "create", word_create
     PUTS(_str_error, _str_error_end)
 @done:
     ret
-@word_buf:
+@params:
     DEFW 0
 ENDWORD "create", word_create
 
@@ -85,3 +69,18 @@ _word_allot_de:
     ld (here_sp), hl
     ret
 ENDWORD "allot", word_allot
+
+
+
+; TODO - implement return stack manipulation
+; WORD ">r", word_return_push
+;     POPDATA()
+;     push de
+;     ret
+; ENDWORD ">r", word_return_push
+
+; WORD "r>", word_return_pop
+;     pop de
+;     PUSHDATA()
+;     ret
+; ENDWORD "r>", word_return_pop

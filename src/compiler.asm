@@ -9,12 +9,15 @@
 ;******************************************************************************
 
     ; Relocate a template and store at `HERE`.
+    ;
     ; Parameters:
-    ;   HL - Template address, MUST be followed by the relocation array
-    ;   BC - Template size in bytes
-    ;   DE - Relocation parameters, must be as big as the reloation array
+    ; - HL - Template address, MUST be followed by the relocation array
+    ; - BC - Template size in bytes
+    ; - DE - Relocation parameters, must be as big as the reloation array
+    ;
     ; Returns:
-    ;   HL - Address where the template was saved
+    ; -  HL - Address where the template was saved
+    ;
     ; Alters:
     ;   A, BC, DE, HL
     PUBLIC reloc_apply_and_store
@@ -43,11 +46,11 @@ reloc_apply_and_store:
 
 
     ; Apply relocations array with the given parameters.
+    ;
     ; Parameters:
-    ;   HL - Relocation array, must end with RELOC_END()
-    ;   DE - Relocation parameters, must be as big as the reloation array
-    ; Returns:
-    ;   None
+    ; - HL - Relocation array, must end with RELOC_END()
+    ; - DE - Relocation parameters, must be as big as the reloation array
+    ;
     ; Alters:
     ;   A, BC, DE, HL
 reloc_apply:

@@ -29,10 +29,10 @@
 
     ; Get the value associated to a key (string) in the hashmap
     ; Parameters:
-    ;   HL - Key for the hashmap (NULL-Terminated string)
+    ; - HL - Key for the hashmap (NULL-Terminated string)
     ; Returns:
-    ;   DE - Value associated to the key
-    ;   A - ERR_SUCCESS if the entry was found
+    ; - DE - Value associated to the key
+    ; - A - ERR_SUCCESS if the entry was found
     ;       ERR_NO_SUCH_ENTRY if the entry was not found
     ; Alters;
     ;   A, BC, DE, HL
@@ -66,10 +66,10 @@ hshtbl_get:
 
     ; Insert a string in the hashmap if it doesn't already exist!
     ; Parameters:
-    ;   HL - String to add to the hashmap
-    ;   DE - Value to store with the string
+    ; - HL - String to add to the hashmap
+    ; - DE - Value to store with the string
     ; Returns:
-    ;   A - ERR_SUCCESS - the data have been inserted successfully
+    ; - A - ERR_SUCCESS - the data have been inserted successfully
     ;       ERR_NO_MORE_MEMORY - no more heap memory
     ;       ERR_ALREADY_EXIST - the string was already inserted
     ; Alters:
@@ -135,10 +135,10 @@ hshtbl_insert:
     ; Prepend a list entry to a list. In other words, add an entry to the
     ; beginning of the list.
     ; Parameters:
-    ;   HL - List entry to prepend
-    ;   DE - List address (first list entry)
+    ; - HL - List entry to prepend
+    ; - DE - List address (first list entry)
     ; Returns:
-    ;   HL - New list address (original HL)
+    ; - HL - New list address (original HL)
     ; Alters:
     ;   A
     PUBLIC hshtbl_list_prepend_entry
@@ -160,9 +160,9 @@ hshtbl_list_prepend_entry:
 
     ; Get the value of the list entry.
     ; Parameters:
-    ;   HL - List entry
+    ; - HL - List entry
     ; Returns:
-    ;   HL - Value of the entry
+    ; - HL - Value of the entry
     ; Alters:
     ;   A, BC, HL
     PUBLIC hshtbl_list_get_value
@@ -178,9 +178,9 @@ hshtbl_list_get_value:
 
     ; Get the next node of the given entry.
     ; Parameters:
-    ;   HL - List entry
+    ; - HL - List entry
     ; Returns:
-    ;   HL - Next node entry
+    ; - HL - Next node entry
     ; Alters:
     ;   HL, BC
     PUBLIC hshtbl_list_get_next
@@ -200,11 +200,11 @@ hshtbl_list_get_next:
 
     ; Same as strncmp, but optimized to test A bytes.
     ; Parameters:
-    ;   HL - First NULL-terminated string address
-    ;   DE - Second NULL-terminated string address
-    ;   A  - Maximum number of char to compare (must not be 0)
+    ; - HL - First NULL-terminated string address
+    ; - DE - Second NULL-terminated string address
+    ; - A  - Maximum number of char to compare (must not be 0)
     ; Returns:
-    ;   A - 0 if strings are identical
+    ; - A - 0 if strings are identical
     ;       > 0 if DE is greater than HL
     ;       < 0 if HL is greater than DE
     ; Alters:
@@ -236,15 +236,15 @@ strncmp_opt:
 
     ; Search the place of new entry in the given sorted list.
     ; Parameters:
-    ;   HL - Address of the list (MUST NOT BE NULL)
-    ;   DE - Address of the entry to search (address of the string)
-    ;   BC - Pointer to the first entry (in case the element must be inserted at the beginning)
+    ; - HL - Address of the list (MUST NOT BE NULL)
+    ; - DE - Address of the entry to search (address of the string)
+    ; - BC - Pointer to the first entry (in case the element must be inserted at the beginning)
     ; Returns:
-    ;   A - ERR_SUCCESS if the entry was found
+    ; - A - ERR_SUCCESS if the entry was found
     ;       ERR_NO_SUCH_ENTRY if the entry was not found
-    ;   HL - Address of the last entry tested. If the entry was not found, this pointer represents
+    ; - HL - Address of the last entry tested. If the entry was not found, this pointer represents
     ;        the next node of the new entry.
-    ;   BC - Address of the previous node's "next" address
+    ; - BC - Address of the previous node's "next" address
     ; Alters:
     ;   A, BC, HL
 hshtbl_list_search:
@@ -286,12 +286,12 @@ hshtbl_list_search:
 
     ; Allocate a new list entry from the given data.
     ; Parameters:
-    ;   HL - String to store in the new entry
-    ;   DE - 16-bit data to store in the new entry
+    ; - HL - String to store in the new entry
+    ; - DE - 16-bit data to store in the new entry
     ; Returns:
-    ;   A - 0 on success, positive value in case of error
-    ;   Z flag - set if A is 0
-    ;   DE - Address of the new entry
+    ; - A - 0 on success, positive value in case of error
+    ; - Z flag - set if A is 0
+    ; - DE - Address of the new entry
     ; Alters:
     ;   A, DE
     PUBLIC hshtbl_list_new_entry
@@ -356,10 +356,10 @@ hshtbl_list_allocate_entry:
 
     ; Get the list which index is the hash value of the given string.
     ; Parameters:
-    ;   HL - NULL-terminated string
+    ; - HL - NULL-terminated string
     ; Returns:
-    ;   HL - Address of first entry
-    ;   BC - Address of the pointer to the first item list. Useful if the entry is 0.
+    ; - HL - Address of first entry
+    ; - BC - Address of the pointer to the first item list. Useful if the entry is 0.
     ; Alters:
     ;   A, HL, BC
 hshtbl_hashmap_get_list:
@@ -384,10 +384,10 @@ hshtbl_hashmap_get_list:
 
     ; Calculate the 8-bit hash value of a given NULL-terminated string
     ; Parameters:
-    ;   HL - Address of the string
+    ; - HL - Address of the string
     ; Returns:
-    ;   A - 0
-    ;   B - Hash value of the string
+    ; - A - 0
+    ; - B - Hash value of the string
     ; Alters:
     ;   A, BC, HL
 hshtbl_hash_str:

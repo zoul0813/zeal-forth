@@ -8,7 +8,7 @@
   ; @brief Push 16-bit value onto data stack
   ;
   ; Parameters:
-  ;       DE - 16-bit value
+  ; - DE - 16-bit value
     PUBLIC pushdata
 pushdata:
     push hl
@@ -24,7 +24,7 @@ pushdata:
   ; @brief Pop top data stack into DE
   ;
   ; Returns:
-  ;   DE  - Value popped
+  ; - DE  - Value popped
     PUBLIC popdata
 popdata:
     push hl
@@ -54,8 +54,8 @@ peekdata:
   ; @brief Print str of length BC at DE
   ;
   ; Returns:
-  ;   A  - ERR_SUCCESS on success, error value else
-  ;   BC - Number of bytes written
+  ; - A  - ERR_SUCCESS on success, error value else
+  ; - BC - Number of bytes written
   ;
   ; Alters:
   ;   A, H, DE, BC
@@ -68,8 +68,8 @@ puts:
   ; @brief Print c
   ;
   ; Returns:
-  ;   A   - ERR_SUCCES on success, error value else
-  ;   BC  - Number of bytes written
+  ; - A   - ERR_SUCCES on success, error value else
+  ; - BC  - Number of bytes written
     PUBLIC putc
 putc:
     ld (_str_buffer), a

@@ -46,10 +46,10 @@ _init_str_end:
 
     ; Look for a word, in HL, and return its value, DE
     ; Parameters:
-    ;   HL - Word (NULL-terminated string)
+    ; - HL - Word (NULL-terminated string)
     ; Returns:
-    ;   DE - Address of the routine to execute
-    ;   A - ERR_SUCCESS if the entry was found
+    ; - DE - Address of the routine to execute
+    ; - A - ERR_SUCCESS if the entry was found
     ;       ERR_NO_SUCH_ENTRY if the entry was not found
     PUBLIC dict_search
 dict_search:
