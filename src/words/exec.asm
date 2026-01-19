@@ -68,7 +68,40 @@ _word_allot_de:
     ret
 ENDWORD "allot", word_allot
 
+; ( "<spaces>name" -- ) Start compiling
+WORD ":", word_colon
+  call next_word
+  ; add this word to the dictionary, pointing to HERE
+  ld hl, (_curr_word)
+  ld de, (here_sp)
+  call hshtbl_insert
+  or a
+  jr z, @change_state ; word added, change state
+  PUTS(_str_error, _str_error_end)
+  jr @done
+@change_state:
+  SET_STATE(STATE_COMP)
+@done:
+  ret
+ENDWORD ":", word_colon
 
+    PUBLIC word_semicolon
+; ( -- ) End compiling
+WORD ";", word_semicolon
+    SET_STATE(STATE_IMM)
+    ld hl, (here_sp)
+    ld a, 0xC9 ; RET
+    ld (hl), a
+    inc hl ; here++
+    ld (here_sp), hl
+    ret
+ENDWORD ";", word_semicolon
+
+; WORD "if", word_if
+; ENDWORD "if", word_if
+
+; WORD "then", word_then
+; ENDWORD "then", word_then
 
 ; TODO - implement return stack manipulation
 ; WORD ">r", word_return_push

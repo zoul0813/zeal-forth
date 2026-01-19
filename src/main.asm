@@ -12,6 +12,7 @@
 
     EXTERN is_alpha ; strutils
     EXTERN is_dec_digit ; strutils
+    EXTERN word_semicolon
 
     EXTERN __BSS_tail
     EXTERN _dict_builtin
@@ -19,10 +20,8 @@
   SECTION TEXT
 main:
     MEMSET(__BSS_head, __BSS_size, 0x00)
-
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
-
 
     PUTS(_str_project_name, _str_project_name_end)
 
@@ -33,7 +32,7 @@ main:
 
     ld hl, _input_buffer
     ld (_next_word), hl
-@process_word:
+@do_next_word:
     call next_word
     jr z, @print_ok
 
@@ -54,12 +53,15 @@ main:
     or a
     ; If A is not 0, the word was not found
     jr nz, @word_not_found
+
+    IF_STATE(STATE_COMP, compile_word)
     ; Word was found, simulate a call to the function pointed by DE
     ; that will return to @next_word
-    ld hl, @process_word
+    ld hl, @do_next_word
     push hl
     ex de, hl
     jp (hl)
+
 @word_not_found:
     PUTS(_str_unknown, _str_unknown_end)
     ld de, (_curr_word)
@@ -68,13 +70,14 @@ main:
     PUTS(_str_newline, _str_newline_end)
     jp @prompt ; skip remaining words
 ; @next_word:
-    jp @process_word
+    jp @do_next_word
 
 @is_number:
-    ; The value is in HL, next word is in DE, swap them as needed by PUSHDATA
+    IF_STATE(STATE_COMP, compile_number)
+    ; The value is in HL, next word is in DE, swap them
     ex de, hl
     PUSH()
-    jp @process_word
+    jp @do_next_word
 
 
 @print_ok:
@@ -91,6 +94,59 @@ main:
     PUTS(_str_error, _str_error_end)
     jp @prompt
 
+_str_compiling:
+  DEFB "Compiling", 0
+_str_compiling_end:
+
+compile_word:
+    ; compare word to `;`
+    ld hl, (_curr_word)
+    ld a, (hl)
+    cp ';'
+    jp z, @end
+    ; TODO: that was dirty, ... words in dict should have "state" (IMM | COMP)
+
+    ; put the word into the current definition
+    ld hl, (here_sp)
+    ld a, 0xCD ; CALL nn
+    ld (hl), a
+    inc hl ; here++
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    inc hl
+    ld (here_sp), hl
+
+    jp main@do_next_word
+@end:
+    call word_semicolon
+    jp main@do_next_word
+
+compile_number:
+    ; can't be ';', so no compare
+    ex de, hl ; DE has the value
+
+    ld hl, (here_sp)
+    ld a, 0x11 ; LD DE,NN
+    ld (hl), a
+    inc hl
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    inc hl
+
+    ld a, 0xCD ; CALL pushdata
+    ld (hl), a
+    inc hl
+    ld de, pushdata
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    inc hl
+
+    ld (here_sp), hl
+
+    jp main@do_next_word
 
 _exit_code:
     ld h, a

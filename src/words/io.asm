@@ -16,3 +16,10 @@ WORD "emit", word_emit
     PUTS(_str_buffer, _str_buffer + 1)
     ret
 ENDWORD "emit", word_emit
+
+WORD "\\", word_discard
+@loop:
+    call next_word
+    jp nz, @loop
+    ret
+ENDWORD "\\", word_discard

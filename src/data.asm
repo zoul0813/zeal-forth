@@ -38,6 +38,8 @@ here_sp:
     DEFW __HERE_head
 
   SECTION BSS
+_state:
+    DEFB STATE_IMM
 _curr_word:
     DEFW 0 ; current word
 _curr_len:

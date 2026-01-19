@@ -22,6 +22,9 @@
     DEFC FALSE = 0
     DEFC TRUE = -1
 
+    DEFC STATE_IMM = 0    ; immediate mode (execute now)
+    DEFC STATE_COMP = 1   ; compile mode
+
     DEFC ERR_NUMERIC_OVERFLOW = -13
 
     EXTERN __TEXT_head
@@ -49,6 +52,7 @@
     EXTERN here_sp        ;; here pointer
 
     ; string buffers
+    EXTERN _state
     EXTERN _curr_word
     EXTERN _curr_len
     EXTERN _next_word

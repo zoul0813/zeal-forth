@@ -26,17 +26,21 @@
 ;******************************************************************************
 ;*                            PUBLIC  ROUTINES                                *
 ;******************************************************************************
+;
 
+    PUBLIC hshtbl_get
     ; Get the value associated to a key (string) in the hashmap
+    ;
     ; Parameters:
     ; - HL - Key for the hashmap (NULL-Terminated string)
+    ;
     ; Returns:
     ; - DE - Value associated to the key
     ; - A - ERR_SUCCESS if the entry was found
     ;       ERR_NO_SUCH_ENTRY if the entry was not found
+    ;
     ; Alters;
     ;   A, BC, DE, HL
-    PUBLIC hshtbl_get
 hshtbl_get:
     ; Put the key (string) in DE as it will be preserved
     ld d, h
@@ -62,21 +66,24 @@ hshtbl_get:
 @not_found:
     ld a, ERR_NO_SUCH_ENTRY
     ret
+;
 
-
+    PUBLIC hshtbl_insert
     ; Insert a string in the hashmap if it doesn't already exist!
+    ;
     ; Parameters:
     ; - HL - String to add to the hashmap
     ; - DE - Value to store with the string
+    ;
     ; Returns:
     ; - A - ERR_SUCCESS - the data have been inserted successfully
     ;       ERR_NO_MORE_MEMORY - no more heap memory
     ;       ERR_ALREADY_EXIST - the string was already inserted
+    ;
     ; Alters:
     ;   A, BC, DE, HL
-    PUBLIC hshtbl_insert
 hshtbl_insert:
-    push hl
+    push hl ; string to add
     call hshtbl_hashmap_get_list
     ; Check if the list is empty
     ld a, h
@@ -85,13 +92,13 @@ hshtbl_insert:
     ; Allocate a new entry. Retrieve the string from the stack and save the
     ; returned list address.
     ex (sp), hl
-    call hshtbl_list_allocate_entry
+    call hshtbl_list_new_entry ; DE = address of new entry
     ret nz
     ; Put the list address in HL and the new entry in DE.
     ; BC contains the a pointer to the first entry, in case the new entry
     ; has to be insert at the beginning of the list.
-    pop hl
-    call hshtbl_list_search
+    pop hl  ; string to add
+    call hshtbl_list_search ; HL = address of entry
     or a
     ; If A is 0, the entry was found, this is an error
     jr z, @insert_already_exist
@@ -103,9 +110,9 @@ hshtbl_insert:
     ld a, d
     ld (bc), a
     ; Make our entry point to its "next" field
-    ex de, hl
+    ex de, hl ; HL = address of new entry, DE = str?
     ld bc, list_entry_next_t
-    add hl, bc
+    add hl, bc  ; HL = next field
     ; Store the new next node in our next field
     ld (hl), e
     inc hl
@@ -115,9 +122,9 @@ hshtbl_insert:
     ret
 @store_str_first:
     ; Retrieve the string from the stack
-    pop hl
+    pop hl  ; string to add
     ; Allocate a new node and store it as the first list entry
-    call hshtbl_list_allocate_entry
+    call hshtbl_list_new_entry
     ; Save the newly created entry (DE)
     ld h, b
     ld l, c
@@ -130,18 +137,21 @@ hshtbl_insert:
 @insert_already_exist:
     ld a, ERR_ALREADY_EXIST
     ret
+;
 
-
+    PUBLIC hshtbl_list_prepend_entry
     ; Prepend a list entry to a list. In other words, add an entry to the
     ; beginning of the list.
+    ;
     ; Parameters:
     ; - HL - List entry to prepend
     ; - DE - List address (first list entry)
+    ;
     ; Returns:
     ; - HL - New list address (original HL)
+    ;
     ; Alters:
     ;   A
-    PUBLIC hshtbl_list_prepend_entry
 hshtbl_list_prepend_entry:
     push hl
     ld a, list_entry_next_t
@@ -156,16 +166,19 @@ hshtbl_list_prepend_entry:
     ld (hl), d
     pop hl
     ret
+;
 
-
+    PUBLIC hshtbl_list_get_value
     ; Get the value of the list entry.
+    ;
     ; Parameters:
     ; - HL - List entry
+    ;
     ; Returns:
     ; - HL - Value of the entry
+    ;
     ; Alters:
     ;   A, BC, HL
-    PUBLIC hshtbl_list_get_value
 hshtbl_list_get_value:
     ld bc, list_entry_value_t
     add hl, bc
@@ -174,8 +187,9 @@ hshtbl_list_get_value:
     ld h, (hl)
     ld l, a
     ret
+;
 
-
+    PUBLIC hshtbl_list_get_next
     ; Get the next node of the given entry.
     ; Parameters:
     ; - HL - List entry
@@ -183,7 +197,6 @@ hshtbl_list_get_value:
     ; - HL - Next node entry
     ; Alters:
     ;   HL, BC
-    PUBLIC hshtbl_list_get_next
 hshtbl_list_get_next:
     ld bc, list_entry_next_t
     add hl, bc
@@ -192,24 +205,23 @@ hshtbl_list_get_next:
     ld h, (hl)
     ld l, a
     ret
+;
 
-
-;******************************************************************************
-;*                            PRIVATE ROUTINES                                *
-;******************************************************************************
-
+    PUBLIC strncmp_opt
     ; Same as strncmp, but optimized to test A bytes.
+    ;
     ; Parameters:
     ; - HL - First NULL-terminated string address
     ; - DE - Second NULL-terminated string address
     ; - A  - Maximum number of char to compare (must not be 0)
+    ;
     ; Returns:
     ; - A - 0 if strings are identical
     ;       > 0 if DE is greater than HL
     ;       < 0 if HL is greater than DE
+    ;
     ; Alters:
     ;       A
-    PUBLIC strncmp_opt
 strncmp_opt:
     push hl
     push de
@@ -233,70 +245,24 @@ strncmp_opt:
     pop de
     pop hl
     ret
-
-    ; Search the place of new entry in the given sorted list.
-    ; Parameters:
-    ; - HL - Address of the list (MUST NOT BE NULL)
-    ; - DE - Address of the entry to search (address of the string)
-    ; - BC - Pointer to the first entry (in case the element must be inserted at the beginning)
-    ; Returns:
-    ; - A - ERR_SUCCESS if the entry was found
-    ;       ERR_NO_SUCH_ENTRY if the entry was not found
-    ; - HL - Address of the last entry tested. If the entry was not found, this pointer represents
-    ;        the next node of the new entry.
-    ; - BC - Address of the previous node's "next" address
-    ; Alters:
-    ;   A, BC, HL
-hshtbl_list_search:
-    ; HL points to the first entry's key (string), we can compared it with DE.
-@search_loop:
-    ld a, LIST_ENTRY_KEY_SIZE
-    ; Routine strncmp doesn't alter BC
-    call strncmp_opt
-    ; If A is 0, both strings are equal
-    or a
-    ret z
-    ; If A is negative, then DE is smaller than HL, so we found its place!
-    jp m, @search_place_here
-    ; Else, HL is smaller, we have to go to the next node, HL += list_entry_next_t
-    ; We can re-use BC since we will overwrite it right after
-    ld bc, list_entry_next_t
-    add hl, bc
-    ; Store HL (next node address) in BC
-    ld b, h
-    ld c, l
-    ; Dereference HL to make it point to the entry
-    ld a, (hl)
-    inc hl
-    ld h, (hl)
-    ld l, a
-    ; If HL is not 0, we can continue going through the list
-    or h
-    jp nz, @search_loop
-    ; Fall-through
-    ; We couldn't find the entry but we've found where to place it
-@search_place_here:
-    ; HL already points to the entry that would be the "next" entry of the one
-    ; pointed by DE.
-    ; BC is also pointing to the previous entry's "next node", so we can return
-    ; safely.
-    ld a, ERR_NO_SUCH_ENTRY
-    ret
+;
 
 
+    PUBLIC hshtbl_list_new_entry
     ; Allocate a new list entry from the given data.
+    ;
     ; Parameters:
     ; - HL - String to store in the new entry
     ; - DE - 16-bit data to store in the new entry
+    ;
     ; Returns:
     ; - A - 0 on success, positive value in case of error
     ; - Z flag - set if A is 0
     ; - DE - Address of the new entry
+    ;
     ; Alters:
     ;   A, DE
-    PUBLIC hshtbl_list_new_entry
 hshtbl_list_new_entry:
-hshtbl_list_allocate_entry:
     push hl
     ld hl, (hshtbl_heap_head)
     ; Subtract LIST_ENTRY_SIZE from HL
@@ -352,14 +318,75 @@ hshtbl_list_allocate_entry:
     ld a, ERR_NO_MORE_MEMORY
     or a
     ret
+;
+
+;******************************************************************************
+;*                            PRIVATE ROUTINES                                *
+;******************************************************************************
+
+    ; Search the place of new entry in the given sorted list.
+    ;
+    ; Parameters:
+    ; - HL - Address of the list (MUST NOT BE NULL)
+    ; - DE - Address of the entry to search (address of the string)
+    ; - BC - Pointer to the first entry (in case the element must be inserted at the beginning)
+    ;
+    ; Returns:
+    ; - A - ERR_SUCCESS if the entry was found
+    ;       ERR_NO_SUCH_ENTRY if the entry was not found
+    ; - HL - Address of the last entry tested. If the entry was not found, this pointer represents
+    ;        the next node of the new entry.
+    ; - BC - Address of the previous node's "next" address
+    ;
+    ; Alters:
+    ;   A, BC, HL
+hshtbl_list_search:
+    ; HL points to the first entry's key (string), we can compared it with DE.
+@search_loop:
+    ld a, LIST_ENTRY_KEY_SIZE
+    ; Routine strncmp doesn't alter BC
+    call strncmp_opt
+    ; If A is 0, both strings are equal
+    or a
+    ret z
+    ; If A is negative, then DE is smaller than HL, so we found its place!
+    jp m, @search_place_here
+    ; Else, HL is smaller, we have to go to the next node, HL += list_entry_next_t
+    ; We can re-use BC since we will overwrite it right after
+    ld bc, list_entry_next_t
+    add hl, bc
+    ; Store HL (next node address) in BC
+    ld b, h
+    ld c, l
+    ; Dereference HL to make it point to the entry
+    ld a, (hl)
+    inc hl
+    ld h, (hl)
+    ld l, a
+    ; If HL is not 0, we can continue going through the list
+    or h
+    jp nz, @search_loop
+    ; Fall-through
+    ; We couldn't find the entry but we've found where to place it
+@search_place_here:
+    ; HL already points to the entry that would be the "next" entry of the one
+    ; pointed by DE.
+    ; BC is also pointing to the previous entry's "next node", so we can return
+    ; safely.
+    ld a, ERR_NO_SUCH_ENTRY
+    ret
+;
 
 
     ; Get the list which index is the hash value of the given string.
+    ;
     ; Parameters:
     ; - HL - NULL-terminated string
+    ;
     ; Returns:
     ; - HL - Address of first entry
     ; - BC - Address of the pointer to the first item list. Useful if the entry is 0.
+    ;
     ; Alters:
     ;   A, HL, BC
 hshtbl_hashmap_get_list:
@@ -380,14 +407,17 @@ hshtbl_hashmap_get_list:
     ld h, (hl)
     ld l, a
     ret
-
+;
 
     ; Calculate the 8-bit hash value of a given NULL-terminated string
+    ;
     ; Parameters:
     ; - HL - Address of the string
+    ;
     ; Returns:
     ; - A - 0
     ; - B - Hash value of the string
+    ;
     ; Alters:
     ;   A, BC, HL
 hshtbl_hash_str:
@@ -407,12 +437,13 @@ hshtbl_hash_str:
     inc hl
     ld b, a
     jp @loop
-
+;
 
   SECTION DATA
     ; The heap is implemented very simply with a pointer to the end of the memory that will decrease
 hshtbl_heap_head:
     DEFW Z80_STACK + 1 - Z80_STACK_SIZE
+;
 
   SECTION BSS
     ; The hashmap is composed of 256 2-byte entries, these entries are lists, in C it would give us:
@@ -422,8 +453,10 @@ hshtbl_heap_head:
     ; where each entry is as follow:
     ; struct list_entry_t {
     ;   uint8_t  content[LIST_ENTRY_CONTENT_SIZE];
+    ;   uint8_t  flags;
     ;   uint16_t next;
     ; }
     PUBLIC hshtbl_hashmap
 hshtbl_hashmap:
     DEFS 256 * 2
+;

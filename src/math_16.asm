@@ -6,7 +6,6 @@
 ; @brief Multiply HL by DE (unsigned 16-bit multiplication)
 ;
 ; Performs unsigned multiplication using a shift-and-add algorithm.
-; Optimizes for 8-bit operands by calling __mul_a_l when both high bytes are zero.
 ;
 ; Parameters:
 ;   HL - Multiplicand (16-bit unsigned)
@@ -20,16 +19,6 @@
 ;
     PUBLIC __mul_hl_de
 __mul_hl_de:
-    ld a, h
-    or d
-    jr nz, __mul_hl_de_f
-    ld a, l
-    ld l, e
-    call __mul_a_l
-    ld e, a
-    ld d, 0
-    ret
-__mul_hl_de_f:
     ld b, h
     ld c, l
     ld hl, 0
@@ -51,7 +40,6 @@ __mul_hl_de_s:
 ; @brief Divide HL by DE (unsigned 16-bit division)
 ;
 ; Performs unsigned division using repeated subtraction.
-; Optimizes for 8-bit operands by calling __div_a_l when both high bytes are zero.
 ; Division by zero returns 0.
 ;
 ; Parameters:
@@ -68,18 +56,8 @@ __mul_hl_de_s:
 __div_hl_de:
     ld a, d
     or e
-    jr nz, __div_hl_de_f
-    ld de, 0
-    ret
-__div_hl_de_f:
-    ld a, h
-    or d
     jr nz, __div_hl_de_l
-    ld a, l
-    ld l, e
-    call __div_a_l
-    ld e, a
-    ld d, 0
+    ld de, 0
     ret
 __div_hl_de_l:
     ld bc, 0
@@ -99,7 +77,6 @@ __div_hl_de_d:
 ; @brief Modulo HL by DE (unsigned 16-bit remainder)
 ;
 ; Performs unsigned modulo using repeated subtraction.
-; Optimizes for 8-bit operands by calling __mod_a_l when both high bytes are zero.
 ; Division by zero returns 0.
 ;
 ; Parameters:
@@ -116,18 +93,8 @@ __div_hl_de_d:
 __mod_hl_de:
     ld a, d
     or e
-    jr nz, __mod_hl_de_f
-    ld de, 0
-    ret
-__mod_hl_de_f:
-    ld a, h
-    or d
     jr nz, __mod_hl_de_l
-    ld a, l
-    ld l, e
-    call __mod_a_l
-    ld e, a
-    ld d, 0
+    ld de, 0
     ret
 __mod_hl_de_l:
     or a

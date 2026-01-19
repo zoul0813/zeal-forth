@@ -8,6 +8,8 @@ Items marked with `-` will be implemented in Forth, and not defined as built-in 
 
 Items marked with `?` may or may not be defined
 
+Items marked with `/` are partially implemented
+
 ## Data stack basics
 
 * [x] swap ( a b -- b a )
@@ -46,8 +48,8 @@ Items marked with `?` may or may not be defined
 
 ## Defining words
 
-* [ ] :
-* [ ] ;
+* [/] :
+* [/] ;
 * [ ] constant
 * [x] variable
 * [x] create
@@ -56,15 +58,15 @@ Items marked with `?` may or may not be defined
 
 ## Memory + bytes
 
-* [ ] c@
-* [ ] c! (byte fetch/store)
+* [x] c@
+* [x] c! (byte fetch/store)
 * [x] cells
 * [-] cell+
 * [-] cell-
 * [-] char+
-* [ ] move
-* [ ] fill
-* [ ] erase
+* [ ] move ( addr1 addr2 u -- ) memcpy(addr2, addr1, u)
+* [ ] fill  ( c-addr u char -- ) memset(c-addr, char, u)
+* [-] erase ( addr u -- ) memset(addr, 0, u)
 
 ## Math
 
@@ -81,16 +83,22 @@ Items marked with `?` may or may not be defined
 
 ## I/O + text
 
-* [ ] cr
-* [ ] (newline)
-* [ ] space
-* [ ] spaces
+* [-] cr
+* [-] (newline)
+* [-] space
+* [-] spaces
 
 * [ ] .\" (print string literal), type (print buffer)
 * [ ] key
 * [x] emit
+* [x] \ ( -- ) discard the remainder of the input buffer
 
 ## Dictionary/introspection
 
 * [x] words (list dictionary)
 * [ ] ' (tick: get execution token)
+
+## System
+
+* [ ] syscall ( n -- ) execute syscall n, additional stack params may be required as defined by syscall
+* [ ] ioctl ( dev c de -- ) ioctl(dev, c, de)

@@ -153,4 +153,24 @@
     call puti
   ENDM
 
+  ; @brief Set the forth state to state
+  ;
+  ; Parameters:
+  ; - state - The state to set
+  MACRO SET_STATE state
+    ld a, state
+    ld (_state), a
+  ENDM
+
+  ; @brief If state, `jp z, goto`
+  ;
+  ; Parameters:
+  ; - state - The state to compare
+  ; - goto  - The address to goto if state matches
+  MACRO IF_STATE state, goto
+    ld a, (_state)
+    cp state
+    jp z, goto
+  ENDM
+
 #endif

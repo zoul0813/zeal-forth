@@ -29,15 +29,20 @@ use the Forth convention `( before -- after )`.
 | `drop` | `( n -- )` | Drop the top stack item. |
 | `wipe` | `( -- )` | Reset the data stack pointer. |
 | `@` | `( a-addr -- x )` | Fetch a 16-bit cell from memory. |
+| `c@` | `( c-addr -- c )` | Fetch a char from c-addr |
 | `!` | `( x a-addr -- )` | Store a 16-bit cell to memory. |
+| `c!` | `( n c-addr -- )` | Store char n in a-addr |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256`. |
 | `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (n * cell size). |
 | `allot` | `( n -- )` | Reserve `n` bytes starting at HERE. |
 | `variable` | `( "name" -- )` | Define a word that pushes its storage address and allocates 1 cell. |
 | `create` | `( "name" -- )` | Define a word that pushes its storage address. |
+| `:` | `( "<spaces>name" -- )` | Start compiling a new word definition. Switches to compile mode. |
+| `;` | `( -- )` | End the current word definition and return to immediate mode. |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
 | `words` | `( -- )` | Print all words in the dictionary. |
+| `\` | `( -- )` | Discard the remainder of the input buffer. |
 
 ## Stack Effect Symbols
 
@@ -75,6 +80,18 @@ use the Forth convention `( before -- after )`.
 \ memory round-trip using HERE and PAD
 here 42 swap !  here @ .
 pad 65 swap !  pad @ emit
+```
+
+```forth
+\ define a new word 'square' that squares a number
+: square dup * ;
+5 square .  \ prints 25
+```
+
+```forth
+\ define a word that computes the average of two numbers
+: average + 2 / ;
+10 20 average .  \ prints 15
 ```
 
 Note: numeric input is decimal only.
