@@ -18,20 +18,27 @@
 ; ENDWORD "r>", word_return_pop
 
 
+; 2244 bytes BEFORE
 
-template_create:
+load_imm_temp:
 @ldde:
     ld de, 0x0000
-    call pushdata
-    ret
+    jp pushdata
 @end:
-@patches:
-    db @ldde + 1 - template_create, TEMPLATE_END
-    db 0
+@reloc:
+    RELOC(@ldde + 1, RELOC_IMM16)
+    RELOC_END()
 
 WORD "create", word_create
-    TEMPLATE_INIT
-    TEMPLATE_APPLY template_create, template_create@end
+    ; We want to put the value of `HERE` after compiling and allocated the
+    ; template, so we need to create a 2-byte big buffer containing that value.
+    ld hl, (here_sp)
+    ld de, load_imm_temp@end - load_imm_temp
+    add hl, de          ; `HERE` after allocating the template
+    ld (@word_buf), hl
+    ; The word we are creating will point to that value, pass the address
+    RELOC_TEMPLATE(load_imm_temp, load_imm_temp@end, @word_buf)
+    ; Returns the address where the word is stored
     push hl           ; save base for dictionary insert
 
     ; advance the input buffer, consume the next word
@@ -46,6 +53,8 @@ WORD "create", word_create
     PUTS(_str_error, _str_error_end)
 @done:
     ret
+@word_buf:
+    DEFW 0
 ENDWORD "create", word_create
 
 WORD "variable", word_variable

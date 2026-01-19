@@ -7,110 +7,80 @@
 ;******************************************************************************
 ;*                            PUBLIC  ROUTINES                                *
 ;******************************************************************************
-    ; Copy a template into HERE and apply patch table entries.
-    ; Parameters:
-    ;   HL - Template start
-    ;   BC - Template size in bytes
-    ;   DE - Patch table (entries terminated by 0)
-    ; Returns:
-    ;   HL - Base address of copied template
-    ; Alters:
-    ;   A, BC, DE, HL, IY, IX
-apply_template:
-    ld iy, de         ; IY = patch table
-    push hl           ; preserve template start
-    call load_pad_ix
-    pop hl
-    ld de, (here_sp)  ; DE = dest
-    ld (ix + TP_BASE), e
-    ld (ix + TP_BASE + 1), d
-@copy_template:
-    ld a, b
-    or c
-    jr z, @copy_done
-    ld a, (hl)
-    ld (de), a
-    inc hl
-    inc de
-    dec bc
-    jr @copy_template
-@copy_done:
-    ld l, (ix + TP_BASE)
-    ld h, (ix + TP_BASE + 1)
-    ld c, (ix + TP_SIZE)
-    ld b, (ix + TP_SIZE + 1)
-    add hl, bc
-    ld (ix + TP_END), l
-    ld (ix + TP_END + 1), h
-    call apply_template_patches
-    ld l, (ix + TP_BASE)
-    ld h, (ix + TP_BASE + 1)
-    ld c, (ix + TP_SIZE)
-    ld b, (ix + TP_SIZE + 1)
-    add hl, bc
-    ld (here_sp), hl  ; update HERE
-    ld l, (ix + TP_BASE)
-    ld h, (ix + TP_BASE + 1)
-    ret
 
-    ; Apply patch table entries to the already-copied template.
+    ; Relocate a template and store at `HERE`.
     ; Parameters:
-    ;   IY - Patch table (entries terminated by 0)
-    ;   IX - PAD base (here_sp + PAD_OFFSET)
-    ;   (ix + TP_BASE) contains base address of copied template
+    ;   HL - Template address, MUST be followed by the relocation array
+    ;   BC - Template size in bytes
+    ;   DE - Relocation parameters, must be as big as the reloation array
     ; Returns:
-    ;   HL - last patched address (advanced during loop)
+    ;   HL - Address where the template was saved
     ; Alters:
-    ;   A, BC, DE, HL, IY
-apply_template_patches:
-@patch_loop:
-    ld a, (iy+0)
-    or a
-    ret z
-    ld l, a
-    ld h, 0
-    push bc
-    ld c, (ix + TP_BASE)
-    ld b, (ix + TP_BASE + 1)
-    add hl, bc
-    pop bc
-    inc iy
-    ld a, (iy+0)
-    inc iy
-    ld b, a
-    and 0x7F
-    ld e, a
-    ld d, 0
+    ;   A, BC, DE, HL
+    PUBLIC reloc_apply_and_store
+reloc_apply_and_store:
+    ; Calculate the relocation array address
     push hl
     push bc
-    push ix
-    pop hl
-    add hl, de
-    ex de, hl          ; DE = PAD + offset
+    add hl, bc
+    ; Apply the modifications to the template (in place)
+    call reloc_apply
+    ; Get back the size of the template and the template address
     pop bc
-    pop hl
-    ld a, b
-    and TP_PATCH_16
-    jr z, @patch8
-    ld a, (de)
-    ld (hl), a
-    inc de
-    inc hl
-@patch8:
-    ld a, (de)
-    ld (hl), a
-    jp @patch_loop
-
-    ; Load IX with PAD base derived from HERE.
-    ; Parameters:
-    ;   (here_sp) - current HERE
-    ; Returns:
-    ;   IX - here_sp + PAD_OFFSET
-    ; Alters:
-    ;   HL, DE, IX
-load_pad_ix:
+    ; Allocate BC bytes in `HERE`, keep the address in DE for the copy
     ld hl, (here_sp)
-    ld de, PAD_OFFSET
-    add hl, de
-    ld ix, hl
+    ld d, h
+    ld e, l
+    add hl, bc
+    ld (here_sp), hl
+    ; Copy the relocated template (BC bytes) to the address pointed by DE
+    ; Get back the template address, keep the destination on the stack to return it
+    pop hl
+    push de
+    ldir
+    pop hl
     ret
+
+
+    ; Apply relocations array with the given parameters.
+    ; Parameters:
+    ;   HL - Relocation array, must end with RELOC_END()
+    ;   DE - Relocation parameters, must be as big as the reloation array
+    ; Returns:
+    ;   None
+    ; Alters:
+    ;   A, BC, DE, HL
+reloc_apply:
+    ; Browse the relocation array, dereference the first address
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    ; Stop when we find RELOC_END (0)
+    ld a, b
+    or c
+    ret z
+    inc hl
+    ; BC contains the address to patch, HL points to the type of relocation
+    ld a, (hl)
+    inc hl
+    cp RELOC_IMM8
+    jr z, @imm8
+    cp RELOC_IMM16
+    jr z, @imm16
+    ; TODO: add more relocations type here
+    ; Unknown relocation type, ignore
+    jr reloc_apply
+@imm16:
+    ; DE contains the 16-bit parameter we have to store in BC
+    ld a, (de)
+    ld (bc), a
+    inc de
+    inc bc
+    ; Fall-thru
+@imm8:
+    ; DE contains the parameters
+    ld a, (de)
+    inc de
+    ; Store it in the destination address
+    ld (bc), a
+    jr reloc_apply
