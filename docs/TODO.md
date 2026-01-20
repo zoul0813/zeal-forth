@@ -10,95 +10,114 @@ Items marked with `?` may or may not be defined
 
 Items marked with `/` are partially implemented
 
+
 ## Data stack basics
 
-* [x] swap ( a b -- b a )
-* [x] over ( a b -- a b a )
-* [x] rot ( a b c -- b c a )
-* [-] nip ( a b -- b )
-* [-] tuck ( a b -- b a b )
+* [x] dup       `( n -- n n )`
+* [x] drop      `( n -- )`
+* [x] swap      `( a b -- b a )`
+* [x] over      `( a b -- a b a )`
+* [x] rot       `( a b c -- b c a )`
+* [x] wipe      `( -- )`
+* [-] nip       `( a b -- b )`
+* [-] tuck      `( a b -- b a b )`
 
 ## Comparisons + logic
 
-* [x] =
-* [x] <>
-* [x] <
-* [x] >
-* [-] 0=
-* [-] 0<
-* [-] 0>
-* [x] and ( n1 n2 -- n3 )
-* [x] or  ( n1 n2 -- n3 )
-* [x] xor ( n1 n2 -- n3 )
-* [x] invert
+* [x] =         `( n1 n2 -- flag )`
+* [?] <>        `( n1 n2 -- flag )`
+* [x] <         `( n1 n2 -- flag )`
+* [x] >         `( n1 n2 -- flag )`
+* [-] 0=        `( n -- flag )`
+* [-] 0<        `( n -- flag )`
+* [-] 0>        `( n -- flag )`
+* [x] and       `( n1 n2 -- n3 )`
+* [x] or        `( n1 n2 -- n3 )`
+* [x] xor       `( n1 n2 -- n3 )`
+* [x] invert    `( n -- n2 )`
 
 ## Control flow
 
-* [ ] if
-* [ ] else
-* [ ] then
-* [ ] begin until
-* [ ] begin while
-* [ ] repeat
-* [ ] do
-* [ ] loop
-* [ ] +loop
-* [ ] i
-* [ ] j (if you add a return stack model)
+* [ ] if        `( flag -- )`
+* [ ] else      `( -- )`
+* [ ] then      `( -- )`
+* [ ] begin     `( -- )`
+* [ ] until     `( flag -- )`
+* [ ] while     `( flag -- )`
+* [ ] repeat    `( -- )`
+* [ ] do        `( limit start -- )`
+* [ ] loop      `( -- )`
+* [ ] +loop     `( n -- )`
+* [ ] i         `( -- n )`
+* [ ] j         `( -- n )` | [if you add a return stack model]
 
 ## Defining words
 
-* [/] :
-* [/] ;
-* [ ] constant
-* [x] variable
-* [x] create
-* [ ] does> (later; powerful but more complex)
-* [x] allot
+* [x] :         `( "<spaces>name" -- )`
+* [x] ;         `( -- )`
+* [x] ,         `( x -- )`
+* [x] c,        `( c -- )`
+* [ ] constant  `( x "<spaces>name" -- )`
+* [x] variable  `( "<spaces>name" -- )`
+* [x] create    `( "<spaces>name" -- )`
+* [ ] does>     `( -- )`
+* [x] allot     `( n -- )`
+* [x] state     `( -- a-addr )` | a-addr is the address of a cell containing the compilation state flag
+* [x] execute   `( x-addr -- )` | execute code at x-addr
 
 ## Memory + bytes
 
-* [x] c@
-* [x] c! (byte fetch/store)
-* [x] cells
-* [-] cell+
-* [-] cell-
-* [-] char+
-* [ ] move ( addr1 addr2 u -- ) memcpy(addr2, addr1, u)
-* [ ] fill  ( c-addr u char -- ) memset(c-addr, char, u)
-* [-] erase ( addr u -- ) memset(addr, 0, u)
+* [x] @         `( a-addr -- x )`
+* [x] !         `( x a-addr -- )`
+* [x] c@        `( c-addr -- c )`
+* [x] c!        `( n c-addr -- )`
+* [x] cells     `( n1 -- n2 )`
+* [x] here      `( -- a-addr )`
+* [x] pad       `( -- c-addr )`
+* [-] cell+     `( a-addr1 -- a-addr2 )`
+* [-] cell-     `( a-addr1 -- a-addr2 )`
+* [-] char+     `( c-addr1 -- c-addr2 )`
+* [ ] move      `( addr1 addr2 u -- )` | memcpy(addr2, addr1, u)
+* [ ] fill      `( c-addr u char -- )` | memset(c-addr, char, u)
+* [-] erase     `( addr u -- )` | memset(addr, 0, u)
 
 ## Math
 
-* [x] * ( n n -- n)
-* [x] / ( n n -- n )
-* [x] mod ( n n -- n )
-* [?] */
-* [?] */mod
-* [ ] /mod
-* [ ] u<
-* [ ] u>
-* [ ] um*
-* [ ] um/mod (unsigned)
+* [x] +         `( n1 n2 -- n1+n2 )`
+* [x] -         `( n1 n2 -- n1-n2 )`
+* [x] *         `( n1 n2 -- n1*n2 )`
+* [x] /         `( n1 n2 -- n3 )`
+* [x] mod       `( n1 n2 -- n3 )`
+* [x] abs       `( n -- u )`
+* [x] negate    `( n -- -n )`
+* [?] */        `( n1 n2 n3 -- n4 )`
+* [?] */mod     `( n1 n2 n3 -- n4 n5 )`
+* [ ] /mod      `( n1 n2 -- n3 n4 )`
+* [ ] u<        `( u1 u2 -- flag )`
+* [ ] u>        `( u1 u2 -- flag )`
+* [ ] um*       `( u1 u2 -- ud )`
+* [ ] um/mod    `( ud u -- u-rem u-quot )`
 
 ## I/O + text
 
-* [-] cr
-* [-] (newline)
-* [-] space
-* [-] spaces
-
-* [ ] .\" (print string literal), type (print buffer)
-* [ ] key
-* [x] emit
-* [x] \ ( -- ) discard the remainder of the input buffer
+* [x] .         `( n -- )`
+* [x] emit      `( c -- )`
+* [x] \         `( -- )` | discard the remainder of the input buffer
+* [-] cr        `( -- )`
+* [-] space     `( -- )`
+* [-] spaces    `( n -- )`
+* [ ] ."        `( "ccc<quote>" -- )`
+* [ ] type      `( c-addr u -- )`
+* [ ] key       `( -- c )`
 
 ## Dictionary/introspection
 
-* [x] words (list dictionary)
-* [ ] ' (tick: get execution token)
+* [x] .s        `( -- )`
+* [x] words     `( -- )`
+* [ ] '         `( "<spaces>name" -- xt )` | (tick: get execution token)
 
 ## System
 
-* [ ] syscall ( n -- ) execute syscall n, additional stack params may be required as defined by syscall
-* [ ] ioctl ( dev c de -- ) ioctl(dev, c, de)
+* [x] bye       `( -- )`
+* [ ] syscall   `( n -- )` | execute syscall n, additional stack params may be required as defined by syscall
+* [ ] ioctl     `( dev c de -- )` | ioctl(dev, c, de)

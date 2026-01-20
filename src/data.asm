@@ -39,7 +39,7 @@ here_sp:
 
   SECTION BSS
 _state:
-    DEFB STATE_IMM
+    DEFW STATE_IMM
 _curr_word:
     DEFW 0 ; current word
 _curr_len:

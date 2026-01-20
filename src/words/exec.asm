@@ -97,6 +97,38 @@ WORD ";", word_semicolon
     ret
 ENDWORD ";", word_semicolon
 
+; ( -- a-addr ) Address of compilation-state flag
+WORD "state", word_state
+    ld de, _state
+    JP_PUSH()
+ENDWORD "state", word_state
+
+; ( x-addr -- ) Execute code at x-addr, stack effects are defined by the code being executed
+WORD "execute", word_execute
+    POP() ; DE = execution address
+    ex de, hl
+    jp (hl)
+ENDWORD "execute", word_execute
+
+WORD ",", word_comma
+    POP()
+    ld hl, (here_sp)
+    call word_store_de_hl
+    inc hl
+    inc hl
+    ld (here_sp), hl
+    ret
+ENDWORD ",", word_comma
+
+WORD "c,", word_comma_char
+    POP()
+    ld hl, (here_sp)
+    call word_store_char_de_hl
+    inc hl
+    ld (here_sp), hl
+    ret
+ENDWORD "c,", word_comma_char
+
 ; WORD "if", word_if
 ; ENDWORD "if", word_if
 

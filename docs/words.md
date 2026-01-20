@@ -13,9 +13,6 @@ use the Forth convention `( before -- after )`.
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (16-bit wraparound). |
 | `/` | `( n1 n2 -- n3 )` | Divide `n1` by `n2` (unsigned), returns the quotient. |
 | `mod` | `( n1 n2 -- n3 )` | Divide `n1` by `n2` (unsigned), returns the remainder. |
-| `swap` | `( n1 n2 -- n2 n1 )` | Swap the top two stack items. |
-| `over` | `( n1 n2 -- n1 n2 n1 )` | Copy the second item to the top. |
-| `rot` | `( n1 n2 n3 -- n2 n3 n1 )` | Rotate the top three items. |
 | `=` | `( n1 n2 -- flag )` | True if equal. |
 | `<` | `( n1 n2 -- flag )` | True if `n1 < n2` (unsigned). |
 | `>` | `( n1 n2 -- flag )` | True if `n1 > n2` (unsigned). |
@@ -25,13 +22,18 @@ use the Forth convention `( before -- after )`.
 | `invert` | `( n -- n2 )` | Bitwise NOT. |
 | `negate` | `( n -- -n )` | Two's-complement negation. |
 | `abs` | `( n -- u )` | Absolute value. |
-| `dup` | `( n -- n n )` | Duplicate the top stack item. |
 | `drop` | `( n -- )` | Drop the top stack item. |
+| `dup` | `( n -- n n )` | Duplicate the top stack item. |
+| `swap` | `( n1 n2 -- n2 n1 )` | Swap the top two stack items. |
+| `over` | `( n1 n2 -- n1 n2 n1 )` | Copy the second item to the top. |
+| `rot` | `( n1 n2 n3 -- n2 n3 n1 )` | Rotate the top three items. |
 | `wipe` | `( -- )` | Reset the data stack pointer. |
 | `@` | `( a-addr -- x )` | Fetch a 16-bit cell from memory. |
 | `c@` | `( c-addr -- c )` | Fetch a char from c-addr |
 | `!` | `( x a-addr -- )` | Store a 16-bit cell to memory. |
 | `c!` | `( n c-addr -- )` | Store char n in a-addr |
+| `emit` | `( c -- )` | Output the low byte of `c` as a character. |
+| `words` | `( -- )` | Print all words in the dictionary. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256`. |
 | `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (n * cell size). |
@@ -40,9 +42,11 @@ use the Forth convention `( before -- after )`.
 | `create` | `( "name" -- )` | Define a word that pushes its storage address. |
 | `:` | `( "<spaces>name" -- )` | Start compiling a new word definition. Switches to compile mode. |
 | `;` | `( -- )` | End the current word definition and return to immediate mode. |
-| `emit` | `( c -- )` | Output the low byte of `c` as a character. |
-| `words` | `( -- )` | Print all words in the dictionary. |
 | `\` | `( -- )` | Discard the remainder of the input buffer. |
+| `state` | `( -- a-addr )` | a-addr is the address of a cell containing the compilation-state flag |
+| `execute` | `( x-addr -- )` | c-addr is the address to begin execution of |
+| `,` | `( x -- )` | store x at here, and advance here 1 cell |
+| `c,` | `( c -- )` | store c at here, and advance here 1 byte |
 
 ## Stack Effect Symbols
 
@@ -52,7 +56,8 @@ use the Forth convention `( before -- after )`.
 | `a-addr` | aligned address | Address that is aligned for native cells | Used for cell-sized data (@, !) |
 | `x-addr` | execution token address | Address of executable code | Used with EXECUTE |
 | `c-addr` | character address | Address of characters (bytes) | Used for strings and raw byte buffers |
-| `c` | 8-bit char, high byte of cell is ignored | Used for character data |
+| `c` | byte | 8-bit char, high byte of cell is ignored | Used for character data |
+| `x` | cell | Used for cell data | Used for cell data |
 
 ## Examples
 

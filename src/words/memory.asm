@@ -24,12 +24,13 @@ WORD "c@", word_fetch_char
     JP_PUSH()
 ENDWORD "c@", word_fetch_char
 
+    PUBLIC word_store_de_hl
 ; ( x a-addr -- ) Store x in cell a-addr
 WORD "!", word_store
     POP()
     ex de, hl ; HL has address
     POP() ; DE has value
-
+word_store_de_hl:
     ld (hl), e
     inc hl
     ld (hl), d
@@ -37,11 +38,13 @@ WORD "!", word_store
     ret
 ENDWORD "!", word_store
 
+    PUBLIC word_store_char_de_hl
 ; ( n c-addr -- ) Store char n in a-addr
 WORD "c!", word_store_char
     POP()
     ex de, hl ; HL has address
     POP() ; DE has value
+word_store_char_de_hl:
     ld (hl), e
     ret
 ENDWORD "c!", word_store_char
