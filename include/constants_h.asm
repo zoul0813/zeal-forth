@@ -6,8 +6,8 @@
     DEFC DATA_STACK_head = data_stack + DATA_STACK_size
     DEFC DATA_STACK_tail = data_stack
     DEFC RETURN_STACK_size = 1024
-    DEFC RETURN_STACK_head = data_stack + RETURN_STACK_size
-    DEFC RETURN_STACK_tail = data_stack
+    DEFC RETURN_STACK_head = return_stack + RETURN_STACK_size
+    DEFC RETURN_STACK_tail = return_stack
     DEFC Z80_STACK = 0xFFFF
     DEFC Z80_STACK_SIZE = 2048
     DEFC __Z80_STACK_tail = Z80_STACK - Z80_STACK_SIZE
@@ -43,8 +43,8 @@
     EXTERN _exit_code
 
     ; stacks
-    EXTERN data_sp        ;; stack pointer
-    EXTERN data_stack     ;; stack data
+    EXTERN data_sp        ;; data stack pointer
+    EXTERN data_stack     ;; data stack data
     EXTERN return_sp      ;; return stack pointer
     EXTERN return_stack   ;; return stack data
 

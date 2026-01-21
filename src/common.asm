@@ -5,54 +5,12 @@
 
   SECTION TEXT
 
-    PUBLIC pushdata
-  ; @brief Push 16-bit value onto data stack
-  ;
-  ; Parameters:
-  ; - DE - 16-bit value
-pushdata:
-    push hl
-    ld hl, (data_sp)
-    dec hl
-    ld (hl), d
-    dec hl
-    ld (hl), e
-    ld (data_sp), hl
-    pop hl
-    ret
-
-    PUBLIC popdata
-  ; @brief Pop top data stack into DE
-  ;
-  ; Returns:
-  ; - DE  - Value popped
-popdata:
-    push hl
-    ld hl, (data_sp)
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    inc hl
-    ld (data_sp), hl
-    pop hl
-    ret
-
-  ; @brief Peek top data stack into DE
-  ;
-  ; Alters:
-  ;   DE
-    PUBLIC peekdata
-peekdata:
-    push hl
-    ld hl, (data_sp)
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    pop hl
-    ret
-
     PUBLIC puts
   ; @brief Print str of length BC at DE
+  ;
+  ; Parameters:
+  ; - DE - Buffer to write
+  ; - BC - Length of buffer
   ;
   ; Returns:
   ; - A  - ERR_SUCCESS on success, error value else
@@ -98,9 +56,20 @@ puti:
 
     ; Set both HL and DE to _str_buffer
     ld hl, _str_buffer
+    call strlen
+
+    ; skip spaces
+@skip_space:
+    ld a, (hl)
+    cp ' '
+    jr nz, @print
+    inc hl
+    dec bc
+    jr @skip_space
+
+@print:
     ld d, h
     ld e, l
-    call strlen
     call puts
     or a
     jp nz, _exit_code

@@ -30,10 +30,13 @@ _str_unknown:
 _str_unknown_end:
 
 
+; data stack pointer
 data_sp:
     DEFW DATA_STACK_head
+; return stack pointer
 return_sp:
     DEFW RETURN_STACK_head
+; here stack pointer
 here_sp:
     DEFW __HERE_head
 

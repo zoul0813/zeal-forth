@@ -4,6 +4,9 @@
     EXTERN pushdata
     EXTERN popdata
     EXTERN peekdata
+    EXTERN pushreturn
+    EXTERN popreturn
+    EXTERN peekreturn
     EXTERN puts
     EXTERN putc
     EXTERN puti

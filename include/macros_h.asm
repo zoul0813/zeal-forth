@@ -121,6 +121,41 @@
   ENDM
 
 
+  ; @brief Push 16-bit value onto return stack
+  ;
+  ; Parameters:
+  ;       DE - 16-bit value
+  ;
+  ; Alters:
+  ;   HL
+  MACRO PUSH_RET _
+    call pushreturn
+  ENDM
+
+  MACRO JP_PUSH_RET _
+    jp pushreturn
+  ENDM
+
+  ; @brief Pop top return stack into DE
+  ;
+  ;
+  ; Returns:
+  ;   DE  - Value popped
+  MACRO POP_RET _
+    call popreturn
+  ENDM
+
+  ; @brief Peek top return stack into DE
+  ;
+  ; Alters:
+  ;   DE
+  MACRO PEEK_RET _
+    call peekreturn
+  ENDM
+
+
+
+
   ; @brief Print str until str_end
   ;
   ; Returns:

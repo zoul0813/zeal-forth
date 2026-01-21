@@ -28,6 +28,7 @@ file(GLOB ASM_INCLUDES CONFIGURE_DEPENDS
 
 add_executable(${target_name}
     src/main.asm
+    src/stack.asm
     src/hashtbl.asm
     src/common.asm
     src/math_8.asm

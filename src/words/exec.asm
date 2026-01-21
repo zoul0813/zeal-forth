@@ -135,15 +135,12 @@ ENDWORD "c,", word_comma_char
 ; WORD "then", word_then
 ; ENDWORD "then", word_then
 
-; TODO - implement return stack manipulation
-; WORD ">r", word_return_push
-;     POP()
-;     push de
-;     ret
-; ENDWORD ">r", word_return_push
+WORD ">r", word_return_push
+    POP()
+    JP_PUSH_RET()
+ENDWORD ">r", word_return_push
 
-; WORD "r>", word_return_pop
-;     pop de
-;     PUSH()
-;     ret
-; ENDWORD "r>", word_return_pop
+WORD "r>", word_return_pop
+    POP_RET()
+    JP_PUSH()
+ENDWORD "r>", word_return_pop
