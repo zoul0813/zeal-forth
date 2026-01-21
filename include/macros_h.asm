@@ -140,6 +140,9 @@
   ; Returns:
   ;   A   - ERR_SUCCES on success, error value else
   ;   BC  - Number of bytes written
+  ;
+  ; Alters:
+  ;   A, H, DE, BC
   MACRO PUTC chr
     ld a, chr
     call putc

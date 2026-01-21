@@ -8,6 +8,25 @@ WORD ".", word_dot
     ret
 ENDWORD ".", word_dot
 
+; ( -- ) Print the string following the word
+WORD ".\"", word_dot_quote
+    ld hl, (_next_word)
+@loop:
+    ld a, (hl)
+    cp '"'
+    jr z, @done
+    push hl
+    call putc
+    pop hl
+    inc hl
+    jr @loop
+@done:
+    inc hl
+    inc hl
+    ld (_next_word), hl
+    ret
+ENDWORD ".\"", word_dot_quote
+
 ; ( c -- )
 WORD "emit", word_emit
     POP()
@@ -16,6 +35,16 @@ WORD "emit", word_emit
     PUTS(_str_buffer, _str_buffer + 1)
     ret
 ENDWORD "emit", word_emit
+
+; (c-addr n -- )
+WORD "type", word_type
+    POP()
+    ld b, d
+    ld c, e   ; BC = strlen
+    POP()     ; DE = str pointer
+    call puts
+    ret
+ENDWORD "type", word_type
 
 WORD "\\", word_discard
 @loop:

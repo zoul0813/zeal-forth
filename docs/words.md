@@ -8,6 +8,7 @@ use the Forth convention `( before -- after )`.
 | `bye` | `( -- )` | Exit the interpreter. |
 | `.` | `( n -- )` | Print `n` in free-field decimal format followed by a newline. |
 | `.s` | `( -- )` | Print stack depth and contents (bottom to top). |
+| `."` | `( -- )` | Print string following the word, until ending `"`. |
 | `+` | `( n1 n2 -- n1+n2 )` | Add the top two stack items (16-bit wraparound). |
 | `-` | `( n1 n2 -- n1-n2 )` | Subtract the top two stack items (16-bit wraparound). |
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (16-bit wraparound). |
@@ -33,6 +34,7 @@ use the Forth convention `( before -- after )`.
 | `!` | `( x a-addr -- )` | Store a 16-bit cell to memory. |
 | `c!` | `( n c-addr -- )` | Store char n in a-addr |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
+| `type` | `( c-addr n -- )` | Output the string specified in c-addr, using n for size |
 | `words` | `( -- )` | Print all words in the dictionary. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256`. |
@@ -56,8 +58,9 @@ use the Forth convention `( before -- after )`.
 | `a-addr` | aligned address | Address that is aligned for native cells | Used for cell-sized data (@, !) |
 | `x-addr` | execution token address | Address of executable code | Used with EXECUTE |
 | `c-addr` | character address | Address of characters (bytes) | Used for strings and raw byte buffers |
-| `c` | byte | 8-bit char, high byte of cell is ignored | Used for character data |
-| `x` | cell | Used for cell data | Used for cell data |
+| `c` | byte | 8-bit char | Used for character data,  high byte of cell is ignored |
+| `x` | cell | 16-bit number | Used for cell data |
+| `n` | cell | 16-bit number | Undefined |
 
 ## Examples
 

@@ -106,8 +106,8 @@ Items marked with `/` are partially implemented
 * [-] cr        `( -- )`
 * [-] space     `( -- )`
 * [-] spaces    `( n -- )`
-* [ ] ."        `( "ccc<quote>" -- )`
-* [ ] type      `( c-addr u -- )`
+* [x] ."        `( "ccc<quote>" -- )`
+* [x] type      `( c-addr n -- )`
 * [ ] key       `( -- c )`
 
 ## Dictionary/introspection

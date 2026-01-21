@@ -5,11 +5,11 @@
 
   SECTION TEXT
 
+    PUBLIC pushdata
   ; @brief Push 16-bit value onto data stack
   ;
   ; Parameters:
   ; - DE - 16-bit value
-    PUBLIC pushdata
 pushdata:
     push hl
     ld hl, (data_sp)
@@ -21,11 +21,11 @@ pushdata:
     pop hl
     ret
 
+    PUBLIC popdata
   ; @brief Pop top data stack into DE
   ;
   ; Returns:
   ; - DE  - Value popped
-    PUBLIC popdata
 popdata:
     push hl
     ld hl, (data_sp)
@@ -51,6 +51,7 @@ peekdata:
     pop hl
     ret
 
+    PUBLIC puts
   ; @brief Print str of length BC at DE
   ;
   ; Returns:
@@ -59,18 +60,20 @@ peekdata:
   ;
   ; Alters:
   ;   A, H, DE, BC
-    PUBLIC puts
 puts:
     S_WRITE1(DEV_STDOUT)
     ERROR_CHECK()
     ret
 
+    PUBLIC putc
   ; @brief Print c
   ;
   ; Returns:
   ; - A   - ERR_SUCCES on success, error value else
   ; - BC  - Number of bytes written
-    PUBLIC putc
+  ;
+  ; Alters:
+  ;   A, H, DE, BC
 putc:
     ld (_str_buffer), a
     ld de, _str_buffer
@@ -78,11 +81,11 @@ putc:
     call puts
     ret
 
+    PUBLIC puti
   ; @brief Print the number in DE
   ;
   ; Alters:
   ;   A, BC, DE, HL
-    PUBLIC puti
 puti:
     ; store the 16-bit value in a 32-bit memory location
     ld (_dword_num), de
