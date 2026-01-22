@@ -40,6 +40,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
   "files.associations": {
-    "*.asm": "z80-macroasm"
+    "*.asm": "z80-macroasm",
+    "*.fs": "forth"
   }
 }

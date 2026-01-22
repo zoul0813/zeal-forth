@@ -19,6 +19,7 @@
 
   SECTION TEXT
 main:
+    push de
     MEMSET(__BSS_head, __BSS_size, 0x00)
     ; set the kb mode to block/cooked for now
     KB_MODE_COOKED()
@@ -27,14 +28,38 @@ main:
 
     call dict_init
 
-@prompt:
+@args:
+    pop de
+    ; get command args
+    ld hl, 0xFFFF
+    xor a ; clear carry
+    sbc hl, de ; HL = 0xFFFF - DE
+    ld a, h
+    or l
+    jr z, prompt ; no args, goto prompt
+
+    ld b, d
+    ld c, e
+    ld h, O_RDONLY
+    OPEN()
+
+    ld h, a
+    CLOSE()
+
+read_file:
+    nop ; TODO: add file reading
+
+; @brief Show the prompt
+prompt:
     GET_INPUT()
 
     ld hl, _input_buffer
     ld (_next_word), hl
-@do_next_word:
+
+; @brief Process next word in input buffer
+do_next_word:
     call next_word
-    jr z, @print_ok
+    jr z, print_ok
 
     ; Try to parse the input as a number
     call parse_dec
@@ -43,7 +68,7 @@ main:
     jr z, @is_number
     ; If A is 1, the value is bigger than 16-bit, so skip this word
     dec a
-    jr z, @numeric_overflow
+    jr z, numeric_overflow
     ; Non-decimal value, fall-through
 
 @is_word:
@@ -57,7 +82,7 @@ main:
     IF_STATE(STATE_COMP, compile_word)
     ; Word was found, simulate a call to the function pointed by DE
     ; that will return to @next_word
-    ld hl, @do_next_word
+    ld hl, do_next_word
     push hl
     ex de, hl
     jp (hl)
@@ -68,31 +93,32 @@ main:
     ld bc, (_curr_len)
     call puts ; DE = buffer, BC = len, A = err, returns BC = len
     PUTS(_str_newline, _str_newline_end)
-    jp @prompt ; skip remaining words
-; @next_word:
-    jp @do_next_word
-
+    jp prompt ; skip remaining words
 @is_number:
     IF_STATE(STATE_COMP, compile_number)
     ; The value is in HL, next word is in DE, swap them
     ex de, hl
     PUSH()
-    jp @do_next_word
+    jp do_next_word
 
 
-@print_ok:
+; @brief Print "  ok"
+print_ok:
     PUTS(_str_ok, _str_ok_end)
-    jp @prompt
+    jp prompt
 
-@numeric_overflow:
+; @brief Set error to numeric overflow
+numeric_overflow:
     ld a, ERR_NUMERIC_OVERFLOW
-@print_error: ; TODO: implement error lookup
+
+; @brief Print current error message
+print_error: ; TODO: implement error lookup
     cp ERR_NUMERIC_OVERFLOW ; numeric overflow
-    jr nz, @print_error_msg
+    jr nz, @msg
     PUTS(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
-@print_error_msg:
+@msg:
     PUTS(_str_error, _str_error_end)
-    jp @prompt
+    jp prompt
 
 _str_compiling:
   DEFB "Compiling", 0
@@ -117,10 +143,10 @@ compile_word:
     inc hl
     ld (here_sp), hl
 
-    jp main@do_next_word
+    jp do_next_word
 @end:
     call word_semicolon
-    jp main@do_next_word
+    jp do_next_word
 
 compile_number:
     ; can't be ';', so no compare
@@ -146,7 +172,7 @@ compile_number:
 
     ld (here_sp), hl
 
-    jp main@do_next_word
+    jp do_next_word
 
 _exit_code:
     ld h, a

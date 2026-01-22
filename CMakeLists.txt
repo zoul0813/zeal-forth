@@ -55,4 +55,13 @@ add_custom_command(
     COMMENT "Fixing z88dk output filename"
 )
 
+# Copy forth.fs to debug directory when it changes
+add_custom_command(
+    TARGET ${target_name} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_LIST_DIR}/forth.fs"
+        "${CMAKE_CURRENT_LIST_DIR}/bin/forth.fs"
+    COMMENT "Copying forth.fs to debug directory"
+)
+
 zos_add_outputs(${target_name})
