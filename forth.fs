@@ -1,25 +1,25 @@
-\ Forth in Forth
-
-." Loaded forth.fs" cr
-
-
-
-." . "
-
-
-." . "
-
-
-." . "
-
-
-." . "
-
-
-." . "
-
-
-." . "
-
-
-." . "
+here 
+ 
+: cr 10 emit ; 
+ 
+." Loaded forth.fs" cr 
+ 
+." . " 
+ 
+." . " 
+ 
+." . " 
+ 
+." . " 
+ 
+." . " 
+ 
+." . " 
+ 
+." . " 
+ 
+." Done." cr 
+ 
+here 
+ 
+.s 

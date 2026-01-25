@@ -52,6 +52,11 @@ _next_word:
 _input_buffer:
     DEFS BUFFER_SIZE
 
+;; file parser
+_file_fd: DEFB 0
+_carry_len: DEFW 0
+_buf_len: DEFW 0
+
   ; a place to store dword numbers for conversion
 _dword_num:
     DEFB 0, 0, 0, 0

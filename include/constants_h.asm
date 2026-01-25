@@ -48,6 +48,11 @@
     EXTERN return_sp      ;; return stack pointer
     EXTERN return_stack   ;; return stack data
 
+    ; file parser
+    EXTERN _file_fd
+    EXTERN _carry_len
+    EXTERN _buf_len
+
     ; HERE
     EXTERN here_sp        ;; here pointer
 

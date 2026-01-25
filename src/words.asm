@@ -18,6 +18,17 @@ next_word:
 ; Alters:
 ;   HL, DE, A
 current_word:
+    ld a, (hl)
+    cp ' '
+    jr z, @nextchar
+    cp '\n'
+    jr z, @nextchar
+    jr @process
+@nextchar:
+    inc hl
+    jr current_word
+
+@process:
     ld a, ' '
     call strsep ; returns HL = str, DE = next, A = found (alters: DE, A)
     call strlen ; returns BC = len (alters: A, BC)

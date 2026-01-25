@@ -36,6 +36,8 @@ add_executable(${target_name}
     src/dict.asm
     src/compiler.asm
     src/data.asm
+    src/parser.asm
+    src/readfile.asm
     src/words.asm
   )
 set_source_files_properties(src/main.asm PROPERTIES
@@ -55,13 +57,19 @@ add_custom_command(
     COMMENT "Fixing z88dk output filename"
 )
 
-# Copy forth.fs to debug directory when it changes
+# Copy forth.fs to bin when it changes, even if no build is needed
+set(FORTH_FS_SRC "${CMAKE_CURRENT_LIST_DIR}/forth.fs")
+set(FORTH_FS_DST "${CMAKE_CURRENT_LIST_DIR}/bin/forth.fs")
+
 add_custom_command(
-    TARGET ${target_name} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_LIST_DIR}/forth.fs"
-        "${CMAKE_CURRENT_LIST_DIR}/bin/forth.fs"
-    COMMENT "Copying forth.fs to debug directory"
+    OUTPUT "${FORTH_FS_DST}"
+    DEPENDS "${FORTH_FS_SRC}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FORTH_FS_SRC}" "${FORTH_FS_DST}"
+    COMMENT "Copying forth.fs to bin directory"
+)
+
+add_custom_target(forth_fs ALL
+    DEPENDS "${FORTH_FS_DST}"
 )
 
 zos_add_outputs(${target_name})
