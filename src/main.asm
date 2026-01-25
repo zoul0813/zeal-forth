@@ -10,12 +10,12 @@
     ORG -1  ; make forth_BSS.bin and just don't merge it
   SECTION HERE
 
-    EXTERN is_alpha ; strutils
-    EXTERN is_dec_digit ; strutils
-    EXTERN word_semicolon
+    ; EXTERN is_alpha ; strutils
+    ; EXTERN is_dec_digit ; strutils
+    
 
-    EXTERN __BSS_tail
-    EXTERN _dict_builtin
+    ; EXTERN __BSS_tail
+    ; EXTERN _dict_builtin
 
   SECTION TEXT
 main:
@@ -42,62 +42,6 @@ main:
 @prompt:
     call prompt
     jr @prompt
-
-
-
-_str_compiling:
-  DEFB "Compiling", 0
-_str_compiling_end:
-
-compile_word:
-    ; compare word to `;`
-    ld hl, (_curr_word)
-    ld a, (hl)
-    cp ';'
-    jp z, @end
-    ; TODO: that was dirty, ... words in dict should have "state" (IMM | COMP)
-
-    ; put the word into the current definition
-    ld hl, (here_sp)
-    ld a, 0xCD ; CALL nn
-    ld (hl), a
-    inc hl ; here++
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-    ld (here_sp), hl
-
-    jp do_next_word
-@end:
-    call word_semicolon
-    jp do_next_word
-
-compile_number:
-    ; can't be ';', so no compare
-    ex de, hl ; DE has the value
-
-    ld hl, (here_sp)
-    ld a, 0x11 ; LD DE,NN
-    ld (hl), a
-    inc hl
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-
-    ld a, 0xCD ; CALL pushdata
-    ld (hl), a
-    inc hl
-    ld de, pushdata
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-
-    ld (here_sp), hl
-
-    jp do_next_word
 
 _exit_code:
     ld h, a

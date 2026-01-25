@@ -16,7 +16,7 @@
     EXTERN read_file
     ; EXTERN print_ok
     ; EXTERN numeric_overflow
-    ; EXTERN print_error
+    EXTERN print_error
 
 
 #endif

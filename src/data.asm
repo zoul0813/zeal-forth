@@ -18,16 +18,16 @@ _str_error:
 _str_error_end:
 
 _str_error_numeric_overflow:
-    DEFB "  numeric overflow"
+    DEFB "numeric overflow"
 _str_error_numeric_overflow_end:
+
+_str_error_not_found:
+    DEFB " not found", 0
+_str_error_not_found_end:
 
 _str_prompt:
     DEFB "> ", 0
 _str_prompt_end:
-
-_str_unknown:
-    DEFB "UNKNOWN: ", 0
-_str_unknown_end:
 
 
 ; data stack pointer
@@ -51,6 +51,8 @@ _next_word:
     DEFW 0 ; location of next word
 _input_buffer:
     DEFS BUFFER_SIZE
+_input_buffer_null:
+    DEFB 0 ; permanent null-terminator
 
 ;; file parser
 _file_fd: DEFB 0

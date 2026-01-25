@@ -35,7 +35,7 @@ do_next_word:
     call dict_search
     or a
     ; If A is not 0, the word was not found
-    jr nz, @word_not_found
+    jp nz, print_error
 
     IF_STATE(STATE_COMP, compile_word)
     ; Word was found, simulate a call to the function pointed by DE
@@ -45,14 +45,6 @@ do_next_word:
     ex de, hl
     jp (hl)
 
-@word_not_found:
-    PUTS(_str_unknown, _str_unknown_end)
-    ld de, (_curr_word)
-    ld bc, (_curr_len)
-    call puts ; DE = buffer, BC = len, A = err, returns BC = len
-    PUTS(_str_newline, _str_newline_end)
-    ; jp prompt ; skip remaining words
-    ret
 @is_number:
     IF_STATE(STATE_COMP, compile_number)
     ; The value is in HL, next word is in DE, swap them
@@ -73,9 +65,26 @@ numeric_overflow:
 
 ; @brief Print current error message
 print_error: ; TODO: implement error lookup
+    cp ERR_NO_SUCH_ENTRY
+    jr z, @not_found
     cp ERR_NUMERIC_OVERFLOW ; numeric overflow
-    jr nz, @msg
+    jr z, @numeric_overflow
+@code:
+    ld e, a
+    ld d, 0
+    PUTI()
+    jr @msg
+@numeric_overflow:
     PUTS(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
+    jr @msg
+@not_found:
+    PUTC('\'')
+    ld de, (_curr_word)
+    ld bc, (_curr_len)
+    call puts ; DE = buffer, BC = len, A = err, returns BC = len
+    PUTC('\'')
+    PUTS(_str_error_not_found, _str_error_not_found_end)
+    ; jr @msg ; fall-thru
 @msg:
     PUTS(_str_error, _str_error_end)
     ; jp prompt
