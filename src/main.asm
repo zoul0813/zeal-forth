@@ -39,6 +39,7 @@ main:
     jr z, @prompt ; no args, goto prompt
 @readfile:
     call read_file
+    ; jr nz, @readfile ; refill the buffer
 @prompt:
     call prompt
     jr @prompt

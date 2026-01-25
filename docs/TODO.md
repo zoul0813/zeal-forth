@@ -6,6 +6,8 @@ Here are high‑value core words (grouped) that make a Forth feel “complete”
 
 Items marked with `-` will be implemented in Forth, and not defined as built-in words.
 
+Items marked with `f` are implemented in forth.fs
+
 Items marked with `?` may or may not be defined
 
 Items marked with `/` are partially implemented
@@ -19,18 +21,18 @@ Items marked with `/` are partially implemented
 * [x] over      `( a b -- a b a )`
 * [x] rot       `( a b c -- b c a )`
 * [x] wipe      `( -- )`
-* [-] nip       `( a b -- b )`
-* [-] tuck      `( a b -- b a b )`
+* [f] nip       `( a b -- b )`
+* [f] tuck      `( a b -- b a b )`
 
 ## Comparisons + logic
 
 * [x] =         `( n1 n2 -- flag )`
-* [?] <>        `( n1 n2 -- flag )`
+* [f] <>        `( n1 n2 -- flag )`
 * [x] <         `( n1 n2 -- flag )`
 * [x] >         `( n1 n2 -- flag )`
-* [-] 0=        `( n -- flag )`
-* [-] 0<        `( n -- flag )`
-* [-] 0>        `( n -- flag )`
+* [f] 0=        `( n -- flag )`
+* [f] 0<        `( n -- flag )`
+* [f] 0>        `( n -- flag )`
 * [x] and       `( n1 n2 -- n3 )`
 * [x] or        `( n1 n2 -- n3 )`
 * [x] xor       `( n1 n2 -- n3 )`
@@ -74,9 +76,9 @@ Items marked with `/` are partially implemented
 * [x] cells     `( n1 -- n2 )`
 * [x] here      `( -- a-addr )`
 * [x] pad       `( -- c-addr )`
-* [-] cell+     `( a-addr1 -- a-addr2 )`
-* [-] cell-     `( a-addr1 -- a-addr2 )`
-* [-] char+     `( c-addr1 -- c-addr2 )`
+* [f] cell+     `( a-addr1 -- a-addr2 )`
+* [f] cell-     `( a-addr1 -- a-addr2 )`
+* [f] char+     `( c-addr1 -- c-addr2 )`
 * [ ] move      `( addr1 addr2 u -- )` | memcpy(addr2, addr1, u)
 * [ ] fill      `( c-addr u char -- )` | memset(c-addr, char, u)
 * [-] erase     `( addr u -- )` | memset(addr, 0, u)
@@ -103,8 +105,8 @@ Items marked with `/` are partially implemented
 * [x] .         `( n -- )`
 * [x] emit      `( c -- )`
 * [x] \         `( -- )` | discard the remainder of the input buffer
-* [-] cr        `( -- )`
-* [-] space     `( -- )`
+* [f] cr        `( -- )`
+* [f] space     `( -- )`
 * [-] spaces    `( n -- )`
 * [x] ."        `( "ccc<quote>" -- )`
 * [x] type      `( c-addr n -- )`

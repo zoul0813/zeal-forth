@@ -46,9 +46,20 @@ WORD "type", word_type
     ret
 ENDWORD "type", word_type
 
+; discard the remaining chars in the "line"
 WORD "\\", word_discard
+    ld hl, (_next_word)
 @loop:
-    call next_word
+    ld a, (hl)
+    or a
+    jr z, @done
+    cp '\n'
+    jr z, @skip_newline
+    inc hl
     jp nz, @loop
+@skip_newline:
+    inc hl ; skip the \n
+@done:
+    ld (_next_word), hl
     ret
 ENDWORD "\\", word_discard

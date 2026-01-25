@@ -43,9 +43,11 @@ read_file:
     ld h, a
     CLOSE()
     ;; TODO: error check
+    xor a ; clear zero flag
     ret
 @error_neg:
     neg
 @error:
     call print_error
+    xor a ; clear zero flag
     ret

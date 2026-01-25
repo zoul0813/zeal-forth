@@ -29,8 +29,22 @@ current_word:
     jr current_word
 
 @process:
-    ld a, ' '
-    call strsep ; returns HL = str, DE = next, A = found (alters: DE, A)
+    ld de, hl ; DE scans forward
+@scan:
+    ld a, (de)
+    or a
+    jr z, @found_end ; null-term
+    cp ' '
+    jr z, @found_delim ; space
+    cp '\n'
+    jr z, @found_delim ; newline
+    inc de
+    jr @scan
+
+@found_delim:
+    ld (de), 0  ; terminate current word
+    inc de      ; next word starts after delimiter
+@found_end:
     call strlen ; returns BC = len (alters: A, BC)
     ld a, b
     or c
