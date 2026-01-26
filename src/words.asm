@@ -6,18 +6,17 @@
     SECTION TEXT
 ; @brief Advanced the input buffer to the next word
 ;
-; Alters:
-;   HL
-next_word:
-    ld hl, (_next_word)
-; @brief Setup the current word + next_word
-;
 ; Paramters:
-;   HL = Address of current word
+;   HL = Address of input_buffer
+;
+; Returns:
+;    Z = set when no word
 ;
 ; Alters:
 ;   HL, DE, A
-current_word:
+next_word:
+    ld hl, (_next_word)
+@loop:
     ld a, (hl)
     cp ' '
     jr z, @nextchar
@@ -26,7 +25,7 @@ current_word:
     jr @process
 @nextchar:
     inc hl
-    jr current_word
+    jr @loop
 
 @process:
     ld de, hl ; DE scans forward

@@ -11,9 +11,9 @@
   ; @brief Jumps to _exit_code on error
   ;
   ; Parameters:
-  ;   A  - error code
+  ; - A  - error code
   ; Returns:
-  ;   A  - ERR_SUCCESS on success
+  ; - A  - ERR_SUCCESS on success
   MACRO ERROR_CHECK _
     or a
     jp nz, _exit_code
@@ -23,9 +23,9 @@
   ; jumps to _exit_code on error
   ;
   ; Returns:
-  ;   A  - ERR_SUCCESS on success, error value else
-  ;   BC - Number of bytes filled in DE.
-  ;   HL - Null-term input
+  ; - A  - ERR_SUCCESS on success, error value else
+  ; - BC - Number of bytes filled in DE.
+  ; - HL - Null-term input
   ;
   ; Alters:
   ;   A, H, DE, BC
@@ -60,9 +60,9 @@
   ; Initialize the memory pointed by HL with the byte given in E.
   ;
   ; Parameters:
-  ;       HL - Memory address to initialize
-  ;       BC - Size of the memory to initialize
-  ;       E  - Byte to initialize the memory with
+  ; - HL - Memory address to initialize
+  ; - BC - Size of the memory to initialize
+  ; -  E  - Byte to initialize the memory with
   MACRO MEMSET addr, size, value
     ld hl, addr
     ld bc, size
@@ -73,12 +73,12 @@
   ; @brief Parse string in HL into a 16-bit value and return in DE
   ;
   ; Parameters:
-  ;       HL - Address of string to parse
+  ; - HL - Address of string to parse
   ;
   ; Returns:
-  ;       HL - Address of string
-  ;       DE - 16-bit value
-  ;        A - 0=success, 1=too large, 2=non-digit
+  ; - HL - Address of string
+  ; - DE - 16-bit value
+  ; -  A - 0=success, 1=too large, 2=non-digit
   MACRO PARSEINT str
     push hl
     ld hl, (str)
@@ -91,7 +91,7 @@
   ; @brief Push 16-bit value onto data stack
   ;
   ; Parameters:
-  ;       DE - 16-bit value
+  ; - DE - 16-bit value
   ;
   ; Alters:
   ;   HL
@@ -107,7 +107,7 @@
   ;
   ;
   ; Returns:
-  ;   DE  - Value popped
+  ; - DE  - Value popped
   MACRO POP _
     call popdata
   ENDM
@@ -124,7 +124,7 @@
   ; @brief Push 16-bit value onto return stack
   ;
   ; Parameters:
-  ;       DE - 16-bit value
+  ; - DE - 16-bit value
   ;
   ; Alters:
   ;   HL
@@ -140,7 +140,7 @@
   ;
   ;
   ; Returns:
-  ;   DE  - Value popped
+  ; - DE  - Value popped
   MACRO POP_RET _
     call popreturn
   ENDM
@@ -159,8 +159,8 @@
   ; @brief Print str until str_end
   ;
   ; Returns:
-  ;   A  - ERR_SUCCESS on success, error value else
-  ;   BC - Number of bytes written
+  ; - A  - ERR_SUCCESS on success, error value else
+  ; - BC - Number of bytes written
   ;
   ; Alters:
   ;   A, H, DE, BC
@@ -173,8 +173,8 @@
   ; @brief Print c
   ;
   ; Returns:
-  ;   A   - ERR_SUCCES on success, error value else
-  ;   BC  - Number of bytes written
+  ; - A   - ERR_SUCCES on success, error value else
+  ; - BC  - Number of bytes written
   ;
   ; Alters:
   ;   A, H, DE, BC

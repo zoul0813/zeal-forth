@@ -31,7 +31,7 @@ WORD "words", word_words
     ld d, h
     ld e, l
     ld b, 0
-    ld c, 16
+    ld c, LIST_ENTRY_KEY_SIZE
 @len_loop:
     ld a, (hl)
     or a
@@ -46,13 +46,22 @@ WORD "words", word_words
     jr nz, @len_loop
 @len_done:
     ld c, b
+    ld a, b
+    or a
+    jr z, @skip_print
     ld b, 0
     call puts
     pop hl
     PUTC(' ')
+    jr @after_print
+@skip_print:
+    pop hl
+@after_print:
     pop bc
     pop de
+    push bc
     call hshtbl_list_get_next
+    pop bc
     ld a, h
     or l
     jr nz, @entry_loop

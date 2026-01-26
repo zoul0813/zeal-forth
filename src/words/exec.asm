@@ -27,6 +27,7 @@ WORD "create", word_create
 
     ; advance the input buffer, consume the next word
     call next_word    ; _current_word == "varName"
+    jp z, print_error
 
     ld hl, (_curr_word)
     pop de            ; HERE (base)
@@ -71,6 +72,8 @@ ENDWORD "allot", word_allot
 ; ( "<spaces>name" -- ) Start compiling
 WORD ":", word_colon
   call next_word
+  jp z, print_error
+
   ; add this word to the dictionary, pointing to HERE
   ld hl, (_curr_word)
   ld de, (here_sp)
