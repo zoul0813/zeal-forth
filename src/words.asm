@@ -54,7 +54,7 @@ next_word:
     ld (_curr_len), bc
     ld (_next_word), de
     ret
-
+;
 
 
     SECTION DATA

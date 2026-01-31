@@ -6,6 +6,21 @@
     INCLUDE "include/strutils_h.asm"
     INCLUDE "common_h.asm"
 
+  ; @brief Backup all registers
+  MACRO BACKUP _
+    push af
+    push bc
+    push de
+    push hl
+  ENDM
+
+  ; @brief Restore all registers
+  MACRO RESTORE _
+    pop hl
+    pop de
+    pop bc
+    pop af
+  ENDM
 
 
   ; @brief Jumps to _exit_code on error
@@ -197,7 +212,7 @@
   ; - state - The state to set
   MACRO SET_STATE state
     ld a, state
-    ld (_state), a
+    ld (STATE), a
   ENDM
 
   ; @brief If state, `jp z, goto`
@@ -206,7 +221,7 @@
   ; - state - The state to compare
   ; - goto  - The address to goto if state matches
   MACRO IF_STATE state, goto
-    ld a, (_state)
+    ld a, (STATE)
     cp state
     jp z, goto
   ENDM

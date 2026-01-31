@@ -1,7 +1,7 @@
     INCLUDE "constants_h.asm"
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
-    INCLUDE "hashtbl_h.asm"
+    INCLUDE "dict_h.asm"
     INCLUDE "compiler_h.asm"
 
 ; @brief Template for "create" word
@@ -15,27 +15,18 @@ template_create:
     PARAM_END()
 
 WORD "create", word_create
+    call next_word ; consume the next word
+    jp z, print_error
+
+    call CREATE_HEADER
+
     ; We want to put the value of `HERE` after compiling and allocated the
     ; template, so we need to create a 2-byte big buffer containing that value.
-    ld hl, (here_sp)
+    ld hl, (HERE)
     OFFSET_HL(template_create, template_create@end) ; get the template size
     STORE_HL(@params) ; store the size
     ; The word we are creating will point to that value, pass the address
     APPLY_TEMPLATE(template_create, template_create@end, @params)
-    ; Returns the address where the word is stored
-    push hl           ; save base for dictionary insert
-
-    ; advance the input buffer, consume the next word
-    call next_word    ; _current_word == "varName"
-    jp z, print_error
-
-    ld hl, (_curr_word)
-    pop de            ; HERE (base)
-    call hshtbl_insert
-    or a
-    jr z, @done
-    ; print an error ... something bad happened?
-    PUTS(_str_error, _str_error_end)
 @done:
     ret
 @params:
@@ -44,7 +35,7 @@ ENDWORD "create", word_create
 
 WORD "variable", word_variable
     call word_create
-    ld hl, (here_sp)
+    ld hl, (HERE)
     ld (hl), 0      ; initialize with 0
     inc hl
     ld (hl), 0      ; initialize with 0
@@ -63,9 +54,9 @@ ENDWORD "cells", word_cells
 WORD "allot", word_allot
     POP()           ; DE = n
 _word_allot_de:
-    ld hl, (here_sp)
+    ld hl, (HERE)
     add hl, de          ; HL = HERE + n
-    ld (here_sp), hl
+    ld (HERE), hl
     ret
 ENDWORD "allot", word_allot
 
@@ -73,18 +64,8 @@ ENDWORD "allot", word_allot
 WORD ":", word_colon
   call next_word
   jp z, print_error
-
-  ; add this word to the dictionary, pointing to HERE
-  ld hl, (_curr_word)
-  ld de, (here_sp)
-  call hshtbl_insert
-  or a
-  jr z, @change_state ; word added, change state
-  PUTS(_str_error, _str_error_end)
-  jr @done
-@change_state:
+  call CREATE_HEADER
   SET_STATE(STATE_COMP)
-@done:
   ret
 ENDWORD ":", word_colon
 
@@ -92,17 +73,17 @@ ENDWORD ":", word_colon
 ; ( -- ) End compiling
 WORD ";", word_semicolon
     SET_STATE(STATE_IMM)
-    ld hl, (here_sp)
+    ld hl, (HERE)
     ld a, 0xC9 ; RET
     ld (hl), a
     inc hl ; here++
-    ld (here_sp), hl
+    ld (HERE), hl
     ret
 ENDWORD ";", word_semicolon
 
 ; ( -- a-addr ) Address of compilation-state flag
 WORD "state", word_state
-    ld de, _state
+    ld de, STATE
     JP_PUSH()
 ENDWORD "state", word_state
 
@@ -115,20 +96,20 @@ ENDWORD "execute", word_execute
 
 WORD ",", word_comma
     POP()
-    ld hl, (here_sp)
+    ld hl, (HERE)
     call word_store_de_hl
     inc hl
     inc hl
-    ld (here_sp), hl
+    ld (HERE), hl
     ret
 ENDWORD ",", word_comma
 
 WORD "c,", word_comma_char
     POP()
-    ld hl, (here_sp)
+    ld hl, (HERE)
     call word_store_char_de_hl
     inc hl
-    ld (here_sp), hl
+    ld (HERE), hl
     ret
 ENDWORD "c,", word_comma_char
 

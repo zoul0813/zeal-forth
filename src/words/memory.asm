@@ -51,13 +51,13 @@ ENDWORD "c!", word_store_char
 
 ; ( -- a-addr ) Put addr-of HERE on stack
 WORD "here", word_here
-    ld de, (here_sp)
+    ld de, (HERE)
     JP_PUSH()
 ENDWORD "here", word_here
 
 ; ( -- c-addr ) Put addr-of PAD on stack
 WORD "pad", word_pad
-    ld de, (here_sp)
+    ld de, (HERE)
     ; DE += 256
     inc d
     JP_PUSH()

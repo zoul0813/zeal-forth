@@ -2,7 +2,7 @@
 
   SECTION DATA
 _str_project_name:
-    DEFB "Zeal Forth\n", 0
+    DEFB "Zeal Forth\n\nType `bye` to exit\n\n", 0
 _str_project_name_end:
 
 _str_newline:
@@ -37,12 +37,18 @@ data_sp:
 return_sp:
     DEFW RETURN_STACK_head
 ; here stack pointer
-here_sp:
+HERE:
     DEFW __HERE_head
+LATEST:
+    DEFW 0
+CURRENT_DEF_CFA:
+    DEFW HERE
+STATE:
+    DEFW STATE_IMM
+BASE:
+    DEFW 0x10
 
   SECTION BSS
-_state:
-    DEFW STATE_IMM
 _curr_word:
     DEFW 0 ; current word
 _curr_len:

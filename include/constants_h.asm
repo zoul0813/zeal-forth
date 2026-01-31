@@ -55,10 +55,12 @@
     EXTERN _buf_len
 
     ; HERE
-    EXTERN here_sp        ;; here pointer
+    EXTERN HERE        ;; here pointer
+    EXTERN LATEST      ;; latest pointer
+    EXTERN STATE         ;; state - 0 interpret, 1 = compile
+    EXTERN BASE          ;; number base for interpreting numbers
 
     ; string buffers
-    EXTERN _state
     EXTERN _curr_word
     EXTERN _curr_len
     EXTERN _next_word

@@ -1,3 +1,4 @@
+    INCLUDE "macros_h.asm"
     INCLUDE "constants_h.asm"
     INCLUDE "common_h.asm"
     INCLUDE "compiler_h.asm"
@@ -31,11 +32,11 @@ apply_template:
     ; Get back the size of the template and the template address
     pop bc
     ; Allocate BC bytes in `HERE`, keep the address in DE for the copy
-    ld hl, (here_sp)
+    ld hl, (HERE)
     ld d, h
     ld e, l
     add hl, bc
-    ld (here_sp), hl
+    ld (HERE), hl
     ; Copy the relocated template (BC bytes) to the address pointed by DE
     ; Get back the template address, keep the destination on the stack to return it
     pop hl

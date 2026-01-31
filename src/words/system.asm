@@ -12,7 +12,8 @@ ENDWORD "bye", word_bye
 
 ; words (-- --) Print all dictionary words
 WORD "words", word_words
-    ld de, hshtbl_hashmap
+    ; ld de, hshtbl_hashmap
+    ld de, 0x0000
     ld c, 0
 @bucket_loop:
     ld a, (de)
@@ -60,7 +61,8 @@ WORD "words", word_words
     pop bc
     pop de
     push bc
-    call hshtbl_list_get_next
+    ; call hshtbl_list_get_next
+    call 0x0000
     pop bc
     ld a, h
     or l

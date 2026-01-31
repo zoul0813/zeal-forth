@@ -30,12 +30,10 @@ do_next_word:
     ; Non-decimal value, fall-through
 
 @is_word:
-    ; go through built-in dictionary
-    ld hl, (_curr_word)
     call dict_search
+    ; If A is 0, the word was not found
     or a
-    ; If A is not 0, the word was not found
-    jp nz, print_error
+    jp z, print_error
 
     IF_STATE(STATE_COMP, compile_word)
     ; Word was found, simulate a call to the function pointed by DE
@@ -100,7 +98,7 @@ compile_word:
     ; TODO: that was dirty, ... words in dict should have "state" (IMM | COMP)
 
     ; put the word into the current definition
-    ld hl, (here_sp)
+    ld hl, (HERE)
     ld a, 0xCD ; CALL nn
     ld (hl), a
     inc hl ; here++
@@ -108,7 +106,7 @@ compile_word:
     inc hl
     ld (hl), d
     inc hl
-    ld (here_sp), hl
+    ld (HERE), hl
 
     jp do_next_word
 @end:
@@ -119,7 +117,7 @@ compile_number:
     ; can't be ';', so no compare
     ex de, hl ; DE has the value
 
-    ld hl, (here_sp)
+    ld hl, (HERE)
     ld a, 0x11 ; LD DE,NN
     ld (hl), a
     inc hl
@@ -137,6 +135,6 @@ compile_number:
     ld (hl), d
     inc hl
 
-    ld (here_sp), hl
+    ld (HERE), hl
 
     jp do_next_word
