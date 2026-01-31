@@ -63,3 +63,16 @@ WORD "\\", word_discard
     ld (_next_word), hl
     ret
 ENDWORD "\\", word_discard
+
+WORD "(", word_lparen
+  ld hl, (_next_word)
+@loop:
+  ld a, (hl)
+  cp ')'
+  inc hl
+  jr z, @done
+  jr @loop
+@done:
+  ld (_next_word), hl
+  ret
+ENDWORD "(", word_lparen
