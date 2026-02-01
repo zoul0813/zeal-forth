@@ -12,65 +12,25 @@ ENDWORD "bye", word_bye
 
 ; words (-- --) Print all dictionary words
 WORD "words", word_words
-    ; ld de, hshtbl_hashmap
-    ld de, 0x0000
-    ld c, 0
-@bucket_loop:
-    ld a, (de)
-    inc de
-    ld h, (de)
-    ld l, a
-    inc de
-    ld a, h
-    or l
-    jr z, @next_bucket
-
-@entry_loop:
-    push de
-    push bc
-    push hl
-    ld d, h
-    ld e, l
-    ld b, 0
-    ld c, LIST_ENTRY_KEY_SIZE
-@len_loop:
-    ld a, (hl)
-    or a
-    jr z, @len_done
-    cp 0x20
-    jr c, @len_done
-    cp 0x7F
-    jr nc, @len_done
+    ld hl, (LATEST) ; last entry
+@loop:
+    ld e, (hl)
     inc hl
-    inc b
-    dec c
-    jr nz, @len_loop
-@len_done:
-    ld c, b
-    ld a, b
-    or a
-    jr z, @skip_print
+    ld d, (hl)    ; DE = previous entry
+    inc hl        ; HL = dict_flags
+    ld a, (hl)
+    and 00011111b;
     ld b, 0
-    call puts
-    pop hl
-    PUTC(' ')
-    jr @after_print
-@skip_print:
-    pop hl
-@after_print:
-    pop bc
-    pop de
-    push bc
-    ; call hshtbl_list_get_next
-    call 0x0000
-    pop bc
+    ld c, a       ; BC = length
+    inc hl        ; HL = dict_name
+    push de       ; push the previous entry
+    ex de, hl     ; DE = dict_name, HL = prev
+    call puts     ; print the word
+    PUTC(' ')     ; print the delim
+    pop hl        ; HL = previous entry
     ld a, h
     or l
-    jr nz, @entry_loop
-
-@next_bucket:
-    inc c
-    jr nz, @bucket_loop
-    PUTS(_str_newline, _str_newline_end)
+    jr nz, @loop
+@done:
     ret
 ENDWORD "words", word_words
