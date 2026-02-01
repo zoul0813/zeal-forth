@@ -22,12 +22,13 @@
 : nip swap drop ;
 : tuck swap over ;
 : 2swap rot >r rot r> ;
-: 2dup over over ;
+: 2dup
+over over ;
+
 : 2drop drop drop ;
 : 2r@ r> r> 2dup >r >r swap ;
 : 2@ dup cell+ @ swap @ ;
 : 2! swap over ! cell+ ! ;
-
 
 ." . "
 
@@ -45,6 +46,59 @@
 
 : 1+ 1 + ;
 : 1- 1 - ;
+\ next buffer
+
+: marker 0 ; \ forget this and drop everything below
+
+: x 1 ;
+: y 1 ;
+: z 1 ;
+: xy 1 ;
+: ab 1 ;
+: bar 1 ;
+: foo 1 ;
+: bart 1 ;
+: foot 1 ;
+: bigword 1 ;
+: smallword 1 ;
+
+: x 1 ;
+: y 1 ;
+: z 1 ;
+: xy 1 ;
+: ab 1 ;
+: bar 1 ;
+: foo 1 ;
+: bart 1 ;
+: foot 1 ;
+: bigword 1 ;
+: smallword 1 ;
+
+: x 1 ;
+: y 1 ;
+: z 1 ;
+: xy 1 ;
+: ab 1 ;
+: bar 1 ;
+: foo 1 ;
+: bart 1 ;
+: foot 1 ;
+: bigword 1 ;
+: smallword 1 ;
+
+: x 1 ;
+: y 1 ;
+: z 1 ;
+: xy 1 ;
+: ab 1 ;
+: bar 1 ;
+: foo 1 ;
+: bart 1 ;
+: foot 1 ;
+: bigword 1 ;
+: smallword 1 ;
+
+
 
 ." . "
 

@@ -15,10 +15,7 @@ template_create:
     PARAM_END()
 
 WORD "create", word_create
-    call next_word ; consume the next word
-    jp z, print_error
-
-    call CREATE_HEADER
+    call word_colon ; create the word in the dictionary, and set HERE to dict_body
 
     ; We want to put the value of `HERE` after compiling and allocated the
     ; template, so we need to create a 2-byte big buffer containing that value.
@@ -28,6 +25,7 @@ WORD "create", word_create
     ; The word we are creating will point to that value, pass the address
     APPLY_TEMPLATE(template_create, template_create@end, @params)
 @done:
+    SET_STATE(STATE_IMM)
     ret
 @params:
     DEFW 0  ; location of HERE after template is applied
@@ -55,7 +53,7 @@ WORD "allot", word_allot
     POP()           ; DE = n
 _word_allot_de:
     ld hl, (HERE)
-    add hl, de          ; HL = HERE + n
+    add hl, de      ; HL = HERE + n
     ld (HERE), hl
     ret
 ENDWORD "allot", word_allot
@@ -65,6 +63,12 @@ WORD ":", word_colon
   call next_word
   jp z, print_error
   call CREATE_HEADER
+  ld hl, (HERE)
+  ld d, h
+  ld e, l
+  inc de
+  inc de ; DE = dict_body
+  call DICT_W ; write the CFA as dict_body???
   SET_STATE(STATE_COMP)
   ret
 ENDWORD ":", word_colon
@@ -112,6 +116,17 @@ WORD "c,", word_comma_char
     ld (HERE), hl
     ret
 ENDWORD "c,", word_comma_char
+
+WORD "forget", word_forget
+    call next_word
+    ld hl, (_curr_word)
+    call dict_search ; HL = address of entry found
+    ld e, (hl)
+    inc hl
+    ld d, (hl) ; DE = previous entry
+    ld (LATEST), de ; set LATEST to the entry before this, forgetting everything else
+    ret
+ENDWORD "forget", word_forget
 
 ; WORD "if", word_if
 ; ENDWORD "if", word_if

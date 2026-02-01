@@ -55,12 +55,14 @@ _init_str_end:
     ;
     ; Returns:
     ; - DE - Address of the routine to execute
-    ; - A - ERR_SUCCESS if the entry was found
-    ;       ERR_NO_SUCH_ENTRY if the entry was not found
+    ; - HL - Address of the current entry
+    ; -  A - ERR_SUCCESS if the entry was found
+    ;        ERR_NO_SUCH_ENTRY if the entry was not found
 dict_search:
     ld hl, (LATEST) ; HL = latest entry
-@search:
     push hl ; current entry
+    IF_STATE(STATE_COMP, @next)
+@search:
     ld bc, dict_flags
     add hl, bc
     ld a, (hl) ; A = dict_flags (lower 5 bits = length)
@@ -82,9 +84,10 @@ dict_search:
     inc hl
     ld h, (hl)
     ld l, a ; HL = previous entry
+    push hl
     ld a, h
     or l
-    ret z ; no more entries
+    jr z, @done ; no more entries
     jr @search
 @found:
     inc hl

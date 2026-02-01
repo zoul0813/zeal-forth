@@ -7,10 +7,10 @@
 ; @brief Advanced the input buffer to the next word
 ;
 ; Paramters:
-;   HL = Address of input_buffer
+; - HL = Address of input_buffer
 ;
 ; Returns:
-;    Z = set when no word
+; -  Z = set when no word
 ;
 ; Alters:
 ;   HL, DE, A
