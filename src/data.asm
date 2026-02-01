@@ -55,6 +55,8 @@ _curr_len:
     DEFW 0 ; current word length
 _next_word:
     DEFW 0 ; location of next word
+; _curr_entry:
+;     DEFW 0 ; location of active dictionary entry
 _input_buffer:
     DEFS BUFFER_SIZE
 _input_buffer_null:

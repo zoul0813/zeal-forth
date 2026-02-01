@@ -9,7 +9,7 @@
       dict_prev DS.W 1
       dict_flags DS.B 1
       dict_name DS.B 0
-      dict_cfa DS.W 0
+      dict_cfa DS.W 1
       dict_body DS.B 0
     }
 

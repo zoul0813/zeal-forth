@@ -66,7 +66,16 @@ dict_search:
     ld a, (hl) ; A = dict_flags (lower 5 bits = length)
     and 00011111b ; A = strlen
     inc hl ; dict_name
+
+@check_length:
+    ld bc, (_curr_len)
+    cp c
+    jr nz, @next ; length mismatch, can't be the word ... skip
+@check_chars:
     ld de, (_curr_word)
+    call strcmp
+    or a
+    jr z, @found
 @next:
     pop hl  ; current entry
     ld a, (hl)
@@ -77,6 +86,11 @@ dict_search:
     or l
     ret z ; no more entries
     jr @search
+@found:
+    inc hl
+    add hl, bc ; BC = len, HL = dict_cfa
+    ld de, (hl)
+    ld a, 1
 @done:
     pop hl ; current entry
     ret
