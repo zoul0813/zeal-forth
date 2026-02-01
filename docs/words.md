@@ -35,6 +35,7 @@ use the Forth convention `( before -- after )`.
 | `c!` | `( n c-addr -- )` | Store char n in a-addr |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
 | `type` | `( c-addr n -- )` | Output the string specified in c-addr, using n for size |
+| `(` | `( -- )` | Discard input until the next `)` (comment). |
 | `words` | `( -- )` | Print all words in the dictionary. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256`. |
@@ -49,6 +50,10 @@ use the Forth convention `( before -- after )`.
 | `execute` | `( x-addr -- )` | c-addr is the address to begin execution of |
 | `,` | `( x -- )` | store x at here, and advance here 1 cell |
 | `c,` | `( c -- )` | store c at here, and advance here 1 byte |
+| `forget` | `( "<spaces>name" -- )` | Forget name |
+| `>r` | `( x -- )` | Move x from the data stack to the return stack. |
+| `r>` | `( -- x )` | Move x from the return stack to the data stack. |
+| `.rs` | `( -- )` | Print return stack depth and contents (bottom to top). |
 
 ## Stack Effect Symbols
 
@@ -61,6 +66,7 @@ use the Forth convention `( before -- after )`.
 | `c` | byte | 8-bit char | Used for character data,  high byte of cell is ignored |
 | `x` | cell | 16-bit number | Used for cell data |
 | `n` | cell | 16-bit number | Undefined |
+| `"<spaces>name"` | word | string | used to indicate the word consumes the next word |
 
 ## Examples
 
@@ -103,3 +109,35 @@ pad 65 swap !  pad @ emit
 ```
 
 Note: numeric input is decimal only.
+
+## Words defined in forth.fs (when loaded)
+
+The following words are defined in `forth.fs`. They are not built in, but
+become available after loading that file.
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `cr` | `( -- )` | Emit a newline (LF). |
+| `space` | `( -- )` | Emit a single space. |
+| `cell+` | `( a-addr1 -- a-addr2 )` | Advance by one cell. |
+| `cell-` | `( a-addr1 -- a-addr2 )` | Move back by one cell. |
+| `char+` | `( c-addr1 -- c-addr2 )` | Advance by one byte. |
+| `nip` | `( a b -- b )` | Drop the second stack item. |
+| `tuck` | `( a b -- b a b )` | Copy top item under the second item. |
+| `2swap` | `( a b c d -- c d a b )` | Swap two pairs. |
+| `2dup` | `( a b -- a b a b )` | Duplicate the top pair. |
+| `2drop` | `( a b -- )` | Drop the top pair. |
+| `2r@` | `( -- x1 x2 )` | Copy the top pair from the return stack (R: x1 x2 -- x1 x2). |
+| `2@` | `( a-addr -- x1 x2 )` | Fetch two cells. |
+| `2!` | `( x1 x2 a-addr -- )` | Store two cells. |
+| `<>` | `( n1 n2 -- flag )` | True if not equal. |
+| `0=` | `( n -- flag )` | True if zero. |
+| `0<` | `( n -- flag )` | True if negative. |
+| `0>` | `( n -- flag )` | True if positive. |
+| `0<>` | `( n -- flag )` | True if non-zero. |
+| `1+` | `( n -- n+1 )` | Increment by one. |
+| `1-` | `( n -- n-1 )` | Decrement by one. |
+
+Note: `forth.fs` also defines a handful of temporary/dummy words for
+dictionary stress testing (e.g. `x`, `y`, `z`, `foo`, `bar`), which are
+omitted here.

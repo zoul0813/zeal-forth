@@ -12,7 +12,6 @@ Items marked with `?` may or may not be defined
 
 Items marked with `/` are partially implemented
 
-
 ## Data stack basics
 
 * [x] dup       `( n -- n n )`

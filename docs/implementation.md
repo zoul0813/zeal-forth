@@ -32,8 +32,7 @@ implementation. It is based on the assembly sources in `src/`.
 
 - Cell size is 2 bytes.
 - Data stack size is 2048 bytes (1024 cells). It grows downward in memory.
-- A return stack of 2048 bytes exists, but the interpreter currently does not
-  expose return-stack words.
+- A return stack of 1024 bytes exists and is exposed via `>r`, `r>`, and `.rs`.
 
 ## Memory access
 
