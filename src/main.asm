@@ -21,13 +21,7 @@
 main:
     push de
     MEMSET(__BSS_head, __BSS_size, 0x00)
-    ; set the kb mode to block/cooked for now
-    KB_MODE_COOKED()
-
-    PUTS(_str_project_name, _str_project_name_end)
-
     call dict_init
-
 @args:
     pop de
     ; get command args
@@ -36,10 +30,14 @@ main:
     sbc hl, de ; HL = 0xFFFF - DE
     ld a, h
     or l
-    jr z, @prompt ; no args, goto prompt
+    jr z, @repl ; no args, goto prompt
 @readfile:
     call read_file
     ; jr nz, @readfile ; refill the buffer
+@repl:
+    ; set the kb mode to block/cooked for now
+    KB_MODE_COOKED()
+    PUTS(_str_project_name, _str_project_name_end)
 @prompt:
     call prompt
     jr @prompt
