@@ -9,7 +9,7 @@
     DEFC RETURN_STACK_head = return_stack + RETURN_STACK_size
     DEFC RETURN_STACK_tail = return_stack
     DEFC Z80_STACK = 0xFFFF
-    DEFC Z80_STACK_SIZE = 2048
+    DEFC Z80_STACK_SIZE = 1024
     DEFC __Z80_STACK_tail = Z80_STACK - Z80_STACK_SIZE
 
     ; Bottom of the heap, if the head reaches this value, return no more memory error

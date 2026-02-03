@@ -63,8 +63,8 @@ dict_search:
     push hl ; current entry
     IF_STATE(STATE_COMP, @next)
 @search:
-    ld bc, dict_flags
-    add hl, bc
+    inc hl
+    inc hl ; HL = dict_flags
     ld a, (hl) ; A = dict_flags (lower 5 bits = length)
     and 00011111b ; A = strlen
     inc hl ; dict_name
@@ -84,15 +84,17 @@ dict_search:
     inc hl
     ld h, (hl)
     ld l, a ; HL = previous entry
-    push hl
     ld a, h
     or l
-    jr z, @done ; no more entries
+    ret z ; no more entries
+    push hl
     jr @search
 @found:
     inc hl
     add hl, bc ; BC = len, HL = dict_cfa
-    ld de, (hl)
+    ld e, (hl)
+    inc hl
+    ld d, (hl) ; DE = CFA
     ld a, 1
 @done:
     pop hl ; current entry

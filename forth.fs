@@ -48,6 +48,9 @@ over over ;
 : 1- 1 - ;
 \ next buffer
 
+\ System ( -- n )
+: free 64511 here - ;
+
 : marker 0 ; \ forget this and drop everything below
 
 : x 1 ;
