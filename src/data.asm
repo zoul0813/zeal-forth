@@ -17,6 +17,10 @@ _str_error:
     DEFB "  error\n", 0
 _str_error_end:
 
+_str_unsupported:
+    DEFB "  unsupported\n", 0
+_str_unsupported_end:
+
 _str_error_numeric_overflow:
     DEFB "numeric overflow"
 _str_error_numeric_overflow_end:
@@ -55,8 +59,8 @@ _curr_len:
     DEFW 0 ; current word length
 _next_word:
     DEFW 0 ; location of next word
-; _curr_entry:
-;     DEFW 0 ; location of active dictionary entry
+_curr_entry:
+    DEFW 0 ; location of active dictionary entry
 _input_buffer:
     DEFS BUFFER_SIZE
 _input_buffer_null:

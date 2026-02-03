@@ -1,9 +1,13 @@
 #ifndef _DICT_H_ASM
 #define _DICT_H_ASM
 
-    DEFC IMMEDIATE = 1 << 7
-    DEFC HIDDEN = 1 << 6
-    DEFC RESERVED = 1 << 5
+    DEFC BIT_IMM = 7
+    DEFC BIT_HIDDEN = 6
+    DEFC BIT_RESERVED = 5
+
+    DEFC IMMEDIATE = 1 << BIT_IMM
+    DEFC HIDDEN = 1 << BIT_HIDDEN
+    DEFC RESERVED = 1 << BIT_RESERVED
 
     DEFVARS 0 {
       dict_prev DS.W 1

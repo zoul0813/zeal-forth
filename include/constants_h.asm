@@ -64,6 +64,7 @@
     EXTERN _curr_word
     EXTERN _curr_len
     EXTERN _next_word
+    EXTERN _curr_entry
     EXTERN _input_buffer
     EXTERN _dword_num
     EXTERN _str_buffer
@@ -80,6 +81,8 @@
     EXTERN _str_ok_end
     EXTERN _str_error
     EXTERN _str_error_end
+    EXTERN _str_unsupported
+    EXTERN _str_unsupported_end
     EXTERN _str_error_not_found
     EXTERN _str_error_not_found_end
     EXTERN _str_error_numeric_overflow

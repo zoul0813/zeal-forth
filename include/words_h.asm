@@ -25,6 +25,17 @@ label:
     SECTION DATA
     DEFW label
     DEFW @str
+    DEFB 0
+    SECTION TEXT
+  ENDM
+
+  MACRO ENDWORD_FLAGS name, label, flags
+@str:
+    DEFM name, 0
+    SECTION DATA
+    DEFW label
+    DEFW @str
+    DEFB flags
     SECTION TEXT
   ENDM
 

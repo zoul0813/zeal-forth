@@ -29,11 +29,25 @@ dict_init:
     inc hl
     ld d, (hl)
     inc hl
+
+    ; get the flags
+    ld c, (hl)
+    inc hl
+
     push hl
 
     ; The value is in DE already, the string is in CA, put it in _curr_word
     ld (_curr_word), de
     call CREATE_HEADER
+
+    ; OR flags into dict_flags
+    ld hl, (LATEST)
+    inc hl
+    inc hl
+    ld a, (hl)  ; A = strlen
+    or c        ; C = flags
+    ld (hl), a  ; A = flags | strlen
+
     pop hl ; HL = next word
     pop de ; DE = call address
     call DICT_W ; write the call address to dict_cfa
@@ -50,18 +64,15 @@ _init_str_end:
     PUBLIC dict_search
     ; Look for a word, in HL, and return its value, DE
     ;
-    ; Parameters:
-    ; - HL - Word (NULL-terminated string)
-    ;
     ; Returns:
     ; - DE - Address of the routine to execute
     ; - HL - Address of the current entry
-    ; -  A - ERR_SUCCESS if the entry was found
-    ;        ERR_NO_SUCH_ENTRY if the entry was not found
+    ; -  A - 0 = not found
+    ;        1 = found
 dict_search:
     ld hl, (LATEST) ; HL = latest entry
     push hl ; current entry
-    IF_STATE(STATE_COMP, @next)
+    IF_STATE(STATE_COMP, @next) ; when compiling, always skip the latest word for searches
 @search:
     inc hl
     inc hl ; HL = dict_flags
@@ -78,6 +89,7 @@ dict_search:
     call strcmp
     or a
     jr z, @found
+
 @next:
     pop hl  ; current entry
     ld a, (hl)
@@ -96,8 +108,9 @@ dict_search:
     inc hl
     ld d, (hl) ; DE = CFA
     ld a, 1
-@done:
     pop hl ; current entry
+    ld (_curr_entry), hl
+
     ret
 ;
 

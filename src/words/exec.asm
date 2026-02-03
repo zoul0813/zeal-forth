@@ -83,7 +83,7 @@ WORD ";", word_semicolon
     inc hl ; here++
     ld (HERE), hl
     ret
-ENDWORD ";", word_semicolon
+ENDWORD_FLAGS ";", word_semicolon, IMMEDIATE
 
 ; ( -- a-addr ) Address of compilation-state flag
 WORD "state", word_state
@@ -127,12 +127,6 @@ WORD "forget", word_forget
     ld (LATEST), de ; set LATEST to the entry before this, forgetting everything else
     ret
 ENDWORD "forget", word_forget
-
-; WORD "if", word_if
-; ENDWORD "if", word_if
-
-; WORD "then", word_then
-; ENDWORD "then", word_then
 
 WORD ">r", word_return_push
     POP()

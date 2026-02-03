@@ -35,7 +35,9 @@ do_next_word:
     or a
     jp z, print_error
 
+    IF_IMMEDIATE(@imm_word)
     IF_STATE(STATE_COMP, compile_word)
+@imm_word:
     ; Word was found, simulate a call to the function pointed by DE
     ; that will return to @next_word
     ld hl, do_next_word
@@ -90,13 +92,6 @@ print_error: ; TODO: implement error lookup
 
 
 compile_word:
-    ; compare word to `;`
-    ld hl, (_curr_word)
-    ld a, (hl)
-    cp ';'
-    jp z, @end
-    ; TODO: that was dirty, ... words in dict should have "state" (IMM | COMP)
-
     ; put the word into the current definition
     ld hl, (HERE)
     ld a, 0xCD ; CALL nn
@@ -109,12 +104,8 @@ compile_word:
     ld (HERE), hl
 
     jp do_next_word
-@end:
-    call word_semicolon
-    jp do_next_word
 
 compile_number:
-    ; can't be ';', so no compare
     ex de, hl ; DE has the value
 
     ld hl, (HERE)

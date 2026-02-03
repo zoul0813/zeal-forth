@@ -1,4 +1,5 @@
     INCLUDE "words_h.asm"
+    INCLUDE "dict_h.asm"
 
 ; ( n -- ) Display n in free field format.
 WORD ".", word_dot
@@ -62,7 +63,7 @@ WORD "\\", word_discard
 @done:
     ld (_next_word), hl
     ret
-ENDWORD "\\", word_discard
+ENDWORD_FLAGS "\\", word_discard, IMMEDIATE
 
 WORD "(", word_lparen
   ld hl, (_next_word)
@@ -75,4 +76,4 @@ WORD "(", word_lparen
 @done:
   ld (_next_word), hl
   ret
-ENDWORD "(", word_lparen
+ENDWORD_FLAGS "(", word_lparen, IMMEDIATE
