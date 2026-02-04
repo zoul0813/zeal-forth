@@ -226,13 +226,4 @@
     jp z, goto
   ENDM
 
-  MACRO IF_IMMEDIATE goto
-    ld hl, (_curr_entry)
-    inc hl
-    inc hl
-    ld a, (hl) ; A = dict_flags
-    bit BIT_IMM, a
-    jr nz, goto
-  ENDM
-
 #endif

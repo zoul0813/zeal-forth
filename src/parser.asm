@@ -35,8 +35,23 @@ do_next_word:
     or a
     jp z, print_error
 
-    IF_IMMEDIATE(@imm_word)
-    IF_STATE(STATE_COMP, compile_word)
+    ; HL = current entry
+    inc hl
+    inc hl  ; HL = dict_flags
+    ld c, (hl) ; C = dict_flags
+
+    ld a, (STATE)
+    cp STATE_COMP
+    jr z, @compile_mode ; compiling, check if immediate
+
+    bit BIT_RESERVED, c
+    jp nz, @compileonly ; this is a compile only word
+    jr @imm_word ; just execute the word
+
+@compile_mode: ; maybe the word is immediate?
+    bit BIT_IMM, c
+    jp z, compile_word
+
 @imm_word:
     ; Word was found, simulate a call to the function pointed by DE
     ; that will return to @next_word
@@ -51,6 +66,10 @@ do_next_word:
     ex de, hl
     PUSH()
     jp do_next_word
+
+@compileonly:
+    PUTS(_str_compile_only, _str_compile_only_end)
+    jp prompt
 
 
 ; @brief Print "  ok"

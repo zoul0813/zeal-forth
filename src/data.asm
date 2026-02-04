@@ -21,6 +21,10 @@ _str_unsupported:
     DEFB "  unsupported\n", 0
 _str_unsupported_end:
 
+_str_compile_only:
+    DEFB "  compile-only\n", 0
+_str_compile_only_end:
+
 _str_error_numeric_overflow:
     DEFB "numeric overflow"
 _str_error_numeric_overflow_end:

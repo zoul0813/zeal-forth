@@ -83,6 +83,8 @@
     EXTERN _str_error_end
     EXTERN _str_unsupported
     EXTERN _str_unsupported_end
+    EXTERN _str_compile_only
+    EXTERN _str_compile_only_end
     EXTERN _str_error_not_found
     EXTERN _str_error_not_found_end
     EXTERN _str_error_numeric_overflow
