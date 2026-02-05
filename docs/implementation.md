@@ -5,15 +5,19 @@ implementation. It is based on the assembly sources in `src/`.
 
 ## Startup and prompt
 
-- On boot, the runtime prints `Zeal Forth` and a newline.
+- On boot, the runtime prints:
+  - `Zeal Forth`
+  - `Type \`bye\` to exit`
+  - A blank line between each line above.
 - A prompt of `> ` is displayed before each input line.
 - After processing a full line, the interpreter prints `  ok` and a newline.
 
 ## Input parsing
 
 - Input is line-based and read into a fixed buffer of 256 bytes.
-- The trailing newline is replaced with a null terminator.
-- The line is split into tokens using a single space (`0x20`) as the delimiter.
+- In the interactive prompt, the trailing newline is replaced with a null
+  terminator.
+- Tokens are split on spaces (`0x20`) and newlines (`0x0A`).
 - Empty tokens are skipped.
 
 ## Numbers
@@ -25,14 +29,17 @@ implementation. It is based on the assembly sources in `src/`.
 
 ## Dictionary lookup
 
-- Each non-numeric token is looked up in the built-in dictionary.
-- Unknown words print `UNKNOWN: <token>` followed by a newline and are skipped.
+- Each non-numeric token is looked up in the dictionary (built-ins plus any
+  definitions created with `:`/`;`, `create`, or `variable`).
+- If a word is not found, the interpreter currently prints a numeric error code
+  (currently `0`) followed by `  error`.
 
 ## Data and return stacks
 
 - Cell size is 2 bytes.
 - Data stack size is 2048 bytes (1024 cells). It grows downward in memory.
 - A return stack of 1024 bytes exists and is exposed via `>r`, `r>`, and `.rs`.
+  It is also used internally for patching `if`/`else`/`then`.
 
 ## Memory access
 
@@ -49,9 +56,21 @@ implementation. It is based on the assembly sources in `src/`.
 
 ## Character output
 
+- `.` prints a 16-bit value in free-field decimal format, then a newline.
 - `emit` writes the low byte of the top stack item to standard output.
+- `type` writes `n` bytes from `c-addr`.
 
 ## Error messages
 
-- Numeric overflow prints `  numeric overflow` followed by `  error`.
-- Other errors currently print a generic `  error` message.
+- Numeric overflow prints `numeric overflow` followed by `  error`.
+- Compile-only words executed in interpret mode print `  compile-only`.
+- Other errors currently print a numeric error code followed by `  error`.
+
+## Compilation model (current)
+
+- `:` switches to compile mode and creates a new dictionary entry.
+- Compiled words are emitted as `CALL` instructions to their CFA.
+- Compiled numbers are emitted as `LD DE,nn` followed by a `CALL pushdata`.
+- `;` ends the definition by emitting a `RET` and returning to interpret mode.
+- `if`/`else`/`then` emit conditional jumps and backpatch targets using the return
+  stack.

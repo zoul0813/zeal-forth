@@ -3,17 +3,33 @@
 The following words are built into the interpreter at boot. Stack effects
 use the Forth convention `( before -- after )`.
 
+## Stack
+
 | Word | Stack effect | Description |
 | --- | --- | --- |
-| `bye` | `( -- )` | Exit the interpreter. |
-| `.` | `( n -- )` | Print `n` in free-field decimal format followed by a newline. |
-| `.s` | `( -- )` | Print stack depth and contents (bottom to top). |
-| `."` | `( -- )` | Print string following the word, until ending `"`. |
+| `dup` | `( n -- n n )` | Duplicate the top stack item. |
+| `drop` | `( n -- )` | Drop the top stack item. |
+| `swap` | `( n1 n2 -- n2 n1 )` | Swap the top two stack items. |
+| `over` | `( n1 n2 -- n1 n2 n1 )` | Copy the second item to the top. |
+| `rot` | `( n1 n2 n3 -- n2 n3 n1 )` | Rotate the top three items. |
+| `wipe` | `( -- )` | Reset the data stack pointer. |
+
+## Math
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
 | `+` | `( n1 n2 -- n1+n2 )` | Add the top two stack items (16-bit wraparound). |
 | `-` | `( n1 n2 -- n1-n2 )` | Subtract the top two stack items (16-bit wraparound). |
-| `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (16-bit wraparound). |
-| `/` | `( n1 n2 -- n3 )` | Divide `n1` by `n2` (unsigned), returns the quotient. |
-| `mod` | `( n1 n2 -- n3 )` | Divide `n1` by `n2` (unsigned), returns the remainder. |
+| `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (lower 16 bits). |
+| `/` | `( n1 n2 -- n3 )` | Unsigned division. Division by zero returns 0. |
+| `mod` | `( n1 n2 -- n3 )` | Unsigned remainder. Division by zero returns 0. |
+| `abs` | `( n -- u )` | Absolute value. |
+| `negate` | `( n -- -n )` | Two's-complement negation. |
+
+## Compare + Logic
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
 | `=` | `( n1 n2 -- flag )` | True if equal. |
 | `<` | `( n1 n2 -- flag )` | True if `n1 < n2` (unsigned). |
 | `>` | `( n1 n2 -- flag )` | True if `n1 > n2` (unsigned). |
@@ -21,39 +37,75 @@ use the Forth convention `( before -- after )`.
 | `or` | `( n1 n2 -- n3 )` | Bitwise OR. |
 | `xor` | `( n1 n2 -- n3 )` | Bitwise XOR. |
 | `invert` | `( n -- n2 )` | Bitwise NOT. |
-| `negate` | `( n -- -n )` | Two's-complement negation. |
-| `abs` | `( n -- u )` | Absolute value. |
-| `drop` | `( n -- )` | Drop the top stack item. |
-| `dup` | `( n -- n n )` | Duplicate the top stack item. |
-| `swap` | `( n1 n2 -- n2 n1 )` | Swap the top two stack items. |
-| `over` | `( n1 n2 -- n1 n2 n1 )` | Copy the second item to the top. |
-| `rot` | `( n1 n2 n3 -- n2 n3 n1 )` | Rotate the top three items. |
-| `wipe` | `( -- )` | Reset the data stack pointer. |
+
+## Memory
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
 | `@` | `( a-addr -- x )` | Fetch a 16-bit cell from memory. |
-| `c@` | `( c-addr -- c )` | Fetch a char from c-addr |
+| `c@` | `( c-addr -- c )` | Fetch a char from `c-addr`. |
 | `!` | `( x a-addr -- )` | Store a 16-bit cell to memory. |
-| `c!` | `( n c-addr -- )` | Store char n in a-addr |
-| `emit` | `( c -- )` | Output the low byte of `c` as a character. |
-| `type` | `( c-addr n -- )` | Output the string specified in c-addr, using n for size |
-| `(` | `( -- )` | Discard input until the next `)` (comment). |
-| `words` | `( -- )` | Print all words in the dictionary. |
+| `c!` | `( n c-addr -- )` | Store the low byte of `n` at `c-addr`. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
-| `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256`. |
-| `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (n * cell size). |
+| `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256` (128 bytes). |
+| `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (`n * 2`). |
 | `allot` | `( n -- )` | Reserve `n` bytes starting at HERE. |
-| `variable` | `( "name" -- )` | Define a word that pushes its storage address and allocates 1 cell. |
+
+## I/O + Text
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `.` | `( n -- )` | Print `n` in decimal, then a newline. |
+| `."` | `( -- )` | Print characters until the next `"`, consuming the input stream. |
+| `emit` | `( c -- )` | Output the low byte of `c` as a character. |
+| `type` | `( c-addr n -- )` | Output `n` bytes from `c-addr`. |
+| `\` | `( -- )` | Discard the remainder of the input buffer. Immediate. |
+| `(` | `( -- )` | Discard input until the next `)` (comment). Immediate. |
+
+## Dictionary + Compilation
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
 | `create` | `( "name" -- )` | Define a word that pushes its storage address. |
-| `:` | `( "<spaces>name" -- )` | Start compiling a new word definition. Switches to compile mode. |
+| `variable` | `( "name" -- )` | Define a word that pushes its storage address and allocates 1 cell. |
+| `:` | `( "<spaces>name" -- )` | Start compiling a new word definition. |
 | `;` | `( -- )` | End the current word definition and return to immediate mode. |
-| `\` | `( -- )` | Discard the remainder of the input buffer. |
-| `state` | `( -- a-addr )` | a-addr is the address of a cell containing the compilation-state flag |
-| `execute` | `( x-addr -- )` | c-addr is the address to begin execution of |
-| `,` | `( x -- )` | store x at here, and advance here 1 cell |
-| `c,` | `( c -- )` | store c at here, and advance here 1 byte |
-| `forget` | `( "<spaces>name" -- )` | Forget name |
-| `>r` | `( x -- )` | Move x from the data stack to the return stack. |
-| `r>` | `( -- x )` | Move x from the return stack to the data stack. |
+| `state` | `( -- a-addr )` | Address of the compilation-state flag. |
+| `execute` | `( x-addr -- )` | Execute code at `x-addr`. |
+| `,` | `( x -- )` | Store `x` at HERE, advance HERE by one cell. |
+| `c,` | `( c -- )` | Store `c` at HERE, advance HERE by one byte. |
+| `forget` | `( "<spaces>name" -- )` | Forget `name` and everything defined after it. |
+| `words` | `( -- )` | Print all words in the dictionary (space-delimited). |
+
+## Return Stack
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `>r` | `( x -- )` | Move `x` from the data stack to the return stack. |
+| `r>` | `( -- x )` | Move `x` from the return stack to the data stack. |
+
+## Debug
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `.s` | `( -- )` | Print data stack depth and contents (bottom to top). |
 | `.rs` | `( -- )` | Print return stack depth and contents (bottom to top). |
+
+## System
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `bye` | `( -- )` | Exit the interpreter. |
+
+## Reserved words
+
+Reserved words are compile-only, which includes branching and other compile time words
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `if` | `( flag -- )` | Compile-time conditional branch. Immediate + compile-only. |
+| `else` | `( -- )` | Compile-time branch target for `if`. Immediate + compile-only. |
+| `then` | `( -- )` | Close the `if`/`else` block. Immediate + compile-only. |
 
 ## Stack Effect Symbols
 
@@ -137,7 +189,9 @@ become available after loading that file.
 | `0<>` | `( n -- flag )` | True if non-zero. |
 | `1+` | `( n -- n+1 )` | Increment by one. |
 | `1-` | `( n -- n-1 )` | Decrement by one. |
+| `free` | `( -- n )` | Remaining free bytes in the heap (`64511 here -`). |
+| `marker` | `( -- 0 )` | Placeholder marker word (currently returns 0). |
 
 Note: `forth.fs` also defines a handful of temporary/dummy words for
-dictionary stress testing (e.g. `x`, `y`, `z`, `foo`, `bar`), which are
-omitted here.
+dictionary stress testing (e.g. `x`, `y`, `z`, `foo`, `bar`). These are repeated
+many times in the file and are omitted here.
