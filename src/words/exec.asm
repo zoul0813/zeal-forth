@@ -2,28 +2,38 @@
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
     INCLUDE "dict_h.asm"
-    INCLUDE "compiler_h.asm"
 
 ; @brief Template for "create" word
-template_create:
-@ldde:
-    ld de, 0x0000
-    jp pushdata
-@end:
-@params:
-    PARAM(@ldde + 1, PARAM_IMM16)
-    PARAM_END()
+; template_create:
+; @ldde:
+;     ld de, 0x0000
+;     jp pushdata
+; @end:
+; @params:
+;     PARAM(@ldde + 1, PARAM_IMM16)
+;     PARAM_END()
 
 WORD "create", word_create
     call word_colon ; create the word in the dictionary, and set HERE to dict_body
 
-    ; We want to put the value of `HERE` after compiling and allocated the
-    ; template, so we need to create a 2-byte big buffer containing that value.
+    ; load constant
+    ld a, 0x11 ; ld de, nn
+    call DICT_C
     ld hl, (HERE)
-    OFFSET_HL(template_create, template_create@end) ; get the template size
-    STORE_HL(@params) ; store the size
-    ; The word we are creating will point to that value, pass the address
-    APPLY_TEMPLATE(template_create, template_create@end, @params)
+    ld de, 0x0000
+    call DICT_W ; ld de, (HERE)
+
+    ; push constant to data stack
+    ld a, 0xC3 ; jp nn
+    call DICT_C
+    ld de, pushdata ; jp pushdata
+    call DICT_W
+
+    ; patch address of constant
+    ld de, (HERE)
+    ld (hl), e
+    inc hl
+    ld (hl), d
 @done:
     SET_STATE(STATE_IMM)
     ret
@@ -121,6 +131,7 @@ WORD "forget", word_forget
     call next_word
     ld hl, (_curr_word)
     call dict_search ; HL = address of entry found
+    ld (HERE), hl
     ld e, (hl)
     inc hl
     ld d, (hl) ; DE = previous entry

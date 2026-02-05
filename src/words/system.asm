@@ -1,6 +1,5 @@
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
-    INCLUDE "hashtbl_h.asm"
     INCLUDE "include/strutils_h.asm"
 
 
