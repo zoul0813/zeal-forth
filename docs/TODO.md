@@ -66,7 +66,7 @@ Items marked with `❓` may or may not be defined
 * [ ] constant  `( x "<spaces>name" -- )`
 * [x] variable  `( "<spaces>name" -- )`
 * [x] create    `( "<spaces>name" -- )`
-* [ ] does>     `( -- )`
+* [x] does>     `( -- )`
 * [x] allot     `( n -- )`
 * [x] state     `( -- a-addr )` | a-addr is the address of a cell containing the compilation state flag
 * [x] execute   `( x-addr -- )` | execute code at x-addr

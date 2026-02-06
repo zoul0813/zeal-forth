@@ -106,6 +106,7 @@ Reserved words are compile-only, which includes branching and other compile time
 | `if` | `( flag -- )` | Compile-time conditional branch. Immediate + compile-only. |
 | `else` | `( -- )` | Compile-time branch target for `if`. Immediate + compile-only. |
 | `then` | `( -- )` | Close the `if`/`else` block. Immediate + compile-only. |
+| `does>` | `( -- )` | Split a defining word so created children execute code after `does>`. Immediate + compile-only. Uses return-stack temporaries internally. |
 
 ## Stack Effect Symbols
 

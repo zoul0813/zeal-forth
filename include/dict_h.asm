@@ -20,6 +20,8 @@
     EXTERN dict_init
     EXTERN dict_search
 
+    EXTERN DICT_CFA
+    EXTERN DICT_BODY
     EXTERN DICT_C
     EXTERN DICT_W
     EXTERN CREATE_HEADER

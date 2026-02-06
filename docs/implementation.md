@@ -39,7 +39,10 @@ implementation. It is based on the assembly sources in `src/`.
 - Cell size is 2 bytes.
 - Data stack size is 2048 bytes (1024 cells). It grows downward in memory.
 - A return stack of 1024 bytes exists and is exposed via `>r`, `r>`, and `.rs`.
-  It is also used internally for patching `if`/`else`/`then`.
+  It is also used internally for compiler/runtime plumbing:
+  - patching `if`/`else`/`then`
+  - `create ... does>` handoff (the created entry and patch sites are passed via
+    return stack temporaries)
 
 ## Memory access
 
@@ -74,3 +77,6 @@ implementation. It is based on the assembly sources in `src/`.
 - `;` ends the definition by emitting a `RET` and returning to interpret mode.
 - `if`/`else`/`then` emit conditional jumps and backpatch targets using the return
   stack.
+- `does>` compiles a runtime patch prologue that redirects the last `create`d
+  child into the code after `does>`, and uses return-stack temporaries to carry
+  patch addresses.

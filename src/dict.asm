@@ -7,7 +7,7 @@
   SECTION TEXT
 
     PUBLIC dict_init
-    ; Put all the words in the hashtable
+    ; @brief Initialize dictionary with built-in words
 dict_init:
     ; NULL marks the end of the table
     ld hl, builtin_words
@@ -62,7 +62,7 @@ _init_str_end:
 ;
 
     PUBLIC dict_search
-    ; Look for a word, in HL, and return its value, DE
+    ; @brief Look for a word, in HL, and return its value, DE
     ;
     ; Returns:
     ; - DE - Address of the routine to execute
@@ -74,11 +74,7 @@ dict_search:
     push hl ; current entry
     IF_STATE(STATE_COMP, @next) ; when compiling, always skip the latest word for searches
 @search:
-    inc hl
-    inc hl ; HL = dict_flags
-    ld a, (hl) ; A = dict_flags (lower 5 bits = length)
-    and 00011111b ; A = strlen
-    inc hl ; dict_name
+    call dict_word_len
 
 @check_length:
     ld bc, (_curr_len)
@@ -114,8 +110,70 @@ dict_search:
     ret
 ;
 
+    ; @brief Get the length of the dict word
+    ;
+    ; Parameters:
+    ; - HL - Address of entry
+    ;
+    ; Returns:
+    ; - HL - Address of dict_name
+    ; -  A - Length of dict_name
+    ;
+    ; Alters:
+    ;   A, HL
+dict_word_len:
+    ; get the dict flags, and jump over the word
+    inc hl
+    inc hl ; HL = dict_flags
+    ld a, (hl) ; A = dict_flags (lower 5 bits = length)
+    and 00011111b ; A = strlen
+    inc hl ; dict_name
+    ret
+
+    PUBLIC DICT_CFA
+    ; @brief Get the dictionary entries CFA
+    ;
+    ; Parameters:
+    ; - HL - Address of entry
+    ;
+    ; Returns:
+    ; - DE - Address of CFA
+    ;
+    ; Alters:
+    ;   DE
+DICT_CFA:
+    push hl
+    call dict_word_len
+
+    ld d, 0
+    ld e, a
+    add hl, de ; HL = dict_cfa
+    inc hl ; skip null-term
+    ex de, hl
+    pop hl
+    ret
+;
+
+    PUBLIC DICT_BODY
+    ; @brief Get the dictionary entries BODY
+    ;
+    ; Parameters:
+    ; - HL - Address of entry
+    ;
+    ; Returns:
+    ; - DE - Address of BODY
+    ;
+    ; Alters:
+    ;   DE
+DICT_BODY:
+    call DICT_CFA
+    inc de
+    inc de
+    ret
+
+
     PUBLIC DICT_C
-    ; Write a byte HERE
+    ; @brief Write a byte HERE
     ;
     ; Parameters:
     ; -  A - Byte to write
@@ -130,7 +188,7 @@ DICT_C:
 ;
 
     PUBLIC DICT_W
-    ; Write a word HERE
+    ; @brief Write a word HERE
     ;
     ; Parameters:
     ; - DE - Word to write
@@ -147,7 +205,9 @@ DICT_W:
 ;
 
     PUBLIC CREATE_HEADER
-    ; Create a new dictionary entry
+    ; @brief Create a new dictionary entry
+    ;
+    ; Updates HERE, LATEST
     ;
     ; Parameters:
     ; - None
