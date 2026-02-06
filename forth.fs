@@ -2,20 +2,19 @@
 
 ." Loading forth.fs "
 
+\ Defining words
+: constant create , does> @ ;
+
 \ Text words
 
 : cr 10 emit ;
 : space 32 emit ;
-
-." . "
 
 \ Cell Words
 
 : cell+ 1 cells + ;
 : cell- 1 cells - ;
 : char+ 1 + ;
-
-." . "
 
 \ Stack words
 
@@ -30,8 +29,6 @@ over over ;
 : 2@ dup cell+ @ swap @ ;
 : 2! swap over ! cell+ ! ;
 
-." . "
-
 \ Conditional words
 
 : <> = invert ;
@@ -39,8 +36,6 @@ over over ;
 : 0< 0 < ;
 : 0> 0 > ;
 : 0<> 0 <> ;
-
-." . "
 
 \ Math helpers
 
@@ -100,9 +95,5 @@ over over ;
 : foot 1 ;
 : bigword 1 ;
 : smallword 1 ;
-
-
-
-." . "
 
 ." Done." cr

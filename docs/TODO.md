@@ -63,7 +63,7 @@ Items marked with `❓` may or may not be defined
 * [x] ;         `( -- )`
 * [x] ,         `( x -- )`
 * [x] c,        `( c -- )`
-* [ ] constant  `( x "<spaces>name" -- )`
+* [x] constant  🇫 `( x "<spaces>name" -- )`
 * [x] variable  `( "<spaces>name" -- )`
 * [x] create    `( "<spaces>name" -- )`
 * [x] does>     `( -- )`

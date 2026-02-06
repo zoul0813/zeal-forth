@@ -14,16 +14,19 @@ WORD ".\"", word_dot_quote
     ld hl, (_next_word)
 @loop:
     ld a, (hl)
-    cp '"'
+    cp '"' ; end
     jr z, @done
+    cp 0x00 ; null-term
+    jr z, @return
     push hl
     call putc
     pop hl
     inc hl
     jr @loop
 @done:
-    inc hl
-    inc hl
+    inc hl ; skip "
+    inc hl ; skip space/null
+@return:
     ld (_next_word), hl
     ret
 ENDWORD ".\"", word_dot_quote
@@ -69,9 +72,11 @@ WORD "(", word_lparen
   ld hl, (_next_word)
 @loop:
   ld a, (hl)
-  cp ')'
-  inc hl
+  cp ')'  ; end
   jr z, @done
+  cp 0x00 ; null-term
+  jr z, @done
+  inc hl
   jr @loop
 @done:
   ld (_next_word), hl

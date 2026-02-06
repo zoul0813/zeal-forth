@@ -67,8 +67,8 @@ _init_str_end:
     ; Returns:
     ; - DE - Address of the routine to execute
     ; - HL - Address of the current entry
-    ; -  A - 0 = not found
-    ;        1 = found
+    ; -  A - 0 = found
+    ;        ERR_NOT_FOUND
 dict_search:
     ld hl, (LATEST) ; HL = latest entry
     push hl ; current entry
@@ -94,7 +94,10 @@ dict_search:
     ld l, a ; HL = previous entry
     ld a, h
     or l
-    ret z ; no more entries
+    jr nz, @keep_search
+    ld a, ERR_NOT_FOUND
+    ret
+@keep_search:
     push hl
     jr @search
 @found:
@@ -103,7 +106,7 @@ dict_search:
     ld e, (hl)
     inc hl
     ld d, (hl) ; DE = CFA
-    ld a, 1
+    xor a ; A = 0
     pop hl ; current entry
     ld (_curr_entry), hl
 

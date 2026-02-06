@@ -6,6 +6,19 @@
 
     DEFC CREATE_JP_TARGET_OFFSET = 7
 
+_begin_new_word:
+    call next_word
+    jp z, print_error
+    call CREATE_HEADER
+    ld hl, (HERE)
+    ld d, h
+    ld e, l
+    inc de
+    inc de ; DE = dict_body
+    call DICT_W ; write the CFA as dict_body???
+    ret
+
+
 ; Runtime helper for DOES>; patches the child entry from return stack
 ; Input: DE = does>-code address
 _does_patch_created_entry:
@@ -24,7 +37,7 @@ _does_patch_created_entry:
 
 ; ( "<spaces>name" -- ) Create a variable
 WORD "create", word_create
-    call word_colon ; create the word in the dictionary, and set HERE to dict_body
+    call _begin_new_word ; create the word in the dictionary, and set HERE to dict_body
 
     ; load constant
     DICT_INS(0x11)      ; ld de, nn
@@ -44,11 +57,6 @@ WORD "create", word_create
     ld (hl), e
     inc hl
     ld (hl), d
-@done:
-    SET_STATE(STATE_IMM)
-    ret
-@params:
-    DEFW 0  ; location of HERE after template is applied
 @create_ret:
     ret
 ENDWORD "create", word_create
@@ -89,6 +97,7 @@ WORD "does>", word_does
 
     DICT_INS(0xC3) ; jp nn
 
+    POP_RET()  ; pop previous 0 marker
     ld de, (HERE)
     PUSH_RET() ; patch site for ; to jump over does>-part
     ld de, 0x0000
@@ -122,17 +131,9 @@ ENDWORD "allot", word_allot
 
 ; ( "<spaces>name" -- ) Start compiling
 WORD ":", word_colon
-  call next_word
-  jp z, print_error
-  call CREATE_HEADER
+  call _begin_new_word
   ld de, 0
   PUSH_RET() ; marker: no pending DOES> patch
-  ld hl, (HERE)
-  ld d, h
-  ld e, l
-  inc de
-  inc de ; DE = dict_body
-  call DICT_W ; write the CFA as dict_body???
   SET_STATE(STATE_COMP)
   ret
 ENDWORD ":", word_colon
@@ -197,7 +198,7 @@ WORD "forget", word_forget
     ld hl, (_curr_word)
     call dict_search ; HL = address of entry found
     or a
-    jr z, @end
+    jr nz, @end
     ld (HERE), hl
     ld e, (hl)
     inc hl

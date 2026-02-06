@@ -33,7 +33,7 @@ do_next_word:
     call dict_search
     ; If A is 0, the word was not found
     or a
-    jp z, print_error
+    jp nz, print_error
 
     ; HL = current entry
     inc hl
@@ -84,7 +84,7 @@ numeric_overflow:
 
 ; @brief Print current error message
 print_error: ; TODO: implement error lookup
-    cp ERR_NO_SUCH_ENTRY
+    cp ERR_NOT_FOUND
     jr z, @not_found
     cp ERR_NUMERIC_OVERFLOW ; numeric overflow
     jr z, @numeric_overflow
