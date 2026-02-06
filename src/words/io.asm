@@ -9,27 +9,65 @@ WORD ".", word_dot
     ret
 ENDWORD ".", word_dot
 
+word_dot_quote_runtime:
+    pop hl ; HL = address of inline <len>
+    ld c, (hl)
+    ld b, 0
+    inc hl ; HL = start of string
+    ld d, h
+    ld e, l ; DE = c-addr
+    add hl, bc ; HL = address after string
+    push hl ; make ret continue after string
+    call puts
+    ret
+
 ; ( -- ) Print the string following the word
 WORD ".\"", word_dot_quote
     ld hl, (_next_word)
-@loop:
+    ld d, h
+    ld e, l
+    ld bc, 0
+@count:
     ld a, (hl)
-    cp '"' ; end
-    jr z, @done
-    cp 0x00 ; null-term
-    jr z, @return
-    push hl
-    call putc
-    pop hl
     inc hl
-    jr @loop
-@done:
-    inc hl ; skip "
-    inc hl ; skip space/null
+    cp '"' ; end
+    jr z, @doit
+    cp 0x00 ; null-term
+    jr nz, @not_null
+    ld a, ERR_UNTERMINATED_STR
+    jp print_error
+@not_null:
+    inc bc
+    jr @count
+
+@doit: ; DE = buffer, BC = length
+    IF_STATE(STATE_COMP, @compile)
+    push hl
+    call puts
+    pop hl
 @return:
     ld (_next_word), hl
     ret
-ENDWORD ".\"", word_dot_quote
+
+@compile:
+    push de
+    push bc
+    DICT_CALL(word_dot_quote_runtime)
+    pop bc
+    ld a, c
+    call DICT_C
+    pop de
+@copy:
+    ld a, b
+    or c
+    jr z, @return
+    ld a, (de)
+    call DICT_C ; copy the byte
+    inc de
+    dec bc
+    jr @copy
+
+ENDWORD_FLAGS ".\"", word_dot_quote, IMMEDIATE
 
 ; ( c -- )
 WORD "emit", word_emit
@@ -69,16 +107,18 @@ WORD "\\", word_discard
 ENDWORD_FLAGS "\\", word_discard, IMMEDIATE
 
 WORD "(", word_lparen
-  ld hl, (_next_word)
+    ld hl, (_next_word)
 @loop:
-  ld a, (hl)
-  cp ')'  ; end
-  jr z, @done
-  cp 0x00 ; null-term
-  jr z, @done
-  inc hl
-  jr @loop
+    ld a, (hl)
+    cp ')'  ; end
+    jr z, @skip
+    cp 0x00 ; null-term
+    jr z, @done
+    inc hl
+    jr @loop
+@skip:
+    inc hl
 @done:
-  ld (_next_word), hl
-  ret
+    ld (_next_word), hl
+    ret
 ENDWORD_FLAGS "(", word_lparen, IMMEDIATE

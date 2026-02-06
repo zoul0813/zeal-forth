@@ -25,6 +25,10 @@ _str_compile_only:
     DEFB "  compile-only\n", 0
 _str_compile_only_end:
 
+_str_unterminated_str:
+    DEFB "  unterminated string", 0
+_str_unterminated_str_end:
+
 _str_error_numeric_overflow:
     DEFB "numeric overflow"
 _str_error_numeric_overflow_end:

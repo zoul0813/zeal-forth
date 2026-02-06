@@ -159,7 +159,7 @@ WORD ";", word_semicolon
     inc hl ; here++
     ld (HERE), hl
     ret
-ENDWORD_FLAGS ";", word_semicolon, IMMEDIATE
+ENDWORD_FLAGS ";", word_semicolon, RESERVED | IMMEDIATE
 
 ; ( -- a-addr ) Address of compilation-state flag
 WORD "state", word_state
@@ -193,12 +193,14 @@ WORD "c,", word_comma_char
     ret
 ENDWORD "c,", word_comma_char
 
+    PUBLIC word_forget@drop
 WORD "forget", word_forget
     call next_word
     ld hl, (_curr_word)
     call dict_search ; HL = address of entry found
     or a
     jr nz, @end
+@drop:
     ld (HERE), hl
     ld e, (hl)
     inc hl

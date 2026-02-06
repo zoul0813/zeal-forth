@@ -4,6 +4,7 @@
     INCLUDE "words_h.asm"
 
     EXTERN word_semicolon
+    EXTERN word_forget@drop
 
   SECTION TEXT
 
@@ -88,10 +89,15 @@ print_error: ; TODO: implement error lookup
     jr z, @not_found
     cp ERR_NUMERIC_OVERFLOW ; numeric overflow
     jr z, @numeric_overflow
+    cp ERR_UNTERMINATED_STR
+    jr z, @unterminated_str
 @code:
     ld e, a
     ld d, 0
     PUTI()
+    jr @msg
+@unterminated_str:
+    PUTS(_str_unterminated_str, _str_unterminated_str_end)
     jr @msg
 @numeric_overflow:
     PUTS(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
@@ -106,8 +112,14 @@ print_error: ; TODO: implement error lookup
     ; jr @msg ; fall-thru
 @msg:
     PUTS(_str_error, _str_error_end)
-    ; jp prompt
-    ret
+
+    IF_STATE(STATE_IMM, @prompt)
+    ld hl, (LATEST) ; set HL to LATEST
+    call word_forget@drop ; reset HERE to start of last word
+
+    SET_STATE(STATE_IMM)
+@prompt:
+    jp prompt
 
 
 compile_word:
