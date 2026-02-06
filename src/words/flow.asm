@@ -1,27 +1,18 @@
     INCLUDE "constants_h.asm"
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
+    INCLUDE "compiler_h.asm"
 
 ; Compile Only
 WORD "if", word_if
   ; compile
-  ; call popdata
-  ld a, 0xCD ; call
-  call DICT_C
-  ld de, popdata
-  call DICT_W
 
-  ; ld a, d
-  ld a, 0x7A ; ld a, d
-  call DICT_C
-
-  ; or e
-  ld a, 0xB3 ; or e
-  call DICT_C
+  DICT_CALL(popdata)  ; call popdata
+  DICT_INS(0x7A)      ; ld a, d
+  DICT_INS(0xB3)      ; or e
 
   ; jp z, 0x0000 ; jump to ELSE
-  ld a, 0xCA ; jp z
-  call DICT_C
+  DICT_INS(0xCA)      ; jp z, nn
 
   ld de, (HERE)
   PUSH_RET() ; push addr of 0x0000 to return stack
@@ -36,8 +27,7 @@ ENDWORD_FLAGS "if", word_if, RESERVED | IMMEDIATE
 WORD "else", word_else
   ; compile
   ; jp 0x0000 ; jump to THEN
-  ld a, 0xC3 ; jp
-  call DICT_C
+  DICT_INS(0xC3) ; jp nn
 
   ; patch IF's address
   POP_RET() ; DE has address of IF's 0x0000

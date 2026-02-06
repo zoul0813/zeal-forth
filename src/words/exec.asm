@@ -2,6 +2,7 @@
     INCLUDE "words_h.asm"
     INCLUDE "common_h.asm"
     INCLUDE "dict_h.asm"
+    INCLUDE "compiler_h.asm"
 
     DEFC CREATE_JP_TARGET_OFFSET = 7
 
@@ -26,23 +27,17 @@ WORD "create", word_create
     call word_colon ; create the word in the dictionary, and set HERE to dict_body
 
     ; load constant
-    ld a, 0x11 ; ld de, nn
-    call DICT_C
+    DICT_INS(0x11)      ; ld de, nn
+
     ld hl, (HERE)
     ld de, 0x0000
     call DICT_W ; ld de, (HERE)
 
     ; push constant to data stack
-    ld a, 0xCD ; call nn
-    call DICT_C
-    ld de, pushdata ; call pushdata
-    call DICT_W
+    DICT_CALL(pushdata) ; call pushdata
 
     ; default behavior is CREATE semantics: return
-    ld a, 0xC3 ; jp nn
-    call DICT_C
-    ld de, @create_ret
-    call DICT_W
+    DICT_JP(@create_ret)
 
     ; patch address of constant
     ld de, (HERE)
@@ -75,32 +70,25 @@ WORD "does>", word_does
     ;   LD DE, <does-code>
     ;   CALL _does_patch_created_entry
     ;   JP <end-of-definition>
-    ld a, 0xED ; LD DE,(nn)
-    call DICT_C
-    ld a, 0x5B
-    call DICT_C
+
+    ld de, 0x5BED ; LD DE,(nn) (little-endian)
+    call DICT_W
+
     ld de, LATEST
     call DICT_W
 
-    ld a, 0xCD ; call nn
-    call DICT_C
-    ld de, pushreturn
-    call DICT_W
+    DICT_CALL(pushreturn)
 
-    ld a, 0x11 ; ld de, nn
-    call DICT_C
+    DICT_INS(0x11) ; ld de, nn
     ld hl, (HERE)
     push hl ; patch site for does-code address
     ld de, 0x0000
     call DICT_W
 
-    ld a, 0xCD ; call nn
-    call DICT_C
-    ld de, _does_patch_created_entry
-    call DICT_W
+    DICT_CALL(_does_patch_created_entry)
 
-    ld a, 0xC3 ; jp nn
-    call DICT_C
+    DICT_INS(0xC3) ; jp nn
+
     ld de, (HERE)
     PUSH_RET() ; patch site for ; to jump over does>-part
     ld de, 0x0000
