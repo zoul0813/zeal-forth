@@ -135,6 +135,7 @@ compile_word:
     ld (HERE), hl
 
     jp do_next_word
+;
 
 compile_number:
     ex de, hl ; DE has the value
@@ -160,3 +161,4 @@ compile_number:
     ld (HERE), hl
 
     jp do_next_word
+;
