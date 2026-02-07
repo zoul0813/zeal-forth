@@ -12,6 +12,7 @@
 \   wordle
 
 5 constant WORD-LEN
+32 constant MAX-WORDS
 6 constant MAX-TRIES
 26 constant ALPHA-LEN
 30 constant BOARD-CELLS
@@ -22,12 +23,10 @@ create hguess BOARD-CELLS allot
 create hmark BOARD-CELLS allot
 create scount ALPHA-LEN allot
 
-create W1 83 c, 84 c, 65 c, 67 c, 75 c,   \ STACK
-create W2 76 c, 79 c, 79 c, 80 c, 83 c,   \ LOOPS
-create W3 87 c, 79 c, 82 c, 68 c, 83 c,   \ WORDS
-create W4 77 c, 65 c, 67 c, 82 c, 79 c,   \ MACRO
-create W5 67 c, 69 c, 76 c, 76 c, 83 c,   \ CELLS
-create W6 66 c, 82 c, 65 c, 78 c, 67 c,   \ BRANC
+create WORDS MAX-WORDS WORD-LEN * allot
+variable WORD-COUNT
+variable srcp
+variable dstp
 
 variable secret-ptr
 variable tries-used
@@ -96,28 +95,72 @@ variable idx-save
 
 : letter-idx ( c -- idx ) 65 - ;
 
-: choose-secret ( -- )
-  rand16 6 mod
-  dup 0 = if
-    drop W1 secret-ptr !
-  else
-    dup 1 = if
-      drop W2 secret-ptr !
+: word-ptr ( idx -- c-addr )
+  WORD-LEN * WORDS +
+;
+
+: add-word ( c-addr u -- ok )
+  dup WORD-LEN = if
+    drop
+    WORD-COUNT @ MAX-WORDS < if
+      srcp !
+      WORD-COUNT @ word-ptr dstp !
+      WORD-LEN 0 do
+        srcp @ i + c@
+        dstp @ i + c!
+      loop
+      WORD-COUNT @ 1+ WORD-COUNT !
+      1
     else
-      dup 2 = if
-        drop W3 secret-ptr !
-      else
-        dup 3 = if
-          drop W4 secret-ptr !
-        else
-          dup 4 = if
-            drop W5 secret-ptr !
-          else
-            drop W6 secret-ptr !
-          then
-        then
-      then
+      drop
+      0
     then
+  else
+    drop drop
+    0
+  then
+;
+
+0 WORD-COUNT !
+s" STACK" add-word drop
+s" LOOPS" add-word drop
+s" WORDS" add-word drop
+s" MACRO" add-word drop
+s" CELLS" add-word drop
+s" BASIC" add-word drop
+s" BYTES" add-word drop
+s" CLOCK" add-word drop
+s" DEBUG" add-word drop
+s" FLAGS" add-word drop
+s" INDEX" add-word drop
+s" INPUT" add-word drop
+s" LOGIC" add-word drop
+s" MICRO" add-word drop
+s" MODEM" add-word drop
+s" MOUSE" add-word drop
+s" PIXEL" add-word drop
+s" RESET" add-word drop
+s" CACHE" add-word drop
+s" DRIVE" add-word drop
+s" TOKEN" add-word drop
+s" ASCII" add-word drop
+s" PATCH" add-word drop
+s" CODES" add-word drop
+s" ARRAY" add-word drop
+s" ROBOT" add-word drop
+s" TURBO" add-word drop
+s" CABLE" add-word drop
+s" ZILOG" add-word drop
+s" CHIPS" add-word drop
+
+: choose-secret ( -- ok )
+  WORD-COUNT @ dup 0 = if
+    drop
+    0
+  else
+    rand16 swap mod
+    word-ptr secret-ptr !
+    1
   then
 ;
 
@@ -245,30 +288,33 @@ variable idx-save
 ;
 
 : wordle ( -- )
-  choose-secret
-  clear-history
-  0 tries-used !
-  begin
-    draw-board
-    tries-used @ MAX-TRIES = if
-      ." You lose. Word was: " show-secret cr
-      1
-    else
-      read-guess if
-        eval-guess
-        tries-used @ save-row
-        tries-used @ 1+ tries-used !
-        guess-correct? if
-          draw-board
-          ." You win!" cr
-          1
+  choose-secret if
+    clear-history
+    0 tries-used !
+    begin
+      draw-board
+      tries-used @ MAX-TRIES = if
+        ." You lose. Word was: " show-secret cr
+        1
+      else
+        read-guess if
+          eval-guess
+          tries-used @ save-row
+          tries-used @ 1+ tries-used !
+          guess-correct? if
+            draw-board
+            ." You win!" cr
+            1
+          else
+            0
+          then
         else
+          ." Invalid guess: letters A-Z only." cr
           0
         then
-      else
-        ." Invalid guess: letters A-Z only." cr
-        0
       then
-    then
-  until
+    until
+  else
+    ." No words in dictionary." cr
+  then
 ;

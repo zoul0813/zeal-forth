@@ -12,10 +12,17 @@
 
 create guessed ALPHA-LEN allot
 
-create W1 70 c, 79 c, 82 c, 84 c, 72 c, 0 c,   \ FORTH
-create W2 83 c, 84 c, 65 c, 67 c, 75 c, 0 c,   \ STACK
-create W3 76 c, 79 c, 79 c, 80 c, 83 c, 0 c,   \ LOOPS
-create W4 87 c, 79 c, 82 c, 68 c, 83 c, 0 c,   \ WORDS
+: str, ( c-addr u -- )
+  0 do
+    dup i + c@ c,
+  loop
+  drop
+;
+
+create W1 s" FORTH" str,
+create W2 s" STACK" str,
+create W3 s" LOOPS" str,
+create W4 s" WORDS" str,
 
 variable secret-ptr
 variable tries-left
