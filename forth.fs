@@ -82,14 +82,29 @@ variable seed
 : slash   ( -- c )
   rand16 1 and if 47 else 92 then ; \ '/' or '\'
 
-: tenprint ( screens -- )
-  0 do          \ 10 screens
-    40 0 do        \ 40 rows
-      80 0 do      \ 80 cols
-        slash emit
-      loop
+: 10print ( -- )
+  40 0 do        \ 40 rows
+    80 0 do      \ 80 cols
+      slash emit
     loop
   loop
+;
+
+: 10print-key ( -- )
+  begin
+    key? if key drop 1 else 0 then
+    if
+      1
+    else
+      slash emit
+      0
+    then
+    until
+;
+
+: wait-key ( -- )
+  begin key? until
+  key drop
 ;
 
 

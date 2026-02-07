@@ -65,6 +65,8 @@
     EXTERN _next_word
     EXTERN _curr_entry
     EXTERN _input_buffer
+    EXTERN _key_buffer
+    EXTERN _key_pending
     EXTERN _dword_num
     EXTERN _str_buffer
 

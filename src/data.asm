@@ -73,6 +73,10 @@ _input_buffer:
     DEFS BUFFER_SIZE
 _input_buffer_null:
     DEFB 0 ; permanent null-terminator
+_key_buffer:
+    DEFB 0 ; single key buffer
+_key_pending:
+    DEFB 0 ; key in buffer
 
 ;; file parser
 _file_fd: DEFB 0

@@ -71,6 +71,17 @@
     ERROR_CHECK()
   ENDM
 
+  ; @brief Switch to Non-blocking/Raw KB Mode
+  ;
+  ; Alters:
+  ;   H, C, DE, A
+  MACRO KB_MODE_RAW _
+    ld h, DEV_STDIN
+    ld c, KB_CMD_SET_MODE
+    ld de, KB_READ_NON_BLOCK | KB_MODE_RAW
+    IOCTL()
+  ENDM
+
   ; @ brief Macro for strutils memset
   ; Initialize the memory pointed by HL with the byte given in E.
   ;

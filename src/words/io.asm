@@ -114,6 +114,7 @@ ENDWORD_FLAGS "(", word_lparen, IMMEDIATE
 WORD "loadfile", word_loadfile
     ld hl, (_next_word)
 @check_quote:
+    ld a, (hl)
     cp '"'
     jr z, @quoted
     ld a, ERR_UNTERMINATED_STR
