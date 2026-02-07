@@ -60,6 +60,11 @@ create _area_buf 4 allot
   _area_buf char+ c@
 ;
 
+\ Syscalls
+: ms ( n -- )
+  0 0 rot 18 syscall drop
+;
+
 \ Stack words
 
 : nip swap drop ;
