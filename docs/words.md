@@ -121,6 +121,14 @@ Reserved words are compile-only, which includes branching and other compile time
 | `n` | cell | 16-bit number | Undefined |
 | `"<spaces>name"` | word | string | used to indicate the word consumes the next word |
 
+## Control Stack Effect Symbols
+
+| Symbol | Type | Description | Usage |
+| --- | --- | --- | --- |
+| `orig` | addr | Placeholder | Patch location |
+| `dest` | addr | Address | Destination that is usually patched into `orig` |
+| `do-sys` | tuple | ... | ... |
+
 ## Examples
 
 ```forth

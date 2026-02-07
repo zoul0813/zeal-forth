@@ -48,52 +48,24 @@ over over ;
 
 : marker 0 ; \ forget this and drop everything below
 
-: x 1 ;
-: y 1 ;
-: z 1 ;
-: xy 1 ;
-: ab 1 ;
-: bar 1 ;
-: foo 1 ;
-: bart 1 ;
-: foot 1 ;
-: bigword 1 ;
-: smallword 1 ;
-
-: x 1 ;
-: y 1 ;
-: z 1 ;
-: xy 1 ;
-: ab 1 ;
-: bar 1 ;
-: foo 1 ;
-: bart 1 ;
-: foot 1 ;
-: bigword 1 ;
-: smallword 1 ;
-
-: x 1 ;
-: y 1 ;
-: z 1 ;
-: xy 1 ;
-: ab 1 ;
-: bar 1 ;
-: foo 1 ;
-: bart 1 ;
-: foot 1 ;
-: bigword 1 ;
-: smallword 1 ;
-
-: x 1 ;
-: y 1 ;
-: z 1 ;
-: xy 1 ;
-: ab 1 ;
-: bar 1 ;
-: foo 1 ;
-: bart 1 ;
-: foot 1 ;
-: bigword 1 ;
-: smallword 1 ;
+: test-begin-until ( -- )
+  0
+  begin
+    1 +
+    dup .
+    dup 5 =
+  until
+;
+\ 
+: test-begin-while-repeat ( -- )
+  0
+  begin
+    dup 5 <
+  while
+    dup .
+    1 +
+  repeat
+  drop
+;
 
 ." Done." cr

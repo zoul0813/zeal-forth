@@ -114,6 +114,13 @@
     call pushdata
   ENDM
 
+  ; @brief Push 16-bit value onto data stack
+  ;
+  ; Parameters:
+  ; - DE - 16-bit value
+  ;
+  ; Alters:
+  ;   HL
   MACRO JP_PUSH _
     jp pushdata
   ENDM
@@ -147,6 +154,13 @@
     call pushreturn
   ENDM
 
+  ; @brief Push 16-bit value onto return stack
+  ;
+  ; Parameters:
+  ; - DE - 16-bit value
+  ;
+  ; Alters:
+  ;   HL
   MACRO JP_PUSH_RET _
     jp pushreturn
   ENDM

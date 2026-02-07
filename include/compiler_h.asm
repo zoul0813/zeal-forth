@@ -39,4 +39,28 @@
       call DICT_C
     ENDM
 
+    ; @brief Push HERE onto return stack
+    ;
+    ; ld de, (HERE)
+    ;
+    ; PUSH_RET()
+    ;
+    MACRO PUSH_HERE _
+      ld de, (HERE)
+      PUSH_RET()
+    ENDM
+
+    ; @brief Patch HL with HERE
+    ;
+    ; Parameters:
+    ; - HL - The address to patch
+    ;
+    ; Alters: DE, HL
+    MACRO PATCH_HERE _
+      ld de, (HERE)
+      ld (hl), e
+      inc hl
+      ld (hl), d
+    ENDM
+
 #endif

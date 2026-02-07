@@ -24,9 +24,6 @@ branch:
 
     ; @brief Conditional control-flow primitive used by compiled branch words.
     ;
-    ; Parameters:
-    ; - DE (via POP()) - flag
-    ;
     ; Expects the CPU return address (on Z80 stack) to point to an inline 16-bit
     ; absolute target cell.
     ;
@@ -48,62 +45,99 @@ branch0:
     ; Non-zero flag: skip inline target and continue after it.
     inc hl
     inc hl
-    push hl
-    ret
+    jp (hl)
 
 @take:
-    ld e, (hl)
+    ld a, (hl)
     inc hl
-    ld d, (hl)
-    push de
-    ret
+    ld h, (hl)
+    ld l, a
+    jp (hl)
 ;
 
 
-; Compile Only
-; ( flag -- )
+; ( flag -- ) [ -- orig ]
 WORD "if", word_if
     ; compile a conditional branch primitive with patchable target
     DICT_CALL(branch0)
-
-    ld de, (HERE)
-    PUSH_RET() ; push addr of 0x0000 to return stack
-
+    PUSH_HERE() ; push addr of 0x0000 to return stack
     ld de, 0x0000
     call DICT_W ; write 0x0000
-
     ret
 ENDWORD_FLAGS "if", word_if, RESERVED | IMMEDIATE
 
-; Compile Only
+; ( -- ) [ orig1 -- orig2 ]
 WORD "else", word_else
     ; compile an unconditional branch primitive with patchable target
     DICT_CALL(branch)
 
     ; patch IF's address
-    POP_RET() ; DE has address of IF's 0x0000
-    ex de, hl ; HL has address of IF's 0x0000
-    ld de, (HERE)
-    ld (hl), e
-    inc hl
-    ld (hl), d ; patched IF's 0x0000
+    POP_RET()   ; DE has address of IF's 0x0000
+    push de
 
-    PUSH_RET() ; push addr of 0x0000 to return stack
-
+    PUSH_HERE()
     ld de, 0x0000
     call DICT_W
+
+    pop hl
+    PATCH_HERE()
 
     ret
 ENDWORD_FLAGS "else", word_else, RESERVED | IMMEDIATE
 
-; Compile Only
+; ( -- ) [ orig -- ]
 WORD "then", word_then
     POP_RET() ; get the address of ELSE 0x0000
     ex de, hl ; HL has address of ELSE's 0x0000
-    ld de, (HERE)
-    ld (hl), e
-    inc hl
-    ld (hl), d ; patched ELSE's 0x0000
-
+    PATCH_HERE() ; patched ELSE's 0x0000
     ret
 ENDWORD_FLAGS "then", word_then, RESERVED | IMMEDIATE
+
+; ( -- ) [ -- dest ]
+WORD "begin", word_begin
+    PUSH_HERE()
+    ret
+ENDWORD_FLAGS "begin", word_begin, RESERVED | IMMEDIATE
+
+; ( flag -- ) [dest -- ]
+WORD "until", word_until
+    POP_RET()
+    push de
+    DICT_CALL(branch0)
+    pop de
+    call DICT_W
+    ret
+ENDWORD_FLAGS "until", word_until, RESERVED | IMMEDIATE
+
+; ( flag -- ) [ dest -- dest orig ]
+WORD "while", word_while
+    POP_RET()
+    PUSH_RET() ; dup
+    call word_if
+    ret
+ENDWORD_FLAGS "while", word_while, RESERVED | IMMEDIATE
+
+; ( -- ) [ dest orig -- ]
+WORD "repeat", word_repeat
+    ; WHILE
+    POP_RET() ; DE = orig
+    push de
+
+    ; BEGIN
+    POP_RET() ; DE = dest
+    push de
+
+    ; go back to BEGIN
+    DICT_CALL(branch)
+
+    ; Compile inline target for branch (back-edge to BEGIN)
+    pop de
+    call DICT_W
+
+    ; Patch WHILE's forward-exit placeholder to HERE
+    pop hl
+    PATCH_HERE()
+    ret
+ENDWORD_FLAGS "repeat", word_repeat, RESERVED | IMMEDIATE
+
+

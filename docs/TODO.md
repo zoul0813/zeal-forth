@@ -47,10 +47,10 @@ Items marked with `❓` may or may not be defined
 * [x] if        `( flag -- )`
 * [x] else      `( -- )`
 * [x] then      `( -- )`
-* [ ] begin     `( -- )`
-* [ ] until     `( flag -- )`
-* [ ] while     `( flag -- )`
-* [ ] repeat    `( -- )`
+* [x] begin     `( -- )`
+* [x] until     `( flag -- )`
+* [x] while     `( flag -- )`
+* [x] repeat    `( -- )`
 * [ ] do        `( limit start -- )`
 * [ ] loop      `( -- )`
 * [ ] +loop     `( n -- )`

@@ -52,11 +52,7 @@ WORD "create", word_create
     ; default behavior is CREATE semantics: return
     DICT_JP(@create_ret)
 
-    ; patch address of constant
-    ld de, (HERE)
-    ld (hl), e
-    inc hl
-    ld (hl), d
+    PATCH_HERE() ; patch address of constant
 @create_ret:
     ret
 ENDWORD "create", word_create
@@ -98,17 +94,15 @@ WORD "does>", word_does
     DICT_INS(0xC3) ; jp nn
 
     POP_RET()  ; pop previous 0 marker
-    ld de, (HERE)
-    PUSH_RET() ; patch site for ; to jump over does>-part
+    PUSH_HERE();
+
     ld de, 0x0000
     call DICT_W
 
     ; patch the does-code address now that HERE points right after the prologue
-    ld de, (HERE)
     pop hl
-    ld (hl), e
-    inc hl
-    ld (hl), d
+    PATCH_HERE()
+
     ret
 ENDWORD_FLAGS "does>", word_does, RESERVED | IMMEDIATE
 
@@ -147,10 +141,7 @@ WORD ";", word_semicolon
     or e
     jr z, @write_ret
     ex de, hl ; HL = patch site
-    ld de, (HERE) ; destination is RET at end of definition
-    ld (hl), e
-    inc hl
-    ld (hl), d
+    PATCH_HERE() ; destination is RET at end of definition
 @write_ret:
     SET_STATE(STATE_IMM)
     ld hl, (HERE)
