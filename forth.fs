@@ -17,6 +17,49 @@
 : cell- 1 cells - ;
 : char+ 1 + ;
 
+\ ZOS Video (IOCTL on DEV_STDOUT=0)
+\ CMD_GET_AREA      = 1
+\ CMD_GET_CURSOR_XY = 2
+\ CMD_SET_CURSOR_XY = 4
+\ CMD_SET_COLORS    = 5
+\ CMD_CLEAR_SCREEN  = 6
+\ CMD_RESET_SCREEN  = 7
+
+: vctl ( cmd param -- status )
+  swap 0 swap rot ioctl
+;
+
+create _cursor_xy 2 allot
+create _area_buf 4 allot
+
+: set-cursor ( x y -- )
+  swap 256 * + 4 swap vctl drop
+;
+
+: get-cursor ( -- x y )
+  2 _cursor_xy vctl drop
+  _cursor_xy c@
+  _cursor_xy char+ c@
+;
+
+: set-colors ( bg fg -- )
+  swap 256 * + 5 swap vctl drop
+;
+
+: clrscr ( -- )
+  6 0 vctl drop
+;
+
+: reset-screen ( -- )
+  7 0 vctl drop
+;
+
+: screen-size ( -- w h )
+  1 _area_buf vctl drop
+  _area_buf c@
+  _area_buf char+ c@
+;
+
 \ Stack words
 
 : nip swap drop ;
@@ -46,6 +89,12 @@
 \ System ( -- n )
 : free 64511 here - ;
 
+variable seed
+12345 seed !
+
+: rand16  ( -- u )
+  seed @ 25173 * 13849 + dup seed ! ;
+
 : marker 0 ; \ forget this and drop everything below
 
 : test-begin-until ( -- )
@@ -73,12 +122,6 @@
     i .
   loop
 ;
-
-variable seed
-12345 seed !
-
-: rand16  ( -- u )
-  seed @ 25173 * 13849 + dup seed ! ;
 
 : slash   ( -- c )
   rand16 1 and if 47 else 92 then ; \ '/' or '\'

@@ -111,3 +111,41 @@ WORD "key", word_key
     KB_MODE_COOKED()
     ret
 ENDWORD "key", word_key
+
+; ( dev cmd param num -- status )
+; Execute raw ZealOS syscall number `num` with:
+;   H = dev (low byte)
+;   C = cmd (low byte)
+;   DE = param
+;   L = syscall number (low byte)
+; Returns status code from A (sign-extended to cell).
+WORD "syscall", word_syscall
+    POP()          ; DE = syscall number
+    ld l, e
+    POP()          ; DE = param
+    push de        ; preserve param
+    POP()          ; DE = cmd
+    ld c, e
+    POP()          ; DE = dev
+    ld h, e
+    pop de         ; restore param
+    rst 0x8
+
+    ; Return A as signed 16-bit cell
+    ld e, a
+    ld d, 0
+    bit 7, a
+    jr z, @ret
+    ld d, 0xFF
+@ret:
+    PUSH()
+    ret
+ENDWORD "syscall", word_syscall
+
+; ( dev cmd param -- status )
+; Wrapper around `syscall` for syscall #7 (IOCTL).
+WORD "ioctl", word_ioctl
+    ld de, 7
+    PUSH()
+    jp word_syscall
+ENDWORD "ioctl", word_ioctl

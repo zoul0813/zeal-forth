@@ -9,6 +9,12 @@
 5 constant WORD-LEN
 6 constant MAX-TRIES
 26 constant ALPHA-LEN
+0 constant COLOR-BG
+15 constant COLOR-DEFAULT
+10 constant COLOR-GREEN
+14 constant COLOR-YELLOW
+12 constant COLOR-RED
+8 constant COLOR-GRAY
 
 create guessed ALPHA-LEN allot
 
@@ -30,7 +36,7 @@ variable tmp-flag
 variable tmp-char
 variable tmp-idx
 
-: cls ( -- ) 12 0 do cr loop ;
+: cls ( -- ) clrscr ;
 
 : gaddr ( idx -- c-addr ) guessed + ;
 : g@ ( idx -- n ) gaddr c@ ;
@@ -112,16 +118,20 @@ variable tmp-idx
     secret-ptr @ i + c@
     dup letter-idx g@
     if
+      COLOR-BG COLOR-GREEN set-colors
       emit
     else
+      COLOR-BG COLOR-GRAY set-colors
       drop 95 emit      \ _
     then
+    COLOR-BG COLOR-DEFAULT set-colors
     32 emit
   loop
   cr
 ;
 
 : show-used ( -- )
+  COLOR-BG COLOR-YELLOW set-colors
   ." Used: "
   ALPHA-LEN 0 do
     i g@ if
@@ -129,6 +139,7 @@ variable tmp-idx
       32 emit
     then
   loop
+  COLOR-BG COLOR-DEFAULT set-colors
   cr
 ;
 
@@ -164,7 +175,9 @@ variable tmp-idx
   MAX-TRIES tries-left !
   begin
     cls
+    COLOR-BG COLOR-YELLOW set-colors
     ." HANGMAN" cr
+    COLOR-BG COLOR-DEFAULT set-colors
     ." Tries left:" cr
     tries-left @ .
     show-word
@@ -179,20 +192,25 @@ variable tmp-idx
     else
       if                     \ valid?
         dup in-secret? if
+          COLOR-BG COLOR-GREEN set-colors
           ." Good guess." cr
         else
+          COLOR-BG COLOR-RED set-colors
           ." Miss." cr
           tries-left @ 1- tries-left !
         then
+        COLOR-BG COLOR-DEFAULT set-colors
         drop
         solved? if
-          cls
+          COLOR-BG COLOR-GREEN set-colors
           ." You win! Word: " secret-ptr @ WORD-LEN type cr
+          COLOR-BG COLOR-DEFAULT set-colors
           1
         else
           tries-left @ 0 = if
-            cls
+            COLOR-BG COLOR-RED set-colors
             ." You lose. Word: " secret-ptr @ WORD-LEN type cr
+            COLOR-BG COLOR-DEFAULT set-colors
             1
           else
             0

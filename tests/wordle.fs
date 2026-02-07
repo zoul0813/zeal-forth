@@ -2,9 +2,9 @@
 \ Assumes forth.fs is loaded (for `constant`, `1+`, `1-`, `cr`, `rand16`).
 \
 \ Feedback:
-\ - Uppercase letter: correct spot (green)
-\ - Lowercase letter: in word, wrong spot (yellow)
-\ - . : not in word (gray)
+\ - Green  letter: correct spot
+\ - Yellow letter: in word, wrong spot
+\ - Gray   .      : not in word
 \
 \ Run:
 \   loadfile "forth.fs"
@@ -16,6 +16,11 @@
 6 constant MAX-TRIES
 26 constant ALPHA-LEN
 30 constant BOARD-CELLS
+0 constant COLOR-BG
+15 constant COLOR-DEFAULT
+10 constant COLOR-GREEN
+14 constant COLOR-YELLOW
+8 constant COLOR-GRAY
 
 create gbuf WORD-LEN allot
 create mbuf WORD-LEN allot
@@ -35,7 +40,7 @@ variable draw-row
 variable row-save
 variable idx-save
 
-: cls ( -- ) 12 0 do cr loop ;
+: cls ( -- ) clrscr ;
 
 : gaddr ( idx -- c-addr ) gbuf + ;
 : gbuf@ ( idx -- n ) gaddr c@ ;
@@ -247,10 +252,9 @@ s" CHIPS" add-word drop
   loop
 ;
 
-: draw-board ( -- )
-  cls
+: draw-board-body ( -- )
   ." WORDLE (5 letters, 6 tries)" cr
-  ." Upper=right, lower=present, .=absent" cr
+  ." Green=right, yellow=present, gray=absent" cr
   cr
   MAX-TRIES 0 do
     i draw-row !
@@ -260,17 +264,21 @@ s" CHIPS" add-word drop
         idx-save @ hmark@
         dup 2 = if
           drop
+          COLOR-BG COLOR-GREEN set-colors
           idx-save @ hguess@ emit
         else
           dup 1 = if
             drop
-            idx-save @ hguess@ to-lower emit
+            COLOR-BG COLOR-YELLOW set-colors
+            idx-save @ hguess@ emit
           else
             drop
+            COLOR-BG COLOR-GRAY set-colors
             46 emit
           then
         then
         32 emit
+        COLOR-BG COLOR-DEFAULT set-colors
       loop
     else
       WORD-LEN 0 do
@@ -281,6 +289,16 @@ s" CHIPS" add-word drop
     cr
   loop
   cr
+;
+
+: draw-board ( -- )
+  cls
+  draw-board-body
+;
+
+: draw-board-final ( -- )
+  clrscr
+  draw-board-body
 ;
 
 : show-secret ( -- )
@@ -299,13 +317,13 @@ s" CHIPS" add-word drop
       else
         read-guess if
           eval-guess
-          tries-used @ save-row
-          tries-used @ 1+ tries-used !
-          guess-correct? if
-            draw-board
-            ." You win!" cr
-            1
-          else
+        tries-used @ save-row
+        tries-used @ 1+ tries-used !
+        guess-correct? if
+          draw-board-final
+          ." You win!" cr
+          1
+        else
             0
           then
         else
