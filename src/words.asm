@@ -4,6 +4,8 @@
     INCLUDE "words_h.asm"
 
     SECTION TEXT
+
+    PUBLIC next_word
 ; @brief Advanced the input buffer to the next word
 ;
 ; Paramters:
@@ -55,6 +57,35 @@ next_word:
     ld (_next_word), de
     ret
 ;
+
+    PUBLIC parse_until_quote
+; @brief Parse bytes from HL until the next '"'.
+;
+; Parameters:
+; - HL - start of text (first byte after opening quote, or immediate text for .")
+;
+; Returns:
+; - DE - start address of text
+; - BC - text length
+; - HL - address just after closing quote
+;
+; On unterminated input, prints ERR_UNTERMINATED_STR and does not return.
+parse_until_quote:
+    ld d, h
+    ld e, l
+    ld bc, 0
+@count:
+    ld a, (hl)
+    inc hl
+    cp '"' ; end
+    ret z
+    cp 0x00 ; null-term
+    jr nz, @not_null
+    ld a, ERR_UNTERMINATED_STR
+    jp print_error
+@not_null:
+    inc bc
+    jr @count
 
 
     SECTION DATA

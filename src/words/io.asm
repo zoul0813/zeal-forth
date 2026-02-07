@@ -1,6 +1,7 @@
     INCLUDE "words_h.asm"
     INCLUDE "dict_h.asm"
 
+
 ; ( n -- ) Display n in free field format.
 WORD ".", word_dot
     POP()
@@ -24,23 +25,7 @@ word_dot_quote_runtime:
 ; ( -- ) Print the string following the word
 WORD ".\"", word_dot_quote
     ld hl, (_next_word)
-    ld d, h
-    ld e, l
-    ld bc, 0
-@count:
-    ld a, (hl)
-    inc hl
-    cp '"' ; end
-    jr z, @doit
-    cp 0x00 ; null-term
-    jr nz, @not_null
-    ld a, ERR_UNTERMINATED_STR
-    jp print_error
-@not_null:
-    inc bc
-    jr @count
-
-@doit: ; DE = buffer, BC = length
+    call parse_until_quote ; DE = buffer, BC = length
     IF_STATE(STATE_COMP, @compile)
     push hl
     call puts
@@ -88,6 +73,7 @@ WORD "type", word_type
     ret
 ENDWORD "type", word_type
 
+; ( -- )
 ; discard the remaining chars in the "line"
 WORD "\\", word_discard
     ld hl, (_next_word)
@@ -106,6 +92,7 @@ WORD "\\", word_discard
     ret
 ENDWORD_FLAGS "\\", word_discard, IMMEDIATE
 
+; ( -- )
 WORD "(", word_lparen
     ld hl, (_next_word)
 @loop:
@@ -123,11 +110,20 @@ WORD "(", word_lparen
     ret
 ENDWORD_FLAGS "(", word_lparen, IMMEDIATE
 
+; ( "ccc<quote>" -- )
 WORD "loadfile", word_loadfile
-    call next_word
-    jr z, @done
-    ld de, (_curr_word)
+    ld hl, (_next_word)
+@check_quote:
+    cp '"'
+    jr z, @quoted
+    ld a, ERR_UNTERMINATED_STR
+    jp print_error
+@quoted:
+    inc hl ; skip opening quote
+    call parse_until_quote ; DE=path, BC=len, HL=after closing quote
+    dec hl
+    ld (hl), 0 ; temporary null-terminate the quoted path
+    inc hl
+    ld (_next_word), hl
     jp loadfile
-@done:
-    ret
 ENDWORD "loadfile", word_loadfile

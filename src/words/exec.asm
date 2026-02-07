@@ -17,7 +17,7 @@ _begin_new_word:
     inc de ; DE = dict_body
     call DICT_W ; write the CFA as dict_body???
     ret
-
+;
 
 ; Runtime helper for DOES>; patches the child entry from return stack
 ; Input: DE = does>-code address
@@ -34,6 +34,7 @@ _does_patch_created_entry:
     inc hl
     ld (hl), d
     ret
+;
 
 ; ( "<spaces>name" -- ) Create a variable
 WORD "create", word_create

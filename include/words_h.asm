@@ -2,7 +2,7 @@
 #define _WORDS_H_ASM_
 
     EXTERN next_word
-    EXTERN current_word
+    EXTERN parse_until_quote
 
 ; Create a new word
 ;
