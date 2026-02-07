@@ -85,7 +85,7 @@ Items marked with `❓` may or may not be defined
 * [x] char+     🇫 `( c-addr1 -- c-addr2 )`
 * [ ] move      `( addr1 addr2 u -- )` | memcpy(addr2, addr1, u)
 * [ ] fill      `( c-addr u char -- )` | memset(c-addr, char, u)
-* [x] erase     🇫 `( addr u -- )` | memset(addr, 0, u)
+* [ ] erase     `( addr u -- )` | memset(addr, 0, u)
 
 ## Math
 
@@ -114,7 +114,8 @@ Items marked with `❓` may or may not be defined
 * [x] spaces    🇫 `( n -- )`
 * [x] ."        `( "ccc<quote>" -- )`
 * [x] type      `( c-addr n -- )`
-* [ ] key       `( -- c )`
+* [x] key?      `( -- flag )` | non-blocking key probe, buffers one key for `key`
+* [x] key       `( -- c )`
 
 ## Dictionary/introspection
 

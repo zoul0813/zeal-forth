@@ -10,7 +10,8 @@ implementation. It is based on the assembly sources in `src/`.
   - `Type \`bye\` to exit`
   - A blank line between each line above.
 - A prompt of `> ` is displayed before each input line.
-- After processing a full line, the interpreter prints `  ok` and a newline.
+- After processing an interactive input line, the interpreter prints `  ok` and a newline.
+- While processing file chunks via `loadfile`, `ok` is suppressed.
 
 ## Input parsing
 
@@ -19,6 +20,20 @@ implementation. It is based on the assembly sources in `src/`.
   terminator.
 - Tokens are split on spaces (`0x20`) and newlines (`0x0A`).
 - Empty tokens are skipped.
+- `."` and `loadfile` both use the same quoted-string parser helper.
+
+## File loading (`loadfile`)
+
+- `loadfile` is a built-in word that requires a quoted path:
+  - valid: `loadfile "forth.fs"`
+  - invalid: `loadfile forth.fs` (unterminated string error)
+- Runtime file reads happen in 256-byte chunks.
+- On full-size chunks, the loader scans backward to the last `\n`, null-terminates
+  there, and parses only complete lines.
+- Any trailing partial line is preserved by seeking the file descriptor backward
+  by the carry length, so the next read resumes from that partial line.
+- If no newline exists in a full chunk, the current behavior does not carry tail
+  bytes to avoid stalling on long lines.
 
 ## Numbers
 
@@ -41,6 +56,7 @@ implementation. It is based on the assembly sources in `src/`.
 - A return stack of 1024 bytes exists and is exposed via `>r`, `r>`, and `.rs`.
   It is also used internally for compiler/runtime plumbing:
   - patching `if`/`else`/`then`
+  - patching `begin`/`until`/`while`/`repeat` and `do`/`loop`
   - `create ... does>` handoff (the created entry and patch sites are passed via
     return stack temporaries)
 
@@ -62,6 +78,8 @@ implementation. It is based on the assembly sources in `src/`.
 - `.` prints a 16-bit value in free-field decimal format, then a newline.
 - `emit` writes the low byte of the top stack item to standard output.
 - `type` writes `n` bytes from `c-addr`.
+- `key?` is non-blocking and returns a flag; when true it buffers one key for `key`.
+- `key` returns one key, consuming the buffered key first when present.
 
 ## Error messages
 
@@ -77,6 +95,10 @@ implementation. It is based on the assembly sources in `src/`.
 - `;` ends the definition by emitting a `RET` and returning to interpret mode.
 - `if`/`else`/`then` emit conditional jumps and backpatch targets using the return
   stack.
+- `begin`/`until`/`while`/`repeat` are compiled using internal `branch`/`branch0`
+  primitives and control-stack patching.
+- `do`/`loop` use runtime helpers (`do_init`, `do_loop`, `do_next`, `do_unwind`)
+  with a zero-trip check compiled by `do`.
 - `does>` compiles a runtime patch prologue that redirects the last `create`d
   child into the code after `does>`, and uses return-stack temporaries to carry
   patch addresses.

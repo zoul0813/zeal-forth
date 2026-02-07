@@ -9,6 +9,7 @@
 
 : cr 10 emit ;
 : space 32 emit ;
+: spaces 0 do space loop ;
 
 \ Cell Words
 

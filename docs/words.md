@@ -59,8 +59,11 @@ use the Forth convention `( before -- after )`.
 | `."` | `( -- )` | Print characters until the next `"`, consuming the input stream. |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
 | `type` | `( c-addr n -- )` | Output `n` bytes from `c-addr`. |
+| `loadfile` | `( "ccc<quote>" -- )` | Load and interpret a file from a quoted path. |
+| `key?` | `( -- flag )` | Non-blocking key probe; buffers one key for `key` when true. |
+| `key` | `( -- c )` | Return one key; consumes buffered key if `key?` found one. |
 | `\` | `( -- )` | Discard the remainder of the input buffer. Immediate. |
-| `(` | `( -- )` | Discard input until the next `)` (comment). Immediate. |
+| `(` | `( -- )` | Discard input until the next `)` in the current buffer. Immediate. |
 
 ## Dictionary + Compilation
 
@@ -99,14 +102,31 @@ use the Forth convention `( before -- after )`.
 
 ## Reserved words
 
-Reserved words are compile-only, which includes branching and other compile time words
+Reserved words are primarily compiler/control words (many are compile-only).
 
 | Word | Stack effect | Description |
 | --- | --- | --- |
-| `if` | `( flag -- )` | Compile-time conditional branch. Immediate + compile-only. |
-| `else` | `( -- )` | Compile-time branch target for `if`. Immediate + compile-only. |
-| `then` | `( -- )` | Close the `if`/`else` block. Immediate + compile-only. |
+| `if` | `( C: -- orig )` | Compile `branch0` and leave forward patch site. Immediate + compile-only. |
+| `else` | `( C: orig1 -- orig2 )` | Compile `branch`, patch `if`, leave new patch site. Immediate + compile-only. |
+| `then` | `( C: orig -- )` | Patch `orig` to current `here`. Immediate + compile-only. |
+| `begin` | `( C: -- dest )` | Mark loop start. Immediate + compile-only. |
+| `until` | `( C: dest -- )` | Compile `branch0` back to `dest`. Immediate + compile-only. |
+| `while` | `( C: dest -- dest orig )` | Compile `if` inside a `begin` loop. Immediate + compile-only. |
+| `repeat` | `( C: dest orig -- )` | Compile back-edge to `dest`, patch `orig`. Immediate + compile-only. |
+| `do` | `( C: -- orig-exit dest )` | Compile counted-loop setup and zero-trip exit. Immediate + compile-only. |
+| `loop` | `( C: orig-exit dest -- )` | Compile increment/test/back-edge and loop unwind. Immediate + compile-only. |
+| `i` | `( -- n )` | Push current loop index. Reserved runtime word. |
 | `does>` | `( -- )` | Split a defining word so created children execute code after `does>`. Immediate + compile-only. Uses return-stack temporaries internally. |
+| `;` | `( -- )` | End definition. Immediate + compile-only. |
+
+## Internal control primitives
+
+These are internal asm labels in `src/words/flow.asm`, not dictionary words:
+
+| Label | Effect | Description |
+| --- | --- | --- |
+| `branch` | `( -- )` | Unconditional jump via inline 16-bit absolute target. |
+| `branch0` | `( flag -- )` | Jump to inline target when `flag = 0`; otherwise skip inline target. |
 
 ## Stack Effect Symbols
 
@@ -125,9 +145,9 @@ Reserved words are compile-only, which includes branching and other compile time
 
 | Symbol | Type | Description | Usage |
 | --- | --- | --- | --- |
-| `orig` | addr | Placeholder | Patch location |
-| `dest` | addr | Address | Destination that is usually patched into `orig` |
-| `do-sys` | tuple | ... | ... |
+| `orig` | addr | Forward branch patch site | Address of inline target cell to patch later |
+| `dest` | addr | Backward branch target | Destination address for loop back-edge |
+| `orig-exit` | addr | `do` zero-trip exit patch site | Patched by `loop` to unwind path |
 
 ## Examples
 
