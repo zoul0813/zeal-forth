@@ -118,11 +118,17 @@ read_file:
     ld h, a
     CLOSE()
     ;; TODO: error check
+    xor a
+    ld (_file_fd), a
     xor a ; clear zero flag
     ret
 @error_neg:
     neg
 @error:
+    push af
+    xor a
+    ld (_file_fd), a
+    pop af
     call print_error
     xor a ; clear zero flag
     ret

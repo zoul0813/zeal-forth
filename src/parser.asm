@@ -75,6 +75,10 @@ do_next_word:
 
 ; @brief Print "  ok"
 print_ok:
+    ; Suppress "ok" while processing file input chunks.
+    ld a, (_file_fd)
+    or a
+    ret nz
     PUTS(_str_ok, _str_ok_end)
     ; jp prompt
     ret
