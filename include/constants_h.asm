@@ -52,8 +52,6 @@
 
     ; file parser
     EXTERN _file_fd
-    EXTERN _carry_len
-    EXTERN _buf_len
 
     ; HERE
     EXTERN HERE        ;; here pointer

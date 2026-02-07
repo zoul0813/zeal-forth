@@ -21,8 +21,7 @@
 : nip swap drop ;
 : tuck swap over ;
 : 2swap rot >r rot r> ;
-: 2dup
-over over ;
+: 2dup over over ;
 
 : 2drop drop drop ;
 : 2r@ r> r> 2dup >r >r swap ;
@@ -56,7 +55,7 @@ over over ;
     dup 5 =
   until
 ;
-\ 
+
 : test-begin-while-repeat ( -- )
   0
   begin
@@ -81,8 +80,7 @@ variable seed
   seed @ 25173 * 13849 + dup seed ! ;
 
 : slash   ( -- c )
-  rand16 1 and if 47 else 92 then ;        
-  \ '/' or '\'
+  rand16 1 and if 47 else 92 then ; \ '/' or '\'
 
 : tenprint ( -- )
   begin

@@ -76,8 +76,6 @@ _input_buffer_null:
 
 ;; file parser
 _file_fd: DEFB 0
-_carry_len: DEFW 0
-_buf_len: DEFW 0
 
   ; a place to store dword numbers for conversion
 _dword_num:
