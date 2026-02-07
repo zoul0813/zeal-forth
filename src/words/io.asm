@@ -122,3 +122,12 @@ WORD "(", word_lparen
     ld (_next_word), hl
     ret
 ENDWORD_FLAGS "(", word_lparen, IMMEDIATE
+
+WORD "loadfile", word_loadfile
+    call next_word
+    jr z, @done
+    ld de, (_curr_word)
+    jp loadfile
+@done:
+    ret
+ENDWORD "loadfile", word_loadfile

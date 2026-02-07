@@ -13,7 +13,7 @@
 
     EXTERN prompt
     EXTERN do_next_word
-    EXTERN read_file
+    EXTERN loadfile
     ; EXTERN print_ok
     ; EXTERN numeric_overflow
     EXTERN print_error

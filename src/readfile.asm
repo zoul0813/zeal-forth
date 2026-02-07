@@ -75,8 +75,10 @@ _readfile_prepare_chunk:
     SEEK()
     pop hl
     ret
+;
 
-read_file:
+    PUBLIC loadfile
+loadfile:
     ld b, d
     ld c, e
     ld h, O_RDONLY

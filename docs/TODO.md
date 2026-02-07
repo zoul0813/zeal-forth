@@ -129,3 +129,4 @@ Items marked with `❓` may or may not be defined
 * [x] marker    🇫 `( -- 0 )` | placeholder marker word (currently returns 0)
 * [ ] syscall   `( n -- )` | execute syscall n, additional stack params may be required as defined by syscall
 * [ ] ioctl     `( dev c de -- )` | ioctl(dev, c, de)
+* [x] loadfile  `( "ccc<quote>" -- )` | Read and parse forth file

@@ -82,10 +82,14 @@ variable seed
 : slash   ( -- c )
   rand16 1 and if 47 else 92 then ; \ '/' or '\'
 
-: tenprint ( -- )
-  begin
-    slash emit
-    0 until    \ infinite loop
+: tenprint ( screens -- )
+  0 do          \ 10 screens
+    40 0 do        \ 40 rows
+      80 0 do      \ 80 cols
+        slash emit
+      loop
+    loop
+  loop
 ;
 
 

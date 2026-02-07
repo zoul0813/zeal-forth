@@ -32,7 +32,7 @@ main:
     or l
     jr z, @repl ; no args, goto prompt
 @readfile:
-    call read_file
+    call loadfile
     ; jr nz, @readfile ; refill the buffer
 @repl:
     ; set the kb mode to block/cooked for now
