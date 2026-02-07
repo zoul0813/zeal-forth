@@ -68,4 +68,27 @@ over over ;
   drop
 ;
 
+: counter ( limit start -- )
+  do
+    i .
+  loop
+;
+
+variable seed
+12345 seed !
+
+: rand16  ( -- u )
+  seed @ 25173 * 13849 + dup seed ! ;
+
+: slash   ( -- c )
+  rand16 1 and if 47 else 92 then ;        
+  \ '/' or '\'
+
+: tenprint ( -- )
+  begin
+    slash emit
+    0 until    \ infinite loop
+;
+
+
 ." Done." cr

@@ -51,10 +51,10 @@ Items marked with `❓` may or may not be defined
 * [x] until     `( flag -- )`
 * [x] while     `( flag -- )`
 * [x] repeat    `( -- )`
-* [ ] do        `( limit start -- )`
-* [ ] loop      `( -- )`
+* [x] do        `( limit start -- )`
+* [x] loop      `( -- )`
 * [ ] +loop     `( n -- )`
-* [ ] i         `( -- n )`
+* [x] i         `( -- n )`
 * [ ] j         `( -- n )` | [if you add a return stack model]
 
 ## Defining words

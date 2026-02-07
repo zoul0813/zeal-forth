@@ -60,9 +60,9 @@ branch0:
 WORD "if", word_if
     ; compile a conditional branch primitive with patchable target
     DICT_CALL(branch0)
-    PUSH_HERE() ; push addr of 0x0000 to return stack
+    PUSH_HERE() ; push addr to return stack
     ld de, 0x0000
-    call DICT_W ; write 0x0000
+    call DICT_W ; write addr
     ret
 ENDWORD_FLAGS "if", word_if, RESERVED | IMMEDIATE
 
@@ -72,7 +72,7 @@ WORD "else", word_else
     DICT_CALL(branch)
 
     ; patch IF's address
-    POP_RET()   ; DE has address of IF's 0x0000
+    POP_RET()   ; DE has address of IF's addr
     push de
 
     PUSH_HERE()
@@ -87,9 +87,9 @@ ENDWORD_FLAGS "else", word_else, RESERVED | IMMEDIATE
 
 ; ( -- ) [ orig -- ]
 WORD "then", word_then
-    POP_RET() ; get the address of ELSE 0x0000
-    ex de, hl ; HL has address of ELSE's 0x0000
-    PATCH_HERE() ; patched ELSE's 0x0000
+    POP_RET() ; get the address of ELSE addr
+    ex de, hl ; HL has address of ELSE's addr
+    PATCH_HERE() ; patched ELSE's addr
     ret
 ENDWORD_FLAGS "then", word_then, RESERVED | IMMEDIATE
 
@@ -141,3 +141,92 @@ WORD "repeat", word_repeat
 ENDWORD_FLAGS "repeat", word_repeat, RESERVED | IMMEDIATE
 
 
+; ( limit start -- )
+do_init:
+    POP()       ; DE = start
+    ex de, hl
+    POP()       ; DE = limit
+    PUSH_RET()  ; [ -- limit ]
+    ex de, hl
+    JP_PUSH_RET()  ; [ -- limit index ]
+
+
+; ( -- flag )
+;
+; flag = 0 when index == limit
+do_loop:
+    POP_RET()   ; DE = index
+    ex de, hl   ; HL = index
+    POP_RET()   ; DE = limit
+    push de     ; backup limit
+
+    push hl
+    or a
+    sbc hl, de  ; index == limit?
+    pop hl
+    jr z, @done
+
+    ld de, TRUE
+    PUSH()
+    jr @return
+@done:
+    ld de, FALSE
+    PUSH()
+
+@return:
+    pop de        ; restore limit
+    PUSH_RET()    ; [ -- limit ]
+    ex de, hl
+    JP_PUSH_RET() ; [ -- limit index ]
+
+
+do_next:
+    POP_RET()          ; DE = index
+    inc de             ; index++
+    PUSH_RET()         ; write back updated index
+    jp do_loop
+
+do_unwind:
+    POP_RET()   ; index
+    POP_RET()   ; limit
+    ret
+
+WORD "do", word_do
+    DICT_CALL(do_init)  ; setup the loop state
+    DICT_CALL(do_loop)  ; zero-trip test
+    DICT_CALL(branch0)  ; branch to unwind when start == limit
+    PUSH_HERE()         ; orig_exit patch site
+    ld de, 0x0000
+    call DICT_W
+    PUSH_HERE()         ; loop body start (dest)
+    ret
+ENDWORD_FLAGS "do", word_do, RESERVED | IMMEDIATE
+
+WORD "loop", word_loop
+    POP_RET()           ; DE = dest
+    push de
+    POP_RET()           ; DE = orig_exit
+    push de
+    DICT_CALL(do_next)  ; ( -- flag )
+    DICT_CALL(branch0)  ; branch to unwind when index == limit
+    PUSH_HERE()         ; local exit patch site
+    ld de, 0x0000
+    call DICT_W
+
+    DICT_CALL(branch)   ; otherwise continue loop body
+    pop hl              ; HL = orig_exit from DO
+    pop de              ; DE = dest
+    call DICT_W         ; LOOP back-edge target
+    PATCH_HERE()        ; patch DO's zero-trip exit to unwind path
+
+    POP_RET()           ; HL = local loop-exit patch site
+    ex de, hl
+    PATCH_HERE()        ; patch LOOP's done-exit to unwind path
+    DICT_CALL(do_unwind)
+    ret
+ENDWORD_FLAGS "loop", word_loop, RESERVED | IMMEDIATE
+
+WORD "i", word_i
+    PEEK_RET()
+    JP_PUSH()
+ENDWORD_FLAGS "i", word_i, RESERVED
