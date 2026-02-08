@@ -97,6 +97,8 @@ print_error: ; TODO: implement error lookup
     jr z, @numeric_overflow
     cp ERR_UNTERMINATED_STR
     jr z, @unterminated_str
+    cp ERR_MISSING_NAME
+    jr z, @missing_name
 @code:
     ld e, a
     ld d, 0
@@ -113,6 +115,9 @@ print_error: ; TODO: implement error lookup
     jr @msg
 @stack_underflow:
     PUTS(_str_err_stack_underflow, _str_err_stack_underflow_end)
+    jr @msg
+@missing_name:
+    PUTS(_str_missing_name_str, _str_missing_name_str_end)
     jr @msg
 @not_found:
     PUTC('\'')

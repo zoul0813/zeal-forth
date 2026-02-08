@@ -28,6 +28,7 @@
     DEFC ERR_NOT_FOUND = -1
     DEFC ERR_NUMERIC_OVERFLOW = -13
     DEFC ERR_UNTERMINATED_STR = -14
+    DEFC ERR_MISSING_NAME = -15
 
     EXTERN __TEXT_head
     EXTERN __TEXT_tail
@@ -89,6 +90,8 @@
     EXTERN _str_unsupported_end
     EXTERN _str_unterminated_str
     EXTERN _str_unterminated_str_end
+    EXTERN _str_missing_name_str
+    EXTERN _str_missing_name_str_end
     EXTERN _str_err_stack_overflow
     EXTERN _str_err_stack_overflow_end
     EXTERN _str_err_stack_underflow

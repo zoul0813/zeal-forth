@@ -29,6 +29,10 @@ _str_unterminated_str:
     DEFB "unterminated string", 0
 _str_unterminated_str_end:
 
+_str_missing_name_str:
+    DEFB "missing name", 0
+_str_missing_name_str_end:
+
 _str_error_numeric_overflow:
     DEFB "numeric overflow", 0
 _str_error_numeric_overflow_end:
