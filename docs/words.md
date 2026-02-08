@@ -120,6 +120,7 @@ Reserved words are primarily compiler/control words (many are compile-only).
 | `repeat` | `( C: dest orig -- )` | Compile back-edge to `dest`, patch `orig`. Immediate + compile-only. |
 | `do` | `( C: -- orig-exit dest )` | Compile counted-loop setup and zero-trip exit. Immediate + compile-only. |
 | `loop` | `( C: orig-exit dest -- )` | Compile increment/test/back-edge and loop unwind. Immediate + compile-only. |
+| `+loop` | `( C: orig-exit dest -- )` | Compile variable-step counted-loop update/test/back-edge and unwind. Immediate + compile-only. Runtime consumes step `( n -- )`. |
 | `i` | `( -- n )` | Push current loop index. Reserved runtime word. |
 | `does>` | `( -- )` | Split a defining word so created children execute code after `does>`. Immediate + compile-only. Uses return-stack temporaries internally. |
 | `;` | `( -- )` | End definition. Immediate + compile-only. |

@@ -4,6 +4,8 @@
 
 : cr 10 emit ;
 
+create __math_tests_marker
+
 variable fails
 0 fails !
 
@@ -53,3 +55,4 @@ variable fails
 ;
 
 summary
+forget __math_tests_marker

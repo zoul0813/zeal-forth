@@ -155,42 +155,105 @@ do_init:
 ;
 ; flag = 0 when index == limit
 do_loop:
-    POP_RET()   ; DE = index
-    ex de, hl   ; HL = index
-    POP_RET()   ; DE = limit
-    push de     ; backup limit
-
-    push hl
-    or a
-    sbc hl, de  ; index == limit?
-    pop hl
-    jr z, @done
-
-    ld de, TRUE
-    PUSH()
-    jr @return
-@done:
-    ld de, FALSE
-    PUSH()
-
-@return:
-    pop de        ; restore limit
-    PUSH_RET()    ; [ -- limit ]
-    ex de, hl
-    JP_PUSH_RET() ; [ -- limit index ]
+    ld de, 0
+    PUSH()             ; zero increment for equality check path
+    jp do_plus
 ;
 
 do_next:
-    POP_RET()          ; DE = index
-    inc de             ; index++
-    PUSH_RET()         ; write back updated index
-    jp do_loop
+    ld de, 1
+    PUSH()             ; fixed increment for LOOP
+    jp do_plus
 ;
 
 do_unwind:
     POP_RET()   ; index
     POP_RET()   ; limit
     ret
+;
+
+; Compare HL < DE as signed 16-bit, return flag in DE.
+_signed_lt_hl_de_flag:
+    push hl
+    ld a, h
+    xor d
+    and 080h
+    jr z, @same_sign
+    pop hl
+    bit 7, h
+    jr z, @false
+@true:
+    ld de, TRUE
+    ret
+@same_sign:
+    or a
+    sbc hl, de
+    pop hl
+    jr c, @true
+@false:
+    ld de, FALSE
+    ret
+;
+
+; ( n -- flag )
+;
+; Runtime step helper for +loop.
+; Uses signed boundary crossing:
+;   n > 0 : continue while index' < limit
+;   n < 0 : continue while index' > limit
+;   n = 0 : continue while index' != limit
+do_plus:
+    POP()              ; DE = increment
+    ld b, d
+    ld c, e            ; BC = increment
+
+    POP_RET()          ; DE = index
+    ex de, hl          ; HL = index
+    POP_RET()          ; DE = limit
+
+    add hl, bc         ; HL = new index
+
+    ; Save loop state while computing continue flag.
+    push de            ; limit
+    push hl            ; new index
+
+    ld a, b
+    or c
+    jr z, @step_zero
+    bit 7, b
+    jr z, @step_pos
+    ; signed (new_index > limit) == signed (limit < new_index)
+    ex de, hl
+    call _signed_lt_hl_de_flag
+    jr @flag_done
+@step_pos:
+    call _signed_lt_hl_de_flag
+    jr @flag_done
+@step_zero:
+    push hl
+    or a
+    sbc hl, de
+    pop hl
+    ld de, FALSE
+    jr z, @flag_done
+    ld de, TRUE
+@flag_done:
+    ld a, e            ; save flag byte (FALSE=0, TRUE=0xFF)
+    ex af, af'
+
+    ; Restore loop state with updated index.
+    pop hl             ; HL = new index
+    pop bc             ; BC = limit
+    ld d, b
+    ld e, c
+    PUSH_RET()         ; [ -- limit ]
+    ex de, hl
+    PUSH_RET()         ; [ -- limit index' ]
+
+    ex af, af'
+    ld e, a
+    ld d, a            ; DE = continue flag
+    JP_PUSH()
 ;
 
 WORD "do", word_do
@@ -212,21 +275,31 @@ WORD "?do", word_do_query
     ret
 ENDWORD_FLAGS "?do", word_do_query, RESERVED | IMMEDIATE
 
-WORD "loop", word_loop
+; Shared compiler path for LOOP/+LOOP.
+;
+; Parameters:
+; - BC = runtime step helper CFA (do_next for LOOP, do_plus for +LOOP)
+compile_counted_loop:
     POP_RET()           ; DE = dest
     push de
     POP_RET()           ; DE = orig_exit
     push de
-    DICT_CALL(do_next)  ; ( -- flag )
-    DICT_CALL(branch0)  ; branch to unwind when index == limit
+
+    ; compile call to runtime step helper
+    DICT_INS(0xCD)      ; call nn
+    ld d, b
+    ld e, c
+    call DICT_W
+
+    DICT_CALL(branch0)  ; branch to unwind when done
     PUSH_HERE()         ; local exit patch site
     ld de, 0x0000
     call DICT_W
 
     DICT_CALL(branch)   ; otherwise continue loop body
-    pop hl              ; HL = orig_exit from DO
+    pop hl              ; HL = orig_exit from DO/?DO
     pop de              ; DE = dest
-    call DICT_W         ; LOOP back-edge target
+    call DICT_W         ; back-edge target
     ld a, h
     or l
     jr z, @skip_do_query_patch
@@ -235,10 +308,20 @@ WORD "loop", word_loop
 
     POP_RET()           ; HL = local loop-exit patch site
     ex de, hl
-    PATCH_HERE()        ; patch LOOP's done-exit to unwind path
+    PATCH_HERE()        ; patch local exit to unwind path
     DICT_CALL(do_unwind)
     ret
+;
+
+WORD "loop", word_loop
+    ld bc, do_next
+    jp compile_counted_loop
 ENDWORD_FLAGS "loop", word_loop, RESERVED | IMMEDIATE
+
+WORD "+loop", word_plus_loop
+    ld bc, do_plus
+    jp compile_counted_loop
+ENDWORD_FLAGS "+loop", word_plus_loop, RESERVED | IMMEDIATE
 
 WORD "i", word_i
     PEEK_RET()
