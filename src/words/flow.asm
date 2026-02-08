@@ -149,7 +149,7 @@ do_init:
     PUSH_RET()  ; [ -- limit ]
     ex de, hl
     JP_PUSH_RET()  ; [ -- limit index ]
-
+;
 
 ; ( -- flag )
 ;
@@ -178,21 +178,31 @@ do_loop:
     PUSH_RET()    ; [ -- limit ]
     ex de, hl
     JP_PUSH_RET() ; [ -- limit index ]
-
+;
 
 do_next:
     POP_RET()          ; DE = index
     inc de             ; index++
     PUSH_RET()         ; write back updated index
     jp do_loop
+;
 
 do_unwind:
     POP_RET()   ; index
     POP_RET()   ; limit
     ret
+;
 
 WORD "do", word_do
     DICT_CALL(do_init)  ; setup the loop state
+    ld de, 0x0000
+    PUSH_RET()
+    PUSH_HERE()
+    ret
+ENDWORD_FLAGS "do", word_do, RESERVED | IMMEDIATE
+
+WORD "?do", word_do_query
+    DICT_CALL(do_init)
     DICT_CALL(do_loop)  ; zero-trip test
     DICT_CALL(branch0)  ; branch to unwind when start == limit
     PUSH_HERE()         ; orig_exit patch site
@@ -200,7 +210,7 @@ WORD "do", word_do
     call DICT_W
     PUSH_HERE()         ; loop body start (dest)
     ret
-ENDWORD_FLAGS "do", word_do, RESERVED | IMMEDIATE
+ENDWORD_FLAGS "?do", word_do_query, RESERVED | IMMEDIATE
 
 WORD "loop", word_loop
     POP_RET()           ; DE = dest
@@ -217,7 +227,11 @@ WORD "loop", word_loop
     pop hl              ; HL = orig_exit from DO
     pop de              ; DE = dest
     call DICT_W         ; LOOP back-edge target
-    PATCH_HERE()        ; patch DO's zero-trip exit to unwind path
+    ld a, h
+    or l
+    jr z, @skip_do_query_patch
+    PATCH_HERE()        ; patch ?DO zero-trip exit to unwind path
+@skip_do_query_patch:
 
     POP_RET()           ; HL = local loop-exit patch site
     ex de, hl
