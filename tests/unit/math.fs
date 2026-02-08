@@ -1,6 +1,6 @@
 \ Math smoke/regression tests for core arithmetic words.
 \ Usage:
-\   loadfile "tests/math.fs"
+\   loadfile "tests/unit/math.fs"
 
 : cr 10 emit ;
 

@@ -1,6 +1,6 @@
 \ Flow/control smoke tests.
 \ Usage:
-\   loadfile "tests/flow.fs"
+\   loadfile "tests/unit/flow.fs"
 
 : cr 10 emit ;
 
