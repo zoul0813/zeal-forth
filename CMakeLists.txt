@@ -30,7 +30,6 @@ add_executable(${target_name}
     src/main.asm
     src/stack.asm
     src/common.asm
-    src/math_8.asm
     src/math_16.asm
     src/dict.asm
     src/data.asm

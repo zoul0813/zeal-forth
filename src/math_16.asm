@@ -37,71 +37,68 @@ __mul_hl_de_s:
     ex de, hl
     ret
 
-; @brief Divide HL by DE (unsigned 16-bit division)
+; @brief Unsigned 16-bit divide core (shared by /, mod, /mod)
 ;
-; Performs unsigned division using repeated subtraction.
-; Division by zero returns 0.
+; Uses restoring long division with a fixed 16-iteration loop.
 ;
 ; Parameters:
-;   HL - Dividend (16-bit unsigned)
-;   DE - Divisor (16-bit unsigned)
+;   HL - Dividend
+;   DE - Divisor
 ;
 ; Returns:
-;   DE - Quotient (HL / DE)
+;   HL - Quotient
+;   BC - Remainder
+;
+; Division by zero:
+;   HL=0, BC=0
 ;
 ; Alters:
-;   A, BC, DE, HL
-;
-    PUBLIC __div_hl_de
-__div_hl_de:
+;   AF, BC, DE, HL
+    PUBLIC __udivmod_hl_de
+__udivmod_hl_de:
     ld a, d
     or e
-    jr nz, __div_hl_de_l
-    ld de, 0
-    ret
-__div_hl_de_l:
+    jr nz, @start
+    ld hl, 0
     ld bc, 0
-__div_hl_de_i:
-    or a
-    sbc hl, de
-    jr c, __div_hl_de_d
-    inc bc
-    jr __div_hl_de_i
-__div_hl_de_d:
-    add hl, de
-    ld h, b
-    ld l, c
-    ex de, hl
     ret
 
-; @brief Modulo HL by DE (unsigned 16-bit remainder)
-;
-; Performs unsigned modulo using repeated subtraction.
-; Division by zero returns 0.
-;
-; Parameters:
-;   HL - Dividend (16-bit unsigned)
-;   DE - Divisor (16-bit unsigned)
-;
-; Returns:
-;   DE - Remainder (HL % DE)
-;
-; Alters:
-;   A, DE, HL
-;
-    PUBLIC __mod_hl_de
-__mod_hl_de:
-    ld a, d
-    or e
-    jr nz, __mod_hl_de_l
-    ld de, 0
-    ret
-__mod_hl_de_l:
-    or a
-    sbc hl, de
-    jr c, __mod_hl_de_d
-    jr __mod_hl_de_l
-__mod_hl_de_d:
-    add hl, de
-    ex de, hl
+@start:
+    ld bc, 0          ; remainder
+    ld a, 16
+    ex af, af'        ; A' = loop counter, A free for compares
+
+@loop:
+    add hl, hl        ; quotient <<= 1, carry gets next dividend bit
+    rl c
+    rl b              ; remainder = (remainder << 1) | carry
+
+    ; if (remainder >= divisor) { remainder -= divisor; quotient |= 1; }
+    ld a, b
+    cp d
+    jr c, @next
+    jr nz, @subtract
+    ld a, c
+    cp e
+    jr c, @next
+
+@subtract:
+    ld a, c
+    sub e
+    ld c, a
+    ld a, b
+    sbc a, d
+    ld b, a
+    ; After add hl,hl the low bit is always 0, so setting it to 1 is inc l.
+    inc l
+
+@next:
+    ex af, af'
+    dec a
+    jr z, @done
+    ex af, af'
+    jr @loop
+
+@done:
+    ex af, af'
     ret

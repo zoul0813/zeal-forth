@@ -41,7 +41,8 @@ WORD "/", word_div
     POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
 
-    call __div_hl_de
+    call __udivmod_hl_de  ; HL=quot, BC=rem
+    ex de, hl             ; DE=quot
     JP_PUSH()
 ENDWORD "/", word_div
 
@@ -52,9 +53,28 @@ WORD "mod", word_mod
     POP()   ; DE = n1
     ex de, hl
 
-    call __mod_hl_de
+    call __udivmod_hl_de  ; HL=quot, BC=rem
+    ld d, b
+    ld e, c               ; DE=rem
     JP_PUSH()
 ENDWORD "mod", word_mod
+
+; ( n1 n2 -- rem quot )
+WORD "/mod", word_divmod
+    POP()   ; DE = n2
+    ex de, hl   ; HL = n2
+    POP()   ; DE = n1
+    ex de, hl   ; DE = n2, HL = n1
+
+    call __udivmod_hl_de  ; HL=quot, BC=rem
+
+    ; push rem first, then quot
+    ld d, b
+    ld e, c
+    PUSH()
+    ex de, hl
+    JP_PUSH()
+ENDWORD "/mod", word_divmod
 
 
 ; ( n -- u ) abs(n)
