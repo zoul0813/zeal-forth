@@ -81,8 +81,7 @@ parse_until_quote:
     ret z
     cp 0x00 ; null-term
     jr nz, @not_null
-    ld a, ERR_UNTERMINATED_STR
-    jp print_error
+    ERROR(ERR_UNTERMINATED_STR)
 @not_null:
     inc bc
     jr @count

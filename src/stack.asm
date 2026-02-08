@@ -1,10 +1,6 @@
     INCLUDE "constants_h.asm"
     INCLUDE "macros_h.asm"
 
-    EXTERN print_error@stack_overflow
-    EXTERN print_error@stack_underflow
-
-
     SECTION TEXT
     PUBLIC pushdata
   ; @brief Push 16-bit value onto data stack
@@ -33,7 +29,7 @@ pushdata:
     ret
 @push_overflow:
     pop hl
-    jp print_error@stack_overflow
+    ERROR(ERR_STACK_OVERFLOW)
 
 
     PUBLIC popdata
@@ -62,7 +58,7 @@ popdata:
     ret
 @pop_underflow:
     pop hl
-    jp print_error@stack_underflow
+    ERROR(ERR_STACK_UNDERFLOW)
 
   ; @brief Peek top data stack into DE
   ;
@@ -87,7 +83,7 @@ peekdata:
     ret
 @dpeek_underflow:
     pop hl
-    jp print_error@stack_underflow
+    ERROR(ERR_STACK_UNDERFLOW)
 
 
     PUBLIC pushreturn
@@ -117,7 +113,7 @@ pushreturn:
     ret
 @rpush_overflow:
     pop hl
-    jp print_error@stack_overflow
+    ERROR(ERR_STACK_OVERFLOW)
 
 
     PUBLIC popreturn
@@ -146,7 +142,7 @@ popreturn:
     ret
 @rpop_underflow:
     pop hl
-    jp print_error@stack_underflow
+    ERROR(ERR_STACK_UNDERFLOW)
 
   ; @brief Peek top return stack into DE
   ;
@@ -171,4 +167,4 @@ peekreturn:
     ret
 @rpeek_underflow:
     pop hl
-    jp print_error@stack_underflow
+    ERROR(ERR_STACK_UNDERFLOW)

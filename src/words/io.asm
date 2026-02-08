@@ -6,7 +6,7 @@
 WORD ".", word_dot
     POP()
     PUTI()
-    PUTS(_str_newline, _str_newline_end)
+    PUTC(' ')
     ret
 ENDWORD ".", word_dot
 
@@ -117,8 +117,7 @@ WORD "loadfile", word_loadfile
     ld a, (hl)
     cp '"'
     jr z, @quoted
-    ld a, ERR_UNTERMINATED_STR
-    jp print_error
+    ERROR(ERR_UNTERMINATED_STR)
 @quoted:
     inc hl ; skip opening quote
     call parse_until_quote ; DE=path, BC=len, HL=after closing quote

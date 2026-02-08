@@ -34,6 +34,11 @@
     jp nz, _exit_code
   ENDM
 
+  MACRO ERROR code
+    ld a, code
+    jp print_error
+  ENDM
+
   ; @brief Read from STDIN into _input_buffer
   ; jumps to _exit_code on error
   ;

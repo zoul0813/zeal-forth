@@ -10,11 +10,18 @@ _str_newline:
 _str_newline_end:
 
 _str_ok:
-    DEFB "  ok\n", 0
+    DEFB "ok\n", 0
 _str_ok_end:
 
+_str_prompt:
+    DEFB "> ", 0
+_str_prompt_end:
+
+;*************
+; ERRORS     *
+;*************
 _str_error:
-    DEFB "error\n", 0
+    DEFB " error\n", 0
 _str_error_end:
 
 _str_unsupported:
@@ -49,9 +56,22 @@ _str_error_not_found:
     DEFB "not found", 0
 _str_error_not_found_end:
 
-_str_prompt:
-    DEFB "> ", 0
-_str_prompt_end:
+_err_string_table:
+    ; index 0 => ERR_NUMERIC_OVERFLOW (-1)
+    DEFW _str_error_numeric_overflow
+    ; index 1 => ERR_UNTERMINATED_STR (-2)
+    DEFW _str_unterminated_str
+    ; index 2 => ERR_STACK_OVERFLOW (-3)
+    DEFW _str_err_stack_overflow
+    ; index 3 => ERR_STACK_UNDERFLOW (-4)
+    DEFW _str_err_stack_underflow
+    ; index 4 => ERR_MISSING_NAME (-5)
+    DEFW _str_missing_name_str
+    ; index 5 => ERR_COMPILE_ONLY (-6)
+    DEFW _str_compile_only
+    ; index 6 => ERR_UNSUPPORTED (-7)
+    DEFW _str_unsupported
+
 
 
 ; data stack pointer

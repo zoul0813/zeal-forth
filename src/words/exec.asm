@@ -9,8 +9,7 @@
 _begin_new_word:
     call next_word
     jp nz, @has_name
-    ld a, ERR_MISSING_NAME
-    jp print_error
+    ERROR(ERR_MISSING_NAME)
 @has_name:
     call CREATE_HEADER
     ld hl, (HERE)

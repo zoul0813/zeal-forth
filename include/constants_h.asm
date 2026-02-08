@@ -25,10 +25,15 @@
     DEFC STATE_IMM = 0    ; immediate mode (execute now)
     DEFC STATE_COMP = 1   ; compile mode
 
-    DEFC ERR_NOT_FOUND = -1
-    DEFC ERR_NUMERIC_OVERFLOW = -13
-    DEFC ERR_UNTERMINATED_STR = -14
-    DEFC ERR_MISSING_NAME = -15
+    DEFC ERR_NUMERIC_OVERFLOW = -1
+    DEFC ERR_UNTERMINATED_STR = -2
+    DEFC ERR_STACK_OVERFLOW = -3
+    DEFC ERR_STACK_UNDERFLOW = -4
+    DEFC ERR_MISSING_NAME = -5
+    DEFC ERR_COMPILE_ONLY = -6
+    DEFC ERR_UNSUPPORTED = -7
+    DEFC ERR_TABLE_LAST = 7 ; adjust when adding new error codes
+    DEFC ERR_NOT_FOUND = -128
 
     EXTERN __TEXT_head
     EXTERN __TEXT_tail
@@ -84,23 +89,14 @@
     EXTERN _str_newline_end
     EXTERN _str_ok
     EXTERN _str_ok_end
+
+    ; ERRORS
     EXTERN _str_error
     EXTERN _str_error_end
     EXTERN _str_unsupported
     EXTERN _str_unsupported_end
-    EXTERN _str_unterminated_str
-    EXTERN _str_unterminated_str_end
-    EXTERN _str_missing_name_str
-    EXTERN _str_missing_name_str_end
-    EXTERN _str_err_stack_overflow
-    EXTERN _str_err_stack_overflow_end
-    EXTERN _str_err_stack_underflow
-    EXTERN _str_err_stack_underflow_end
-    EXTERN _str_compile_only
-    EXTERN _str_compile_only_end
     EXTERN _str_error_not_found
     EXTERN _str_error_not_found_end
-    EXTERN _str_error_numeric_overflow
-    EXTERN _str_error_numeric_overflow_end
+    EXTERN _err_string_table
 
 #endif

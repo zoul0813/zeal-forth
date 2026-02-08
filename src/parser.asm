@@ -70,8 +70,7 @@ do_next_word:
     jp do_next_word
 
 @compileonly:
-    PUTS(_str_compile_only, _str_compile_only_end)
-    jp prompt
+    ERROR(ERR_COMPILE_ONLY)
 
 
 ; @brief Print "  ok"
@@ -93,42 +92,58 @@ numeric_overflow:
 print_error: ; TODO: implement error lookup
     cp ERR_NOT_FOUND
     jr z, @not_found
-    cp ERR_NUMERIC_OVERFLOW ; numeric overflow
-    jr z, @numeric_overflow
-    cp ERR_UNTERMINATED_STR
-    jr z, @unterminated_str
-    cp ERR_MISSING_NAME
-    jr z, @missing_name
-@code:
+
+    neg ; errs are negative
+
+    ; Table handles ERR_NUMERIC_OVERFLOW..ERR_UNSUPPORTED (1..ERR_TABLE_LAST)
+    or a
+    jr z, @unknown
+    cp ERR_TABLE_LAST + 1
+    jr nc, @unknown
+
+    ; index = magnitude - 1
+    dec a
+    add a, a              ; 2-byte pointers
     ld e, a
     ld d, 0
-    PUTI()
+    ld hl, _err_string_table
+    add hl, de
+
+    ; DE = c-addr of null-terminated message
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+    ; BC = strlen(DE)
+    ld h, d
+    ld l, e
+    call strlen
+
+    ; puts(DE, BC)
+    call puts
     jr @msg
-@unterminated_str:
-    PUTS(_str_unterminated_str, _str_unterminated_str_end)
-    jr @msg
-@numeric_overflow:
-    PUTS(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
-    jr @msg
-@stack_overflow:
-    PUTS(_str_err_stack_overflow, _str_err_stack_overflow_end)
-    jr @msg
-@stack_underflow:
-    PUTS(_str_err_stack_underflow, _str_err_stack_underflow_end)
-    jr @msg
-@missing_name:
-    PUTS(_str_missing_name_str, _str_missing_name_str_end)
-    jr @msg
+
 @not_found:
     PUTC('\'')
     ld de, (_curr_word)
     ld bc, (_curr_len)
-    call puts ; DE = buffer, BC = len, A = err, returns BC = len
+    call puts
     PUTC('\'')
-    PUTS(_str_error_not_found, _str_error_not_found_end)
-    ; jr @msg ; fall-thru
-@msg:
     PUTC(' ')
+    ld de, _str_error_not_found
+    ld hl, de
+    call strlen
+    call puts
+    jr @msg
+
+@unknown:
+    ; Optional fallback
+    ld de, _str_unsupported
+    ld hl, de
+    call strlen
+    call puts
+
+@msg:
     PUTS(_str_error, _str_error_end)
 
     IF_STATE(STATE_IMM, @prompt)
