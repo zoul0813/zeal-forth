@@ -21,17 +21,45 @@ prompt:
 ; @brief Process next word in input buffer
 do_next_word:
     call next_word
-    jr z, print_ok
+    jp z, print_ok
 
-    ; Try to parse the input as a number
+    ; Try to parse the input as a number.
+    ; Support optional leading '-' for signed decimal literals.
+    ld a, (hl)
+    cp '-'
+    jr nz, @parse_unsigned
+    inc hl
+    ld a, (hl)
+    or a
+    jr z, @is_word          ; "-" alone is not a number
+    call parse_dec
+    or a
+    jr z, @is_negative_number
+    dec a
+    jp z, numeric_overflow
+    jr @is_word             ; non-decimal value, fall-through to word lookup
+
+@parse_unsigned:
     call parse_dec
     ; If A is 0, the current word is a number
     or a
     jr z, @is_number
     ; If A is 1, the value is bigger than 16-bit, so skip this word
     dec a
-    jr z, numeric_overflow
-    ; Non-decimal value, fall-through
+    jp z, numeric_overflow
+    ; Non-decimal value, treat as a word.
+    jr @is_word
+
+@is_negative_number:
+    ; HL = magnitude, convert to two's-complement negative in place.
+    ld a, h
+    cpl
+    ld h, a
+    ld a, l
+    cpl
+    ld l, a
+    inc hl
+    jr @is_number
 
 @is_word:
     call dict_search
@@ -71,7 +99,7 @@ do_next_word:
     ; The value is in HL, next word is in DE, swap them
     ex de, hl
     PUSH()
-    jr do_next_word
+    jp do_next_word
 
 @compileonly:
     ERROR(ERR_COMPILE_ONLY)
@@ -89,7 +117,7 @@ compile_word:
     inc hl
     ld (HERE), hl
 
-    jr do_next_word
+    jp do_next_word
 ;
 
 compile_number:
@@ -115,7 +143,7 @@ compile_number:
 
     ld (HERE), hl
 
-    jr do_next_word
+    jp do_next_word
 ;
 
 ; @brief Print "  ok"

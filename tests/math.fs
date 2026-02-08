@@ -39,7 +39,7 @@ variable fails
 ." [ /mod0 ] 123 0 -> 0 0: "      123 0 /mod swap 0 = swap 0 = and report
 
 \ Extra edge checks for unsigned 16-bit behavior.
-." [ / ] 65535 255 -> 257: "      65535 255 / 257 = report
+." [ / ] 65535 255 -> -1: "       65535 255 / -1 = report
 ." [ mod ] 65535 256 -> 255: "    65535 256 mod 255 = report
 
 : summary ( -- )

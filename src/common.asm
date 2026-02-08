@@ -45,6 +45,24 @@ putc:
   ; Alters:
   ;   A, BC, DE, HL
 puti:
+    ; Signed output: print '-' and convert magnitude if value is negative.
+    bit 7, d
+    jr z, @convert
+    push de
+    ld a, '-'
+    call putc
+    pop de
+    or a
+    jp nz, _exit_code
+    ld a, d
+    cpl
+    ld d, a
+    ld a, e
+    cpl
+    ld e, a
+    inc de
+
+@convert:
     ; store the 16-bit value in a 32-bit memory location
     ld (_dword_num), de
     ld hl, 0

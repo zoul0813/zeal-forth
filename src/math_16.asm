@@ -166,12 +166,10 @@ __fdivmod_hl_de:
     push af
     call __udivmod_hl_de   ; HL=q0, BC=r0, DE=|divisor|
     pop af                 ; A = flags
-
-    ; Save quotient sign/flags in E; reuse A for tests.
-    ld e, a
+    push af                ; keep flags on stack (DE must keep |divisor|)
 
     ; Floored quotient correction.
-    bit 0, e
+    bit 0, a
     jr z, @q_done          ; quotient non-negative
     ld a, b
     or c
@@ -187,7 +185,9 @@ __fdivmod_hl_de:
     ld a, b
     or c
     jr z, @r_sign          ; remainder zero stays zero
-    bit 0, e
+    pop af
+    push af
+    bit 0, a
     jr z, @r_sign
 
     ; BC = |divisor| - BC
@@ -204,7 +204,8 @@ __fdivmod_hl_de:
 
 @r_sign:
     ; Remainder sign follows divisor sign.
-    bit 1, e
+    pop af
+    bit 1, a
     ret z
     push hl
     ld h, b
