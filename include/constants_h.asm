@@ -86,18 +86,15 @@
     EXTERN _str_project_name_end
     EXTERN _str_prompt
     EXTERN _str_prompt_end
-    EXTERN _str_newline
-    EXTERN _str_newline_end
     EXTERN _str_ok
     EXTERN _str_ok_end
 
     ; ERRORS
     EXTERN _str_error
     EXTERN _str_error_end
-    EXTERN _str_unsupported
-    EXTERN _str_unsupported_end
     EXTERN _str_error_not_found
     EXTERN _str_error_not_found_end
     EXTERN _err_string_table
+    EXTERN _err_unsupported
 
 #endif

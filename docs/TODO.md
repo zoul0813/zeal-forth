@@ -98,7 +98,7 @@ Items marked with `❓` may or may not be defined
 * [x] negate    `( n -- -n )`
 * [ ] */        ❓`( n1 n2 n3 -- n4 )`
 * [ ] */mod     ❓`( n1 n2 n3 -- n4 n5 )`
-* [ ] /mod      `( n1 n2 -- n3 n4 )`
+* [x] /mod      `( n1 n2 -- n3 n4 )`
 * [ ] u<        `( u1 u2 -- flag )`
 * [ ] u>        `( u1 u2 -- flag )`
 * [ ] um*       `( u1 u2 -- ud )`

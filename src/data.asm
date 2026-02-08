@@ -5,10 +5,6 @@ _str_project_name:
     DEFB "Zeal Forth\n\nType `bye` to exit\n\n", 0
 _str_project_name_end:
 
-_str_newline:
-    DEFB '\n', 0
-_str_newline_end:
-
 _str_ok:
     DEFB "ok\n", 0
 _str_ok_end:
@@ -24,59 +20,44 @@ _str_error:
     DEFB " error\n", 0
 _str_error_end:
 
-_str_unsupported:
-    DEFB "unsupported", 0
-_str_unsupported_end:
-
-_str_compile_only:
-    DEFB "compile-only", 0
-_str_compile_only_end:
-
-_str_unterminated_str:
-    DEFB "unterminated string", 0
-_str_unterminated_str_end:
-
-_str_missing_name_str:
-    DEFB "missing name", 0
-_str_missing_name_str_end:
-
-_str_error_numeric_overflow:
-    DEFB "numeric overflow", 0
-_str_error_numeric_overflow_end:
-
-_str_err_stack_overflow:
-    DEFB "stack overflow", 0
-_str_err_stack_overflow_end:
-
-_str_err_stack_underflow:
-    DEFB "stack underflow", 0
-_str_err_stack_underflow_end:
-
-_str_err_too_long:
-    DEFB "too long", 0
-_str_err_too_long_end:
-
 _str_error_not_found:
     DEFB "not found", 0
 _str_error_not_found_end:
 
+_err_error_numeric_overflow:
+    DEFB "numeric overflow", 0
+_err_unterminated_str:
+    DEFB "unterminated string", 0
+_err_err_stack_overflow:
+    DEFB "stack overflow", 0
+_err_err_stack_underflow:
+    DEFB "stack underflow", 0
+_err_missing_name:
+    DEFB "missing name", 0
+_err_compile_only:
+    DEFB "compile-only", 0
+_err_unsupported:
+    DEFB "unsupported", 0
+_err_err_too_long:
+    DEFB "too long", 0
+
 _err_string_table:
     ; index 0 => ERR_NUMERIC_OVERFLOW (-1)
-    DEFW _str_error_numeric_overflow
+    DEFW _err_error_numeric_overflow
     ; index 1 => ERR_UNTERMINATED_STR (-2)
-    DEFW _str_unterminated_str
+    DEFW _err_unterminated_str
     ; index 2 => ERR_STACK_OVERFLOW (-3)
-    DEFW _str_err_stack_overflow
+    DEFW _err_err_stack_overflow
     ; index 3 => ERR_STACK_UNDERFLOW (-4)
-    DEFW _str_err_stack_underflow
+    DEFW _err_err_stack_underflow
     ; index 4 => ERR_MISSING_NAME (-5)
-    DEFW _str_missing_name_str
+    DEFW _err_missing_name
     ; index 5 => ERR_COMPILE_ONLY (-6)
-    DEFW _str_compile_only
+    DEFW _err_compile_only
     ; index 6 => ERR_UNSUPPORTED (-7)
-    DEFW _str_unsupported
+    DEFW _err_unsupported
     ; index 7 => ERR_UNSUPPORTED (-8)
-    DEFW _str_err_too_long
+    DEFW _err_err_too_long
 
 
 
@@ -91,8 +72,6 @@ HERE:
     DEFW __HERE_head
 LATEST:
     DEFW 0
-CURRENT_DEF_CFA:
-    DEFW HERE
 STATE:
     DEFW STATE_IMM
 BASE:

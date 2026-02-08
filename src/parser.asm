@@ -184,7 +184,7 @@ print_error: ; TODO: implement error lookup
 
 @unknown:
     ; Optional fallback
-    ld de, _str_unsupported
+    ld de, _err_unsupported
     ld hl, de
     call strlen
     call puts
