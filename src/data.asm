@@ -25,21 +25,23 @@ _str_error_not_found:
 _str_error_not_found_end:
 
 _err_error_numeric_overflow:
-    DEFB "numeric overflow", 0
+    DEFB "numovf", 0
 _err_unterminated_str:
-    DEFB "unterminated string", 0
+    DEFB "unclosed", 0 ; unterminated string
 _err_err_stack_overflow:
-    DEFB "stack overflow", 0
+    DEFB "stkovf", 0
 _err_err_stack_underflow:
-    DEFB "stack underflow", 0
+    DEFB "stkunf", 0
 _err_missing_name:
-    DEFB "missing name", 0
+    DEFB "noname", 0
 _err_compile_only:
-    DEFB "compile-only", 0
+    DEFB "cmp", 0
 _err_unsupported:
-    DEFB "unsupported", 0
+    DEFB "unsup", 0
 _err_err_too_long:
-    DEFB "too long", 0
+    DEFB "lenovf", 0
+_err_unbalanced_control:
+    DEFB "imbal", 0 ; unbalanced
 
 _err_string_table:
     ; index 0 => ERR_NUMERIC_OVERFLOW (-1)
@@ -58,6 +60,8 @@ _err_string_table:
     DEFW _err_unsupported
     ; index 7 => ERR_UNSUPPORTED (-8)
     DEFW _err_err_too_long
+    ; index 8 => ERR_UNBALANCED_CONTROL (-9)
+    DEFW _err_unbalanced_control
 
 
 
@@ -98,6 +102,8 @@ _key_pending:
 ;; file parser
 _file_fd: DEFB 0
 _recovery_sp:
+    DEFW 0
+_compile_return_sp:
     DEFW 0
 
   ; a place to store dword numbers for conversion

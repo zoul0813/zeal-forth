@@ -193,6 +193,8 @@ print_error: ; TODO: implement error lookup
     PUTS(_str_error, _str_error_end)
 
     IF_STATE(STATE_IMM, @prompt)
+    ld hl, (_compile_return_sp)
+    ld (return_sp), hl
     ld hl, (LATEST) ; set HL to LATEST
     call word_forget@drop ; reset HERE to start of last word
 
@@ -201,4 +203,3 @@ print_error: ; TODO: implement error lookup
     ; Restore recovery SP after error jumps.
     ld sp, (_recovery_sp)
     jp prompt
-

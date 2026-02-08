@@ -129,6 +129,8 @@ ENDWORD "allot", word_allot
 ; ( "<spaces>name" -- ) Start compiling
 WORD ":", word_colon
   call _begin_new_word
+  ld hl, (return_sp)
+  ld (_compile_return_sp), hl
   ld de, 0
   PUSH_RET() ; marker: no pending DOES> patch
   SET_STATE(STATE_COMP)
@@ -138,13 +140,32 @@ ENDWORD ":", word_colon
     PUBLIC word_semicolon
 ; ( -- ) End compiling
 WORD ";", word_semicolon
+    ; There must be at least one compile-control item (the : marker/DOES> patch)
+    ld hl, (return_sp)
+    ld de, (_compile_return_sp)
+    or a
+    sbc hl, de
+    jr c, @pop_marker
+    ERROR(ERR_UNBALANCED_CONTROL)
+
+@pop_marker:
     ; close pending DOES> jump if present
     POP_RET() ; DE = patch site (or 0 marker)
     ld a, d
     or e
-    jr z, @write_ret
+    jr z, @check_balanced
     ex de, hl ; HL = patch site
     PATCH_HERE() ; destination is RET at end of definition
+
+@check_balanced:
+    ; After consuming ; bookkeeping, control stack must be back at baseline.
+    ld hl, (return_sp)
+    ld de, (_compile_return_sp)
+    or a
+    sbc hl, de
+    jr z, @write_ret
+    ERROR(ERR_UNBALANCED_CONTROL)
+
 @write_ret:
     SET_STATE(STATE_IMM)
     ld hl, (HERE)

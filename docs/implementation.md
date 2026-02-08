@@ -32,8 +32,8 @@ implementation. It is based on the assembly sources in `src/`.
   there, and parses only complete lines.
 - Any trailing partial line is preserved by seeking the file descriptor backward
   by the carry length, so the next read resumes from that partial line.
-- If no newline exists in a full chunk, the current behavior does not carry tail
-  bytes to avoid stalling on long lines.
+- If no newline exists in a full chunk, `loadfile` raises a `too long` error
+  (line too long for the fixed chunk parser).
 
 ## Numbers
 
@@ -46,8 +46,7 @@ implementation. It is based on the assembly sources in `src/`.
 
 - Each non-numeric token is looked up in the dictionary (built-ins plus any
   definitions created with `:`/`;`, `create`, or `variable`).
-- If a word is not found, the interpreter currently prints a numeric error code
-  (currently `0`) followed by `  error`.
+- If a word is not found, the interpreter prints `'token' not found error`.
 
 ## Data and return stacks
 
@@ -83,9 +82,21 @@ implementation. It is based on the assembly sources in `src/`.
 
 ## Error messages
 
-- Numeric overflow prints `numeric overflow` followed by `  error`.
-- Compile-only words executed in interpret mode print `  compile-only`.
-- Other errors currently print a numeric error code followed by `  error`.
+Errors print as `<short-code> error` (or `'token' not found error` for lookup
+failures).
+
+Current short-form messages and meanings:
+
+- `numovf`: Numeric overflow (parsed decimal literal did not fit 16-bit cell).
+- `unclosed`: Unterminated quoted string (no closing `"` before buffer end).
+- `stkovf`: Stack overflow (data/return stack push exceeded bounds).
+- `stkunf`: Stack underflow (data/return stack pop/peek on empty/corrupt stack).
+- `noname`: Missing required name token (for example after `:`, `create`, `forget`).
+- `cmp`: Compile-only word used in interpret mode.
+- `unsup`: Unsupported/unknown error fallback.
+- `lenovf`: Input line too long for `loadfile` chunk parser (no newline in full chunk).
+- `imbal`: Unbalanced compile-time control structures at `;`.
+- `'token' not found`: Dictionary lookup failed for the current input token.
 
 ## Compilation model (current)
 
@@ -97,8 +108,8 @@ implementation. It is based on the assembly sources in `src/`.
   stack.
 - `begin`/`until`/`while`/`repeat` are compiled using internal `branch`/`branch0`
   primitives and control-stack patching.
-- `do`/`loop` use runtime helpers (`do_init`, `do_loop`, `do_next`, `do_unwind`)
-  with a zero-trip check compiled by `do`.
+- `do`/`loop` use runtime helpers (`do_init`, `do_loop`, `do_next`, `do_unwind`).
+  `do` is non-zero-trip; `?do` compiles the zero-trip precheck path.
 - `does>` compiles a runtime patch prologue that redirects the last `create`d
   child into the code after `does>`, and uses return-stack temporaries to carry
   patch addresses.

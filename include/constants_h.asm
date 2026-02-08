@@ -33,7 +33,8 @@
     DEFC ERR_COMPILE_ONLY = -6
     DEFC ERR_UNSUPPORTED = -7
     DEFC ERR_TOO_LONG = -8
-    DEFC ERR_TABLE_LAST = 8 ; adjust when adding new error codes
+    DEFC ERR_UNBALANCED_CONTROL = -9
+    DEFC ERR_TABLE_LAST = 9 ; adjust when adding new error codes
     DEFC ERR_NOT_FOUND = -128
 
     EXTERN __TEXT_head
@@ -62,6 +63,7 @@
     ; file parser
     EXTERN _file_fd
     EXTERN _recovery_sp
+    EXTERN _compile_return_sp
 
     ; HERE
     EXTERN HERE        ;; here pointer
