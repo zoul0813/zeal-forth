@@ -85,7 +85,7 @@ variable next-y
 ;
 
 : clear-bricks ( -- )
-  MAX-BRICKS 0 do
+  MAX-BRICKS 0 ?do
     0 i b!
   loop
 ;
@@ -96,12 +96,12 @@ variable next-y
   0 0 set-cursor ." Breakout: A/D move, Q quit"
   COLOR-BG COLOR-BORDER set-colors
 
-  scr-w @ 0 do
+  scr-w @ 0 ?do
     i 1 35 COLOR-BORDER plot
     i scr-h @ 1- 35 COLOR-BORDER plot
   loop
 
-  scr-h @ 2 do
+  scr-h @ 2 ?do
     0 i 35 COLOR-BORDER plot
     scr-w @ 1- i 35 COLOR-BORDER plot
   loop
@@ -110,13 +110,13 @@ variable next-y
 ;
 
 : draw-paddle ( -- )
-  PADDLE-W 0 do
+  PADDLE-W 0 ?do
     paddle-x @ i + paddle-y @ 61 COLOR_PADDLE plot
   loop
 ;
 
 : erase-old-paddle ( -- )
-  PADDLE-W 0 do
+  PADDLE-W 0 ?do
     old-paddle-x @ i + paddle-y @ 32 COLOR-DEFAULT plot
   loop
 ;
@@ -134,7 +134,7 @@ variable next-y
   tmp-row !
   tmp-row @ brick-fg tmp-c !
   1 tmp-col @ BRICK-W * + tmp-a !
-  BRICK-W 0 do
+  BRICK-W 0 ?do
     tmp-a @ i + 2 tmp-row @ + 35 tmp-c @ plot
   loop
 ;
@@ -143,7 +143,7 @@ variable next-y
   tmp-col !
   tmp-row !
   1 tmp-col @ BRICK-W * + tmp-a !
-  BRICK-W 0 do
+  BRICK-W 0 ?do
     tmp-a @ i + 2 tmp-row @ + 32 COLOR-DEFAULT plot
   loop
 ;
@@ -151,9 +151,9 @@ variable next-y
 : build-bricks ( -- )
   clear-bricks
   0 bricks-left !
-  BRICK-ROWS 0 do
+  BRICK-ROWS 0 ?do
     i build-row !
-    brick-cols @ 0 do
+    brick-cols @ 0 ?do
       1 build-row @ i brick-idx b!
       build-row @ i draw-brick
       bricks-left @ 1+ bricks-left !

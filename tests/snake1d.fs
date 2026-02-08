@@ -40,7 +40,7 @@ variable rev-b
 
 : is-snake? ( x -- flag )
   0 tmp-hit !
-  snake-len @ 0 do
+  snake-len @ 0 ?do
     dup i body@ = if 1 tmp-hit ! then
   loop
   drop
@@ -50,7 +50,7 @@ variable rev-b
 : collides-from ( pos start -- flag )
   scan-start !
   0 tmp-hit !
-  snake-len @ scan-start @ do
+  snake-len @ scan-start @ ?do
     dup i body@ = if 1 tmp-hit ! then
   loop
   drop
@@ -82,7 +82,7 @@ variable rev-b
 
 : draw-snake ( -- )
   13 emit
-  WIDTH 0 do
+  WIDTH 0 ?do
     i head-pos = if
       64 emit            \ @
     else
@@ -96,13 +96,13 @@ variable rev-b
 ;
 
 : shift-left ( -- )
-  snake-len @ 1 - 0 do
+  snake-len @ 1 - 0 ?do
     i 1 + body@ i body!
   loop
 ;
 
 : reverse-body ( -- )
-  snake-len @ 2 / 0 do
+  snake-len @ 2 / 0 ?do
     i rev-i !
     snake-len @ 1 - i - rev-j !
     rev-i @ body@ rev-a !
@@ -161,7 +161,7 @@ variable rev-b
   then
 ;
 
-: delay ( -- ) 3000 0 do loop ;
+: delay ( -- ) 3000 0 ?do loop ;
 
 : snake ( -- )
   snake-init

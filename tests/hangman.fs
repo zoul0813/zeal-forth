@@ -19,7 +19,7 @@
 create guessed ALPHA-LEN allot
 
 : str, ( c-addr u -- )
-  0 do
+  0 ?do
     dup i + c@ c,
   loop
   drop
@@ -43,7 +43,7 @@ variable tmp-idx
 : g! ( n idx -- ) gaddr c! ;
 
 : clear-guessed ( -- )
-  ALPHA-LEN 0 do
+  ALPHA-LEN 0 ?do
     0 i g!
   loop
 ;
@@ -90,7 +90,7 @@ variable tmp-idx
 : in-secret? ( c -- flag )
   tmp-char !
   0 tmp-flag !
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     secret-ptr @ i + c@
     tmp-char @ =
     if
@@ -102,7 +102,7 @@ variable tmp-idx
 
 : solved? ( -- flag )
   1 tmp-flag !
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     secret-ptr @ i + c@
     letter-idx g@
     0 =
@@ -114,7 +114,7 @@ variable tmp-idx
 ;
 
 : show-word ( -- )
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     secret-ptr @ i + c@
     dup letter-idx g@
     if
@@ -133,7 +133,7 @@ variable tmp-idx
 : show-used ( -- )
   COLOR-BG COLOR-YELLOW set-colors
   ." Used: "
-  ALPHA-LEN 0 do
+  ALPHA-LEN 0 ?do
     i g@ if
       i 65 + emit
       32 emit

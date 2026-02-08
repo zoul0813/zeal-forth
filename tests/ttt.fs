@@ -34,10 +34,10 @@ variable found-flag
 : cell@ ( idx -- n ) cell-addr @ ;
 : cell! ( n idx -- ) cell-addr ! ;
 
-: cls ( -- ) 12 0 do cr loop ;
+: cls ( -- ) 12 0 ?do cr loop ;
 
 : board-clear ( -- )
-  BOARD-SZ 0 do
+  BOARD-SZ 0 ?do
     0 i cell!
   loop
 ;
@@ -92,7 +92,7 @@ variable found-flag
 
 : board-full? ( -- flag )
   1 full-flag !
-  BOARD-SZ 0 do
+  BOARD-SZ 0 ?do
     i cell@ 0 = if
       0 full-flag !
     then

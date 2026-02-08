@@ -78,13 +78,13 @@ variable center-y
   COLOR-BG COLOR-BORDER set-colors
 
   \ top + bottom border
-  play-w @ 2 + 0 do
+  play-w @ 2 + 0 ?do
     i 1 set-cursor 35 emit
     i play-h @ 2 + set-cursor 35 emit
   loop
 
   \ left + right border
-  play-h @ 0 do
+  play-h @ 0 ?do
     0 i 2 + set-cursor 35 emit
     play-w @ 1 + i 2 + set-cursor 35 emit
   loop
@@ -97,7 +97,7 @@ variable center-y
 ;
 
 : draw-snake-all ( -- )
-  snake-len @ 0 do
+  snake-len @ 0 ?do
     i snake-len @ 1 - = if
       i sx@ i sy@ 64 COLOR-SNAKE draw-cell
     else
@@ -111,7 +111,7 @@ variable center-y
   tmp-y !
   tmp-x !
   0 tmp-hit !
-  snake-len @ scan-start @ do
+  snake-len @ scan-start @ ?do
     tmp-x @ i sx@ = if
       tmp-y @ i sy@ = if
         1 tmp-hit !
@@ -147,7 +147,7 @@ variable center-y
 ;
 
 : shift-left-2d ( -- )
-  snake-len @ 1 - 0 do
+  snake-len @ 1 - 0 ?do
     i 1 + sx@ i sx!
     i 1 + sy@ i sy!
   loop

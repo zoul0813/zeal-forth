@@ -115,7 +115,7 @@ variable start-y-row
 ;
 
 : init-lanes ( -- )
-  lane-count @ 0 do
+  lane-count @ 0 ?do
     rand16 PERIOD mod i lo!
     i 4 mod 2 + dup i ld!
     i lc!
@@ -137,11 +137,11 @@ variable start-y-row
 
 : draw-border ( -- )
   COLOR-BG COLOR-BORDER set-colors
-  scr-w @ 0 do
+  scr-w @ 0 ?do
     i 2 35 COLOR-BORDER plot
     i scr-h @ 1- 35 COLOR-BORDER plot
   loop
-  scr-h @ 3 do
+  scr-h @ 3 ?do
     0 i 35 COLOR-BORDER plot
     scr-w @ 1- i 35 COLOR-BORDER plot
   loop
@@ -161,7 +161,7 @@ variable start-y-row
 : draw-lane-row ( lane -- )
   tmp-lane !
   lane-top @ tmp-lane @ + lane-y !
-  scr-w @ 2 - 0 do
+  scr-w @ 2 - 0 ?do
     i tmp-lane @ car-at? if
       i 1+ lane-y @ 61 COLOR-CAR plot
     else
@@ -171,21 +171,21 @@ variable start-y-row
 ;
 
 : draw-road ( -- )
-  lane-count @ 0 do
+  lane-count @ 0 ?do
     i draw-lane-row
   loop
 ;
 
 : draw-goal-start ( -- )
   COLOR-BG COLOR-GOAL set-colors
-  scr-w @ 2 - 0 do
+  scr-w @ 2 - 0 ?do
     i 1+ goal-y @ 94 COLOR-GOAL plot
   loop
   COLOR-BG COLOR-DEFAULT set-colors
 ;
 
 : draw-start-row ( -- )
-  scr-w @ 2 - 0 do
+  scr-w @ 2 - 0 ?do
     i 1+ start-y @ 32 COLOR-DEFAULT plot
   loop
 ;
@@ -250,7 +250,7 @@ variable start-y-row
 
 : render-delta ( -- )
   draw-hud
-  lane-count @ 0 do
+  lane-count @ 0 ?do
     i lm@ if i draw-lane-row then
   loop
   old-frog-x @ old-frog-y @ restore-cell
@@ -291,7 +291,7 @@ variable start-y-row
 ;
 
 : update-lanes ( -- )
-  lane-count @ 0 do
+  lane-count @ 0 ?do
     i lc@ 1- dup 0= if
       drop
       i ld@ i lc!

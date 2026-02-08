@@ -9,13 +9,13 @@
 
 : cr 10 emit ;
 : space 32 emit ;
-: spaces 0 do space loop ;
+: spaces ( n -- ) 0 ?do space loop ;
 
 \ Cell Words
 
-: cell+ 1 cells + ;
-: cell- 1 cells - ;
-: char+ 1 + ;
+: cell+ ( n1 -- n2 ) 1 cells + ;
+: cell- ( n1 -- n2 ) 1 cells - ;
+: char+ ( n1 -- n2 ) 1 + ;
 
 \ ZOS Video (IOCTL on DEV_STDOUT=0)
 \ CMD_GET_AREA      = 1
@@ -132,8 +132,8 @@ variable seed
   rand16 1 and if 47 else 92 then ; \ '/' or '\'
 
 : 10print ( -- )
-  40 0 do        \ 40 rows
-    80 0 do      \ 80 cols
+  40 0 ?do        \ 40 rows
+    80 0 ?do      \ 80 cols
       slash emit
     loop
   loop

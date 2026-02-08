@@ -110,7 +110,7 @@ variable idx-save
     WORD-COUNT @ MAX-WORDS < if
       srcp !
       WORD-COUNT @ word-ptr dstp !
-      WORD-LEN 0 do
+      WORD-LEN 0 ?do
         srcp @ i + c@
         dstp @ i + c!
       loop
@@ -170,13 +170,13 @@ s" CHIPS" add-word drop
 ;
 
 : clear-counts ( -- )
-  ALPHA-LEN 0 do
+  ALPHA-LEN 0 ?do
     0 i scount!
   loop
 ;
 
 : clear-history ( -- )
-  BOARD-CELLS 0 do
+  BOARD-CELLS 0 ?do
     0 i hguess!
     0 i hmark!
   loop
@@ -185,7 +185,7 @@ s" CHIPS" add-word drop
 : read-guess ( -- valid )
   1 tmp-flag !
   ." Guess (5 letters): "
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     key to-upper dup emit
     dup alpha? if
       dup i gbuf!
@@ -203,7 +203,7 @@ s" CHIPS" add-word drop
   clear-counts
 
   \ pass 1: mark greens, count unmatched secret letters
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     secret-ptr @ i + c@
     i gbuf@
     2dup = if
@@ -217,7 +217,7 @@ s" CHIPS" add-word drop
   loop
 
   \ pass 2: mark yellows using remaining counts
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     i mbuf@ 2 = if
     else
       i gbuf@ letter-idx dup
@@ -234,7 +234,7 @@ s" CHIPS" add-word drop
 
 : guess-correct? ( -- flag )
   1 tmp-flag !
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     i mbuf@ 2 = if
     else
       0 tmp-flag !
@@ -245,7 +245,7 @@ s" CHIPS" add-word drop
 
 : save-row ( row -- )
   row-save !
-  WORD-LEN 0 do
+  WORD-LEN 0 ?do
     row-save @ i hidx dup idx-save !
     i gbuf@ idx-save @ hguess!
     i mbuf@ idx-save @ hmark!
@@ -256,10 +256,10 @@ s" CHIPS" add-word drop
   ." WORDLE (5 letters, 6 tries)" cr
   ." Green=right, yellow=present, gray=absent" cr
   cr
-  MAX-TRIES 0 do
+  MAX-TRIES 0 ?do
     i draw-row !
     draw-row @ tries-used @ < if
-      WORD-LEN 0 do
+      WORD-LEN 0 ?do
         draw-row @ i hidx dup idx-save !
         idx-save @ hmark@
         dup 2 = if
@@ -274,14 +274,14 @@ s" CHIPS" add-word drop
           else
             drop
             COLOR-BG COLOR-GRAY set-colors
-            46 emit
+            idx-save @ hguess@ emit
           then
         then
         32 emit
         COLOR-BG COLOR-DEFAULT set-colors
       loop
     else
-      WORD-LEN 0 do
+      WORD-LEN 0 ?do
         95 emit
         32 emit
       loop
