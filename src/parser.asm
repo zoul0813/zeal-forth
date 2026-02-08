@@ -33,9 +33,9 @@ do_next_word:
 
 @is_word:
     call dict_search
-    ; If A is 0, the word was not found
+    ; If A is 0, the word was found
     or a
-    jp nz, print_error
+    jr nz, print_error
 
     ; HL = current entry
     inc hl
@@ -47,12 +47,12 @@ do_next_word:
     jr z, @compile_mode ; compiling, check if immediate
 
     bit BIT_RESERVED, c
-    jp nz, @compileonly ; this is a compile only word
+    jr nz, @compileonly ; this is a compile only word
     jr @imm_word ; just execute the word
 
 @compile_mode: ; maybe the word is immediate?
     bit BIT_IMM, c
-    jp z, compile_word
+    jr z, compile_word
 
 @imm_word:
     ; Word was found, simulate a call to the function pointed by DE
@@ -63,15 +63,58 @@ do_next_word:
     jp (hl)
 
 @is_number:
-    IF_STATE(STATE_COMP, compile_number)
+    ld a, (STATE)
+    cp STATE_COMP
+    jr z, compile_number
     ; The value is in HL, next word is in DE, swap them
     ex de, hl
     PUSH()
-    jp do_next_word
+    jr do_next_word
 
 @compileonly:
     ERROR(ERR_COMPILE_ONLY)
+;
 
+compile_word:
+    ; put the word into the current definition
+    ld hl, (HERE)
+    ld a, 0xCD ; CALL nn
+    ld (hl), a
+    inc hl ; here++
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    inc hl
+    ld (HERE), hl
+
+    jr do_next_word
+;
+
+compile_number:
+    ex de, hl ; DE has the value
+
+    ld hl, (HERE)
+    ld a, 0x11 ; LD DE,NN
+    ld (hl), a
+    inc hl
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    inc hl
+
+    ld a, 0xCD ; CALL pushdata
+    ld (hl), a
+    inc hl
+    ld de, pushdata
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    inc hl
+
+    ld (HERE), hl
+
+    jr do_next_word
+;
 
 ; @brief Print "  ok"
 print_ok:
@@ -80,11 +123,12 @@ print_ok:
     or a
     ret nz
     PUTS(_str_ok, _str_ok_end)
-    ; jp prompt
     ret
+;
 
 ; @brief Set error to numeric overflow
 numeric_overflow:
+    ; fall thru to print_error
     ld a, ERR_NUMERIC_OVERFLOW
 
 
@@ -156,44 +200,3 @@ print_error: ; TODO: implement error lookup
     ld sp, (_recovery_sp)
     jp prompt
 
-
-compile_word:
-    ; put the word into the current definition
-    ld hl, (HERE)
-    ld a, 0xCD ; CALL nn
-    ld (hl), a
-    inc hl ; here++
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-    ld (HERE), hl
-
-    jp do_next_word
-;
-
-compile_number:
-    ex de, hl ; DE has the value
-
-    ld hl, (HERE)
-    ld a, 0x11 ; LD DE,NN
-    ld (hl), a
-    inc hl
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-
-    ld a, 0xCD ; CALL pushdata
-    ld (hl), a
-    inc hl
-    ld de, pushdata
-    ld (hl), e
-    inc hl
-    ld (hl), d
-    inc hl
-
-    ld (HERE), hl
-
-    jp do_next_word
-;

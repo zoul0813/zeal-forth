@@ -190,17 +190,20 @@ ENDWORD "c,", word_comma_char
     PUBLIC word_forget@drop
 WORD "forget", word_forget
     call next_word
+    jr nz, @have_name
+    ERROR(ERR_MISSING_NAME)
+@have_name:
     ld hl, (_curr_word)
     call dict_search ; HL = address of entry found
     or a
-    jr nz, @end
+    jr z, @drop
+    ERROR(ERR_NOT_FOUND)
 @drop:
     ld (HERE), hl
     ld e, (hl)
     inc hl
     ld d, (hl) ; DE = previous entry
     ld (LATEST), de ; set LATEST to the entry before this, forgetting everything else
-@end:
     ret
 ENDWORD "forget", word_forget
 
