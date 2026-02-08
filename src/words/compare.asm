@@ -64,6 +64,33 @@ WORD ">", word_greaterthan
 
 ENDWORD ">", word_greaterthan
 
+; ( u1 u2 -- flag )
+WORD "u<", word_ulessthan
+    POP()   ; DE = u2
+    ex de, hl   ; HL = u2
+    POP()   ; DE = u1
+    ex de, hl   ; DE = u2, HL = u1
+
+    or a
+    sbc hl, de
+    jr c, de_true
+    jr de_false
+ENDWORD "u<", word_ulessthan
+
+; ( u1 u2 -- flag )
+WORD "u>", word_ugreaterthan
+    POP()   ; DE = u2
+    ex de, hl   ; HL = u2
+    POP()   ; DE = u1
+    ex de, hl   ; DE = u2, HL = u1
+
+    or a
+    sbc hl, de
+    jr z, de_false
+    jr c, de_false
+    jr de_true
+ENDWORD "u>", word_ugreaterthan
+
 ; ( n1 n2 -- n3 )
 WORD "and", word_and
     POP()   ; DE = n2

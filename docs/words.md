@@ -23,6 +23,9 @@ use the Forth convention `( before -- after )`.
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (lower 16 bits). |
 | `/` | `( n1 n2 -- n3 )` | Signed floored division. Division by zero raises `div0 error`. |
 | `mod` | `( n1 n2 -- n3 )` | Signed floored remainder (sign follows divisor). Division by zero raises `div0 error`. |
+| `u/` | `( u1 u2 -- u3 )` | Unsigned division. Division by zero raises `div0 error`. |
+| `umod` | `( u1 u2 -- u3 )` | Unsigned remainder. Division by zero raises `div0 error`. |
+| `u/mod` | `( u1 u2 -- urem uquot )` | Unsigned remainder and quotient. Division by zero raises `div0 error`. |
 | `abs` | `( n -- u )` | Absolute value. |
 | `negate` | `( n -- -n )` | Two's-complement negation. |
 
@@ -33,6 +36,8 @@ use the Forth convention `( before -- after )`.
 | `=` | `( n1 n2 -- flag )` | True if equal. |
 | `<` | `( n1 n2 -- flag )` | True if `n1 < n2` (signed). |
 | `>` | `( n1 n2 -- flag )` | True if `n1 > n2` (signed). |
+| `u<` | `( u1 u2 -- flag )` | True if `u1 < u2` (unsigned). |
+| `u>` | `( u1 u2 -- flag )` | True if `u1 > u2` (unsigned). |
 | `and` | `( n1 n2 -- n3 )` | Bitwise AND. |
 | `or` | `( n1 n2 -- n3 )` | Bitwise OR. |
 | `xor` | `( n1 n2 -- n3 )` | Bitwise XOR. |

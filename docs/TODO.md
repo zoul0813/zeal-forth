@@ -34,6 +34,8 @@ Items marked with `❓` may or may not be defined
 * [x] <>        🇫 `( n1 n2 -- flag )`
 * [x] <         `( n1 n2 -- flag )`
 * [x] >         `( n1 n2 -- flag )`
+* [x] u<        `( u1 u2 -- flag )`
+* [x] u>        `( u1 u2 -- flag )`
 * [x] 0=        🇫 `( n -- flag )`
 * [x] 0<        🇫 `( n -- flag )`
 * [x] 0>        🇫 `( n -- flag )`
@@ -99,8 +101,9 @@ Items marked with `❓` may or may not be defined
 * [ ] */        ❓`( n1 n2 n3 -- n4 )`
 * [ ] */mod     ❓`( n1 n2 n3 -- n4 n5 )`
 * [x] /mod      `( n1 n2 -- n3 n4 )`
-* [ ] u<        `( u1 u2 -- flag )`
-* [ ] u>        `( u1 u2 -- flag )`
+* [x] u/        `( u1 u2 -- u3 )`
+* [x] umod      `( u1 u2 -- u3 )`
+* [x] u/mod     `( u1 u2 -- u-rem u-quot )`
 * [ ] um*       `( u1 u2 -- ud )`
 * [ ] um/mod    `( ud u -- u-rem u-quot )`
 
@@ -128,6 +131,6 @@ Items marked with `❓` may or may not be defined
 * [x] bye       `( -- )`
 * [x] free      🇫 `( -- n )` | remaining bytes in heap
 * [x] marker    🇫 `( -- 0 )` | placeholder marker word (currently returns 0)
-* [ ] syscall   `( n -- )` | execute syscall n, additional stack params may be required as defined by syscall
-* [ ] ioctl     `( dev c de -- )` | ioctl(dev, c, de)
+* [x] syscall   `( n -- )` | execute syscall n, additional stack params may be required as defined by syscall
+* [x] ioctl     `( dev c de -- )` | ioctl(dev, c, de)
 * [x] loadfile  `( "ccc<quote>" -- )` | Read and parse forth file

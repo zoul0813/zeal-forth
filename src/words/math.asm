@@ -91,6 +91,59 @@ WORD "/mod", word_divmod
     JP_PUSH()
 ENDWORD "/mod", word_divmod
 
+; ( u1 u2 -- u3 )
+WORD "u/", word_udiv
+    POP()   ; DE = u2
+    ex de, hl   ; HL = u2
+    POP()   ; DE = u1
+    ex de, hl   ; DE = u2, HL = u1
+    ld a, d
+    or e
+    jr nz, @do_udiv
+    ERROR(ERR_DIV_BY_ZERO)
+@do_udiv:
+    call __udivmod_hl_de  ; HL=quot, BC=rem
+    ex de, hl             ; DE=quot
+    JP_PUSH()
+ENDWORD "u/", word_udiv
+
+; ( u1 u2 -- u3 )
+WORD "umod", word_umod
+    POP()   ; DE = u2
+    ex de, hl   ; HL = u2
+    POP()   ; DE = u1
+    ex de, hl   ; DE = u2, HL = u1
+    ld a, d
+    or e
+    jr nz, @do_umod
+    ERROR(ERR_DIV_BY_ZERO)
+@do_umod:
+    call __udivmod_hl_de  ; HL=quot, BC=rem
+    ld d, b
+    ld e, c               ; DE=rem
+    JP_PUSH()
+ENDWORD "umod", word_umod
+
+; ( u1 u2 -- urem uquot )
+WORD "u/mod", word_udivmod
+    POP()   ; DE = u2
+    ex de, hl   ; HL = u2
+    POP()   ; DE = u1
+    ex de, hl   ; DE = u2, HL = u1
+    ld a, d
+    or e
+    jr nz, @do_udivmod
+    ERROR(ERR_DIV_BY_ZERO)
+@do_udivmod:
+    call __udivmod_hl_de  ; HL=quot, BC=rem
+    ; push rem first, then quot
+    ld d, b
+    ld e, c
+    PUSH()
+    ex de, hl
+    JP_PUSH()
+ENDWORD "u/mod", word_udivmod
+
 
 ; ( n -- u ) abs(n)
 WORD "abs", word_abs
