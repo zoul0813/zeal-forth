@@ -25,6 +25,14 @@ variable fails
 \ /mod leaves ( rem quot )
 ." [ /mod ] 20 3 -> 2 6: "        20 3 /mod >r 2 = r> 6 = and report
 
+\ Floored signed division/modulo.
+." [ / ] -20 3 -> -7: "           -20 3 / -7 = report
+." [ mod ] -20 3 -> 1: "          -20 3 mod 1 = report
+." [ / ] 20 -3 -> -7: "           20 -3 / -7 = report
+." [ mod ] 20 -3 -> -1: "         20 -3 mod -1 = report
+." [ / ] -20 -3 -> 6: "           -20 -3 / 6 = report
+." [ mod ] -20 -3 -> -2: "        -20 -3 mod -2 = report
+
 \ Division-by-zero behavior in this implementation is defined as 0.
 ." [ /0 ] 123 0 -> 0: "           123 0 / 0 = report
 ." [ mod0 ] 123 0 -> 0: "         123 0 mod 0 = report

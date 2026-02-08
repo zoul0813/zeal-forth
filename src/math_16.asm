@@ -102,3 +102,115 @@ __udivmod_hl_de:
 @done:
     ex af, af'
     ret
+
+; @brief Negate signed 16-bit HL in-place (two's complement).
+;
+; Parameters:
+;   HL - value
+;
+; Returns:
+;   HL - -value
+;
+; Alters:
+;   A, HL
+_neg_hl:
+    ld a, h
+    cpl
+    ld h, a
+    ld a, l
+    cpl
+    ld l, a
+    inc hl
+    ret
+
+; @brief Floored signed 16-bit divide/mod core.
+;
+; Parameters:
+;   HL - Dividend (n1)
+;   DE - Divisor  (n2)
+;
+; Returns:
+;   HL - Quotient (n1 / n2), floored
+;   BC - Remainder (n1 mod n2), sign follows divisor
+;
+; Division by zero:
+;   HL=0, BC=0
+;
+; Alters:
+;   AF, BC, DE, HL
+    PUBLIC __fdivmod_hl_de
+__fdivmod_hl_de:
+    xor a                  ; flags: bit0=quotient negative, bit1=divisor negative
+
+    ; Normalize dividend to |dividend| and record sign.
+    bit 7, h
+    jr z, @dividend_abs_done
+    set 0, a
+    push af
+    call _neg_hl
+    pop af
+@dividend_abs_done:
+
+    ; Normalize divisor to |divisor|, record divisor sign, toggle quotient sign.
+    bit 7, d
+    jr z, @divisor_abs_done
+    xor 00000001b          ; quotient sign ^= 1
+    or 00000010b           ; divisor negative
+    push af
+    ex de, hl
+    call _neg_hl
+    ex de, hl
+    pop af
+@divisor_abs_done:
+
+    push af
+    call __udivmod_hl_de   ; HL=q0, BC=r0, DE=|divisor|
+    pop af                 ; A = flags
+
+    ; Save quotient sign/flags in E; reuse A for tests.
+    ld e, a
+
+    ; Floored quotient correction.
+    bit 0, e
+    jr z, @q_done          ; quotient non-negative
+    ld a, b
+    or c
+    jr z, @q_exact
+    call _neg_hl
+    dec hl
+    jr @q_done
+@q_exact:
+    call _neg_hl
+@q_done:
+
+    ; Remainder magnitude correction when quotient was rounded down.
+    ld a, b
+    or c
+    jr z, @r_sign          ; remainder zero stays zero
+    bit 0, e
+    jr z, @r_sign
+
+    ; BC = |divisor| - BC
+    push hl
+    push de                ; preserve |divisor|
+    ld h, d
+    ld l, e
+    or a
+    sbc hl, bc
+    ld b, h
+    ld c, l
+    pop de
+    pop hl
+
+@r_sign:
+    ; Remainder sign follows divisor sign.
+    bit 1, e
+    ret z
+    push hl
+    ld h, b
+    ld l, c
+    call _neg_hl
+    ld b, h
+    ld c, l
+    pop hl
+    ret

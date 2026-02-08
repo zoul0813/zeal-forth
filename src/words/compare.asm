@@ -26,6 +26,15 @@ WORD "<", word_lessthan
     POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
 
+    ; Signed compare: if signs differ, negative is less.
+    ld a, h
+    xor d
+    and 080h
+    jr z, @same_sign
+    bit 7, h
+    jr nz, de_true
+    jr de_false
+@same_sign:
     or a
     sbc hl, de
     jr c, de_true
@@ -36,11 +45,21 @@ WORD ">", word_greaterthan
     POP()   ; DE = n2
     ex de, hl   ; HL = n2
     POP()   ; DE = n1
+    ex de, hl   ; DE = n2, HL = n1
 
-    ; Instead of checking if n1 > n2, let's check if n2 >= n1
+    ; Signed compare: if signs differ, positive is greater.
+    ld a, h
+    xor d
+    and 080h
+    jr z, @same_sign
+    bit 7, h
+    jr z, de_true
+    jr de_false
+@same_sign:
     or a
-    sbc hl, de
-    jr nc, de_false
+    sbc hl, de           ; HL = n1 - n2
+    jr z, de_false
+    jr c, de_false
     jr de_true
 
 ENDWORD ">", word_greaterthan

@@ -41,7 +41,7 @@ WORD "/", word_div
     POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
 
-    call __udivmod_hl_de  ; HL=quot, BC=rem
+    call __fdivmod_hl_de  ; HL=quot, BC=rem (floored signed)
     ex de, hl             ; DE=quot
     JP_PUSH()
 ENDWORD "/", word_div
@@ -53,7 +53,7 @@ WORD "mod", word_mod
     POP()   ; DE = n1
     ex de, hl
 
-    call __udivmod_hl_de  ; HL=quot, BC=rem
+    call __fdivmod_hl_de  ; HL=quot, BC=rem (floored signed)
     ld d, b
     ld e, c               ; DE=rem
     JP_PUSH()
@@ -66,7 +66,7 @@ WORD "/mod", word_divmod
     POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
 
-    call __udivmod_hl_de  ; HL=quot, BC=rem
+    call __fdivmod_hl_de  ; HL=quot, BC=rem (floored signed)
 
     ; push rem first, then quot
     ld d, b
