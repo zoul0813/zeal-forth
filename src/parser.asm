@@ -11,7 +11,9 @@
 ; @brief Show the prompt
 prompt:
     ld (_recovery_sp), sp
+    KB_MODE_COOKED()
     GET_INPUT()
+    KB_MODE_RAW()
 
     ld hl, _input_buffer
     ld (_next_word), hl

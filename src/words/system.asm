@@ -40,10 +40,6 @@ WORD "key?", word_key_query
     or a
     jr nz, @pending ; there's already a key pending, consume it first
 
-    KB_MODE_RAW()
-    or a
-    jr nz, @nokey
-
     S_READ3(DEV_STDIN, _key_buffer, 1)
     ; Non-block probe: BC==0 means no key available.
     or a
@@ -73,7 +69,6 @@ WORD "key?", word_key_query
     ld de, TRUE
     PUSH()
 @done:
-    KB_MODE_COOKED()
     ret
 ENDWORD "key?", word_key_query
 
@@ -85,7 +80,6 @@ WORD "key", word_key
     jr nz, @pending
 
     ; Poll in RAW non-block mode until a key press arrives.
-    KB_MODE_RAW()
 @read_loop:
     S_READ3(DEV_STDIN, _key_buffer, 1)
     ERROR_CHECK()
@@ -108,7 +102,6 @@ WORD "key", word_key
 
     xor a
     ld (_key_pending), a
-    KB_MODE_COOKED()
     ret
 ENDWORD "key", word_key
 
