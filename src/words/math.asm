@@ -40,6 +40,11 @@ WORD "/", word_div
     ex de, hl   ; HL = n2
     POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
+    ld a, d
+    or e
+    jr nz, @do_div
+    ERROR(ERR_DIV_BY_ZERO)
+@do_div:
 
     call __fdivmod_hl_de  ; HL=quot, BC=rem (floored signed)
     ex de, hl             ; DE=quot
@@ -52,6 +57,11 @@ WORD "mod", word_mod
     ex de, hl   ; HL = n2
     POP()   ; DE = n1
     ex de, hl
+    ld a, d
+    or e
+    jr nz, @do_mod
+    ERROR(ERR_DIV_BY_ZERO)
+@do_mod:
 
     call __fdivmod_hl_de  ; HL=quot, BC=rem (floored signed)
     ld d, b
@@ -65,6 +75,11 @@ WORD "/mod", word_divmod
     ex de, hl   ; HL = n2
     POP()   ; DE = n1
     ex de, hl   ; DE = n2, HL = n1
+    ld a, d
+    or e
+    jr nz, @do_divmod
+    ERROR(ERR_DIV_BY_ZERO)
+@do_divmod:
 
     call __fdivmod_hl_de  ; HL=quot, BC=rem (floored signed)
 

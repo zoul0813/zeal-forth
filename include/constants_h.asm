@@ -34,7 +34,8 @@
     DEFC ERR_UNSUPPORTED = -7
     DEFC ERR_TOO_LONG = -8
     DEFC ERR_UNBALANCED_CONTROL = -9
-    DEFC ERR_TABLE_LAST = 9 ; adjust when adding new error codes
+    DEFC ERR_DIV_BY_ZERO = -10
+    DEFC ERR_TABLE_LAST = 10 ; adjust when adding new error codes
     DEFC ERR_NOT_FOUND = -128
 
     EXTERN __TEXT_head

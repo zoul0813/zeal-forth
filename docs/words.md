@@ -21,8 +21,8 @@ use the Forth convention `( before -- after )`.
 | `+` | `( n1 n2 -- n1+n2 )` | Add the top two stack items (16-bit wraparound). |
 | `-` | `( n1 n2 -- n1-n2 )` | Subtract the top two stack items (16-bit wraparound). |
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (lower 16 bits). |
-| `/` | `( n1 n2 -- n3 )` | Unsigned division. Division by zero returns 0. |
-| `mod` | `( n1 n2 -- n3 )` | Unsigned remainder. Division by zero returns 0. |
+| `/` | `( n1 n2 -- n3 )` | Signed floored division. Division by zero raises `div0 error`. |
+| `mod` | `( n1 n2 -- n3 )` | Signed floored remainder (sign follows divisor). Division by zero raises `div0 error`. |
 | `abs` | `( n -- u )` | Absolute value. |
 | `negate` | `( n -- -n )` | Two's-complement negation. |
 
@@ -31,8 +31,8 @@ use the Forth convention `( before -- after )`.
 | Word | Stack effect | Description |
 | --- | --- | --- |
 | `=` | `( n1 n2 -- flag )` | True if equal. |
-| `<` | `( n1 n2 -- flag )` | True if `n1 < n2` (unsigned). |
-| `>` | `( n1 n2 -- flag )` | True if `n1 > n2` (unsigned). |
+| `<` | `( n1 n2 -- flag )` | True if `n1 < n2` (signed). |
+| `>` | `( n1 n2 -- flag )` | True if `n1 > n2` (signed). |
 | `and` | `( n1 n2 -- n3 )` | Bitwise AND. |
 | `or` | `( n1 n2 -- n3 )` | Bitwise OR. |
 | `xor` | `( n1 n2 -- n3 )` | Bitwise XOR. |

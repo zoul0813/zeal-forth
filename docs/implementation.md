@@ -96,6 +96,7 @@ Current short-form messages and meanings:
 - `unsup`: Unsupported/unknown error fallback.
 - `lenovf`: Input line too long for `loadfile` chunk parser (no newline in full chunk).
 - `imbal`: Unbalanced compile-time control structures at `;`.
+- `div0`: Division by zero in `/`, `mod`, or `/mod`.
 - `'token' not found`: Dictionary lookup failed for the current input token.
 
 ## Compilation model (current)
