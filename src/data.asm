@@ -52,6 +52,10 @@ _str_err_stack_underflow:
     DEFB "stack underflow", 0
 _str_err_stack_underflow_end:
 
+_str_err_too_long:
+    DEFB "too long", 0
+_str_err_too_long_end:
+
 _str_error_not_found:
     DEFB "not found", 0
 _str_error_not_found_end:
@@ -71,6 +75,8 @@ _err_string_table:
     DEFW _str_compile_only
     ; index 6 => ERR_UNSUPPORTED (-7)
     DEFW _str_unsupported
+    ; index 7 => ERR_UNSUPPORTED (-8)
+    DEFW _str_err_too_long
 
 
 

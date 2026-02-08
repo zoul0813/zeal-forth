@@ -44,7 +44,9 @@ _readfile_prepare_chunk:
     jr nz, @scan_last_nl
 
     ; No newline in full chunk: do not carry tail to avoid stalling.
-    ld de, 0
+    pop bc
+    ld a, ERR_TOO_LONG
+    ret
 @finalize:
     ; processed_len = BC - DE
     pop hl              ; HL = original chunk length
@@ -116,21 +118,25 @@ loadfile:
     jr @read
 
 @eof:
-    ld a, (_file_fd)
-    ld h, a
-    CLOSE()
-    ;; TODO: error check
-    xor a
-    ld (_file_fd), a
-    xor a ; clear zero flag
-    ret
+    xor a                  ; success status
+    jr @close_and_ret
 @error_neg:
     neg
 @error:
-    push af
+    ; A already holds the error code
+@close_and_ret:
+    push af                ; preserve status/error code across close
+    ld a, (_file_fd)
+    or a
+    jr z, @closed
+    ld h, a
+    CLOSE()
+@closed:
     xor a
     ld (_file_fd), a
     pop af
-    call print_error
-    xor a ; clear zero flag
+    or a
+    ret z                  ; EOF/success path
+    call print_error       ; error path
+    xor a
     ret
