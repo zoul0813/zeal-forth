@@ -21,6 +21,7 @@
 main:
     push de
     MEMSET(__BSS_head, __BSS_size, 0x00)
+    ld (_recovery_sp), sp
     call dict_init
 @args:
     pop de
@@ -45,4 +46,3 @@ main:
 _exit_code:
     ld h, a
     EXIT()
-

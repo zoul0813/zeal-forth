@@ -45,19 +45,22 @@
     EXTERN _exit_code
 
     ; stacks
-    EXTERN data_sp        ;; data stack pointer
-    EXTERN data_stack     ;; data stack data
-    EXTERN return_sp      ;; return stack pointer
-    EXTERN return_stack   ;; return stack data
+    EXTERN data_sp            ;; data stack pointer
+    EXTERN data_stack         ;; data stack data
+    EXTERN _data_stack_end    ;; data stack data
+    EXTERN return_sp          ;; return stack pointer
+    EXTERN return_stack       ;; return stack data
+    EXTERN _return_stack_end  ;; return stack data
 
     ; file parser
     EXTERN _file_fd
+    EXTERN _recovery_sp
 
     ; HERE
     EXTERN HERE        ;; here pointer
     EXTERN LATEST      ;; latest pointer
-    EXTERN STATE         ;; state - 0 interpret, 1 = compile
-    EXTERN BASE          ;; number base for interpreting numbers
+    EXTERN STATE       ;; state - 0 interpret, 1 = compile
+    EXTERN BASE        ;; number base for interpreting numbers
 
     ; string buffers
     EXTERN _curr_word
@@ -86,6 +89,10 @@
     EXTERN _str_unsupported_end
     EXTERN _str_unterminated_str
     EXTERN _str_unterminated_str_end
+    EXTERN _str_err_stack_overflow
+    EXTERN _str_err_stack_overflow_end
+    EXTERN _str_err_stack_underflow
+    EXTERN _str_err_stack_underflow_end
     EXTERN _str_compile_only
     EXTERN _str_compile_only_end
     EXTERN _str_error_not_found

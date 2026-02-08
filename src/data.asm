@@ -14,27 +14,35 @@ _str_ok:
 _str_ok_end:
 
 _str_error:
-    DEFB "  error\n", 0
+    DEFB "error\n", 0
 _str_error_end:
 
 _str_unsupported:
-    DEFB "  unsupported\n", 0
+    DEFB "unsupported", 0
 _str_unsupported_end:
 
 _str_compile_only:
-    DEFB "  compile-only\n", 0
+    DEFB "compile-only", 0
 _str_compile_only_end:
 
 _str_unterminated_str:
-    DEFB "  unterminated string", 0
+    DEFB "unterminated string", 0
 _str_unterminated_str_end:
 
 _str_error_numeric_overflow:
-    DEFB "numeric overflow"
+    DEFB "numeric overflow", 0
 _str_error_numeric_overflow_end:
 
+_str_err_stack_overflow:
+    DEFB "stack overflow", 0
+_str_err_stack_overflow_end:
+
+_str_err_stack_underflow:
+    DEFB "stack underflow", 0
+_str_err_stack_underflow_end:
+
 _str_error_not_found:
-    DEFB " not found", 0
+    DEFB "not found", 0
 _str_error_not_found_end:
 
 _str_prompt:
@@ -80,6 +88,8 @@ _key_pending:
 
 ;; file parser
 _file_fd: DEFB 0
+_recovery_sp:
+    DEFW 0
 
   ; a place to store dword numbers for conversion
 _dword_num:

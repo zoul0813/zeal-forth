@@ -17,6 +17,8 @@
     ; EXTERN print_ok
     ; EXTERN numeric_overflow
     EXTERN print_error
+    EXTERN print_error@stack_overflow
+    EXTERN print_error@stack_underflow
 
 
 #endif

@@ -10,6 +10,7 @@
 
 ; @brief Show the prompt
 prompt:
+    ld (_recovery_sp), sp
     GET_INPUT()
 
     ld hl, _input_buffer
@@ -87,6 +88,7 @@ print_ok:
 numeric_overflow:
     ld a, ERR_NUMERIC_OVERFLOW
 
+
 ; @brief Print current error message
 print_error: ; TODO: implement error lookup
     cp ERR_NOT_FOUND
@@ -106,6 +108,12 @@ print_error: ; TODO: implement error lookup
 @numeric_overflow:
     PUTS(_str_error_numeric_overflow, _str_error_numeric_overflow_end)
     jr @msg
+@stack_overflow:
+    PUTS(_str_err_stack_overflow, _str_err_stack_overflow_end)
+    jr @msg
+@stack_underflow:
+    PUTS(_str_err_stack_underflow, _str_err_stack_underflow_end)
+    jr @msg
 @not_found:
     PUTC('\'')
     ld de, (_curr_word)
@@ -115,6 +123,7 @@ print_error: ; TODO: implement error lookup
     PUTS(_str_error_not_found, _str_error_not_found_end)
     ; jr @msg ; fall-thru
 @msg:
+    PUTC(' ')
     PUTS(_str_error, _str_error_end)
 
     IF_STATE(STATE_IMM, @prompt)
@@ -123,6 +132,8 @@ print_error: ; TODO: implement error lookup
 
     SET_STATE(STATE_IMM)
 @prompt:
+    ; Restore recovery SP after error jumps.
+    ld sp, (_recovery_sp)
     jp prompt
 
 
