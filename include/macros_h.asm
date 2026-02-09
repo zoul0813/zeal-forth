@@ -150,6 +150,15 @@
     call popdata
   ENDM
 
+  ; @brief Pop top data stack into DE
+  ;
+  ;
+  ; Returns:
+  ; - DE  - Value popped
+  MACRO JP_POP _
+    jp popdata
+  ENDM
+
   ; @brief Peek top data stack into DE
   ;
   ; Alters:

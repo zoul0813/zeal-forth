@@ -60,7 +60,7 @@ use the Forth convention `( before -- after )`.
 
 | Word | Stack effect | Description |
 | --- | --- | --- |
-| `.` | `( n -- )` | Print `n` in decimal, then a newline. |
+| `.` | `( n -- )` | Print `n` in decimal, then a space. |
 | `."` | `( -- )` | Print characters until the next `"`, consuming the input stream. |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
 | `type` | `( c-addr n -- )` | Output `n` bytes from `c-addr`. |

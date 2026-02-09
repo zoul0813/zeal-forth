@@ -8,12 +8,7 @@ ENDWORD "dup", word_dup
 
 ; ( n -- ) Drop top stack item
 WORD "drop", word_drop
-    ; Increment the data stack twice, no need to get the data
-    ld hl, (data_sp)
-    inc hl
-    inc hl
-    ld (data_sp), hl
-    ret
+    JP_POP()
 ENDWORD "drop", word_drop
 
 ; ( n1 n2 -- n2 n1 )
@@ -29,12 +24,12 @@ ENDWORD "swap", word_swap
 
 ; ( n1 n2 -- n1 n2 n1 )
 WORD "over", word_over
-    ld hl, (data_sp)
-    inc hl
-    inc hl
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
+    POP()
+    ex de, hl
+    POP()
+    ex de, hl
+    PUSH()
+    ex de, hl
     JP_PUSH()
 ENDWORD "over", word_over
 
