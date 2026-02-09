@@ -217,18 +217,31 @@ DICT_W:
 CREATE_HEADER:
     BACKUP()
 
+    ; Validate name length before mutating dictionary layout/links.
+    ld hl, (_curr_word)
+    call strlen
+    ld a, b
+    or a
+    jr nz, @too_long
+    ld a, c
+    cp 32
+    jr nc, @too_long
+    push bc
+
     ld hl, (HERE)
     ld de, (LATEST)
     call DICT_W ; write the current LATEST to dict_prev
     ld (LATEST), hl ; update LATEST to HERE
 
-    ld hl, (_curr_word)
-    call strlen
+    pop bc
     ld a, c
     call DICT_C ; write LEN to dict_flags
 
     ld de, (HERE)
+    ld hl, (_curr_word)
+    push bc
     call strcpy ; copy word to HERE
+    pop bc
     ld hl, (HERE)
     add hl, bc
     inc hl ; add null-term
@@ -236,3 +249,7 @@ CREATE_HEADER:
 
     RESTORE()
     ret
+
+@too_long:
+    RESTORE()
+    ERROR(ERR_TOO_LONG)
