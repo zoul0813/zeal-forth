@@ -9,6 +9,29 @@
 
   SECTION TEXT
 
+; @brief Parse numeric token according to BASE policy.
+;
+; Parameters:
+; - HL - token start
+;
+; Returns:
+; - HL - parsed value on success
+; -  A - 0=success, 1=too large, 2=not-number, or ERR_UNSUPPORTED for invalid BASE
+parse_by_base:
+    ld a, (BASE)
+    cp 16
+    jr z, @hex
+    cp 10
+    jr z, @dec
+    ld a, ERR_UNSUPPORTED
+    ret
+@hex:
+    jp parse_hex
+@dec:
+    ; Keep parse_int behavior in decimal mode so explicit hex prefixes like
+    ; $EA/0xEA continue to work.
+    jp parse_int
+
 ; @brief Show the prompt
 prompt:
     ld (_recovery_sp), sp
@@ -33,7 +56,7 @@ do_next_word:
     ld a, (hl)
     or a
     jr z, @is_word          ; "-" alone is not a number
-    call parse_dec
+    call parse_by_base
     or a
     jr z, @is_negative_number
     dec a
@@ -41,7 +64,7 @@ do_next_word:
     jr @is_word             ; non-decimal value, fall-through to word lookup
 
 @parse_unsigned:
-    call parse_dec
+    call parse_by_base
     ; If A is 0, the current word is a number
     or a
     jr z, @is_number

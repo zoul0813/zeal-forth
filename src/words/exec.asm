@@ -182,6 +182,24 @@ WORD "state", word_state
     JP_PUSH()
 ENDWORD "state", word_state
 
+; ( -- a-addr ) Address of numeric base cell
+WORD "base", word_base
+    ld de, BASE
+    JP_PUSH()
+ENDWORD "base", word_base
+
+WORD "hex", word_hex
+    ld hl, 16
+    ld (BASE), hl
+    ret
+ENDWORD_FLAGS "hex", word_hex, IMMEDIATE
+
+WORD "decimal", word_decimal
+    ld hl, 10
+    ld (BASE), hl
+    ret
+ENDWORD_FLAGS "decimal", word_decimal, IMMEDIATE
+
 ; ( x-addr -- ) Execute code at x-addr, stack effects are defined by the code being executed
 WORD "execute", word_execute
     POP() ; DE = execution address

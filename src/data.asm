@@ -83,7 +83,7 @@ LATEST:
 STATE:
     DEFW STATE_IMM
 BASE:
-    DEFW 0x10
+    DEFW 10
 
   SECTION BSS
 _curr_word:

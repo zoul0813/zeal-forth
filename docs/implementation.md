@@ -37,14 +37,20 @@ implementation. It is based on the assembly sources in `src/`.
 
 ## Numbers
 
-- Numeric parsing accepts decimal digits only.
+- Numeric parsing follows the `BASE` cell (`base` word):
+  - `BASE = 10` (default): decimal parsing is enabled, and explicit hex forms
+    supported by the parser (for example `$EA`, `0xEA`) are accepted.
+  - `BASE = 16`: unprefixed tokens are parsed as hexadecimal.
+- `hex` and `decimal` are immediate words that update `BASE` during
+  interpretation and compilation.
 - Values must fit in a 16-bit cell; larger values trigger a numeric overflow
   error.
 - Parsed values are pushed onto the data stack.
 
 ## Dictionary lookup
 
-- Each non-numeric token is looked up in the dictionary (built-ins plus any
+- Tokens are parsed as numbers first (according to `BASE`); only non-numeric
+  tokens are looked up in the dictionary (built-ins plus any
   definitions created with `:`/`;`, `create`, or `variable`).
 - If a word is not found, the interpreter prints `'token' not found error`.
 
@@ -74,7 +80,7 @@ implementation. It is based on the assembly sources in `src/`.
 
 ## Character output
 
-- `.` prints a 16-bit value in free-field decimal format, then a newline.
+- `.` prints a 16-bit value in free-field decimal format, then a trailing space.
 - `emit` writes the low byte of the top stack item to standard output.
 - `type` writes `n` bytes from `c-addr`.
 - `key?` is non-blocking and returns a flag; when true it buffers one key for `key`.
@@ -87,7 +93,7 @@ failures).
 
 Current short-form messages and meanings:
 
-- `numovf`: Numeric overflow (parsed decimal literal did not fit 16-bit cell).
+- `numovf`: Numeric overflow (parsed literal did not fit 16-bit cell).
 - `unclosed`: Unterminated quoted string (no closing `"` before buffer end).
 - `stkovf`: Stack overflow (data/return stack push exceeded bounds).
 - `stkunf`: Stack underflow (data/return stack pop/peek on empty/corrupt stack).

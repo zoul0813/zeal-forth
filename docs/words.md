@@ -79,6 +79,9 @@ use the Forth convention `( before -- after )`.
 | `:` | `( "<spaces>name" -- )` | Start compiling a new word definition. |
 | `;` | `( -- )` | End the current word definition and return to immediate mode. |
 | `state` | `( -- a-addr )` | Address of the compilation-state flag. |
+| `base` | `( -- a-addr )` | Address of the numeric base cell. |
+| `hex` | `( -- )` | Set `BASE` to 16. Immediate. |
+| `decimal` | `( -- )` | Set `BASE` to 10. Immediate. |
 | `execute` | `( x-addr -- )` | Execute code at `x-addr`. |
 | `,` | `( x -- )` | Store `x` at HERE, advance HERE by one cell. |
 | `c,` | `( c -- )` | Store `c` at HERE, advance HERE by one byte. |
@@ -195,7 +198,11 @@ pad 65 swap !  pad @ emit
 10 20 average .  \ prints 15
 ```
 
-Note: numeric input is decimal only.
+```forth
+\ switch numeric input mode
+hex EA .      \ prints 234
+decimal 234 . \ prints 234
+```
 
 ## Words defined in forth.fs (when loaded)
 
