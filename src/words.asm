@@ -30,7 +30,8 @@ next_word:
     jr @loop
 
 @process:
-    ld de, hl ; DE scans forward
+    ld d, h ; DE scans forward
+    ld e, l
 @scan:
     ld a, (de)
     or a
@@ -43,7 +44,8 @@ next_word:
     jr @scan
 
 @found_delim:
-    ld (de), 0  ; terminate current word
+    xor a
+    ld (de), a  ; terminate current word
     inc de      ; next word starts after delimiter
 @found_end:
     call strlen ; returns BC = len (alters: A, BC)
@@ -79,7 +81,7 @@ parse_until_quote:
     inc hl
     cp '"' ; end
     ret z
-    cp 0x00 ; null-term
+    or a ; cp 0x00 null-term
     jr nz, @not_null
     ERROR(ERR_UNTERMINATED_STR)
 @not_null:

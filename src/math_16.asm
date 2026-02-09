@@ -59,8 +59,11 @@ __udivmod_hl_de:
     ld a, d
     or e
     jr nz, @start
-    ld hl, 0
-    ld bc, 0
+    ; A is 0
+    ld h, a
+    ld l, a
+    ld b, a
+    ld c, a
     ret
 
 @start:
@@ -113,6 +116,7 @@ __udivmod_hl_de:
 ;
 ; Alters:
 ;   A, HL
+    PUBLIC _neg_hl
 _neg_hl:
     ld a, h
     cpl
@@ -145,10 +149,8 @@ __fdivmod_hl_de:
     ; Normalize dividend to |dividend| and record sign.
     bit 7, h
     jr z, @dividend_abs_done
-    set 0, a
-    push af
     call _neg_hl
-    pop af
+    ld a, 1
 @dividend_abs_done:
 
     ; Normalize divisor to |divisor|, record divisor sign, toggle quotient sign.
@@ -169,8 +171,8 @@ __fdivmod_hl_de:
     push af                ; keep flags on stack (DE must keep |divisor|)
 
     ; Floored quotient correction.
-    bit 0, a
-    jr z, @q_done          ; quotient non-negative
+    rrca                    ; Check if A's bit 0 is 0 (nc)
+    jr nc, @q_done          ; quotient non-negative
     ld a, b
     or c
     jr z, @q_exact
@@ -187,20 +189,20 @@ __fdivmod_hl_de:
     jr z, @r_sign          ; remainder zero stays zero
     pop af
     push af
-    bit 0, a
-    jr z, @r_sign
+    ; Check lowest bit, nc if 0, c if 1
+    rrca
+    jr nc, @r_sign
 
     ; BC = |divisor| - BC
-    push hl
     push de                ; preserve |divisor|
-    ld h, d
-    ld l, e
+    ; HL will be saved in DE
+    ex de, hl
     or a
     sbc hl, bc
     ld b, h
     ld c, l
+    ex de, hl
     pop de
-    pop hl
 
 @r_sign:
     ; Remainder sign follows divisor sign.

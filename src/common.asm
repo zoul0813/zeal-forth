@@ -5,6 +5,21 @@
 
   SECTION TEXT
 
+    PUBLIC putc
+  ; @brief Print c
+  ;
+  ; Returns:
+  ; - A   - ERR_SUCCES on success, error value else
+  ; - BC  - Number of bytes written
+  ;
+  ; Alters:
+  ;   A, H, DE, BC
+putc:
+    ld de, _str_buffer
+    ld (de), a
+    ld bc, 1
+    ; Fall-through (puts)
+
     PUBLIC puts
   ; @brief Print str of length BC at DE
   ;
@@ -23,22 +38,6 @@ puts:
     ERROR_CHECK()
     ret
 
-    PUBLIC putc
-  ; @brief Print c
-  ;
-  ; Returns:
-  ; - A   - ERR_SUCCES on success, error value else
-  ; - BC  - Number of bytes written
-  ;
-  ; Alters:
-  ;   A, H, DE, BC
-putc:
-    ld (_str_buffer), a
-    ld de, _str_buffer
-    ld bc, 1
-    call puts
-    ret
-
     PUBLIC puti
   ; @brief Print the number in DE
   ;
@@ -50,17 +49,15 @@ puti:
     jr z, @convert
     push de
     ld a, '-'
+    ; FIXME: putc will jump to _exit_code on error, it shouldn't in this case since `DE` is on the stack
     call putc
     pop de
     or a
     jp nz, _exit_code
-    ld a, d
-    cpl
-    ld d, a
-    ld a, e
-    cpl
-    ld e, a
-    inc de
+    ; Carry is cleared because `or` was used above
+    ld hl, 0
+    sbc hl, de
+    ex de, hl
 
 @convert:
     ; store the 16-bit value in a 32-bit memory location
@@ -77,18 +74,10 @@ puti:
     call strlen
 
     ; skip spaces
+    ld a, ' '
 @skip_space:
-    ld a, (hl)
-    cp ' '
-    jr nz, @print
-    inc hl
-    dec bc
-    jr @skip_space
-
-@print:
-    ld d, h
-    ld e, l
-    call puts
-    or a
-    jp nz, _exit_code
-    ret
+    cpi
+    jr z, @skip_space
+    ; puts already jumps to _exit_code on error
+    ex de, hl
+    jp puts

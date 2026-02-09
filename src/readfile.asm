@@ -22,10 +22,11 @@ _readfile_prepare_chunk:
     ; carry_len in DE (bytes after last newline in full chunk)
     ld de, 0
     ld a, b
-    cp 0x01
+    ; Check if A is 1
+    dec a ; cp 0x01
     jr nz, @finalize
     ld a, c
-    cp 0x00
+    or a  ; cp 0x00
     jr nz, @finalize
 
     ; Full chunk: scan backwards for last newline.
@@ -50,24 +51,26 @@ _readfile_prepare_chunk:
 @finalize:
     ; processed_len = BC - DE
     pop hl              ; HL = original chunk length
-    or a
+    xor a               ; A = 0, clear carry
     sbc hl, de
     push hl
 
     ; Null-terminate at processed_len to parse only complete lines.
     ld bc, _input_buffer
     add hl, bc
-    ld (hl), 0
+    ; A is 0
+    ld (hl), a
     pop hl
 
     ; If trailing data exists, seek back by -carry_len.
     ld a, d
-    or e
-    ret z            ; A = 0
+    or e 
+    ret z            ; A == 0
 
     push hl
-    ld hl, 0
-    or a
+    xor a               ; A = 0, carry reset
+    ld h, a
+    ld l, a             ; HL = 0
     sbc hl, de          ; HL = -carry_len
     ex de, hl           ; DE = low 16-bit offset
     ld bc, 0xFFFF       ; sign-extend to 32-bit negative

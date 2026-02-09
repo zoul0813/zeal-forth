@@ -5,6 +5,7 @@
 
     EXTERN word_semicolon
     EXTERN word_forget@drop
+    EXTERN _neg_hl
 
   SECTION TEXT
 
@@ -52,13 +53,7 @@ do_next_word:
 
 @is_negative_number:
     ; HL = magnitude, convert to two's-complement negative in place.
-    ld a, h
-    cpl
-    ld h, a
-    ld a, l
-    cpl
-    ld l, a
-    inc hl
+    call _neg_hl
     jr @is_number
 
 @is_word:
