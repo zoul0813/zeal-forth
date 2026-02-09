@@ -73,11 +73,18 @@ puti:
     ld hl, _str_buffer
     call strlen
 
-    ; skip spaces
-    ld a, ' '
+    ; skip leading spaces without consuming the first non-space digit
 @skip_space:
-    cpi
-    jr z, @skip_space
+    ld a, b
+    or c
+    ret z
+    ld a, (hl)
+    cp ' '
+    jr nz, @print
+    inc hl
+    dec bc
+    jr @skip_space
+@print:
     ; puts already jumps to _exit_code on error
     ex de, hl
     jp puts

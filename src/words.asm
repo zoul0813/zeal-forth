@@ -32,6 +32,7 @@ next_word:
 @process:
     ld d, h ; DE scans forward
     ld e, l
+    ld bc, 0 ; BC = token length
 @scan:
     ld a, (de)
     or a
@@ -41,6 +42,7 @@ next_word:
     cp '\n'
     jr z, @found_delim ; newline
     inc de
+    inc bc
     jr @scan
 
 @found_delim:
@@ -48,7 +50,6 @@ next_word:
     ld (de), a  ; terminate current word
     inc de      ; next word starts after delimiter
 @found_end:
-    call strlen ; returns BC = len (alters: A, BC)
     ld a, b
     or c
     ret z
