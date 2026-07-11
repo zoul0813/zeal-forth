@@ -56,3 +56,5 @@ variable fails
 
 summary
 forget __math_tests_marker
+
+bye

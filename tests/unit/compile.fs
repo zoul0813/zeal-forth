@@ -57,3 +57,5 @@ forget tmpforget
 
 summary
 forget __compile_tests_marker
+
+bye

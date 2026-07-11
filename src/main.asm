@@ -25,9 +25,37 @@ main:
     ld a, h
     or l
     jr z, @repl ; no args, goto prompt
+@next_arg:
+    ; ZOS passes all arguments as one space-separated string in DE.
+    ; Skip separators and stop at the terminating null.
+    ld a, (de)
+    or a
+    jr z, @repl
+    cp ' '
+    jr nz, @arg_start
+    inc de
+    jr @next_arg
+@arg_start:
+    ld h, d
+    ld l, e              ; HL = start of filename
+@arg_end:
+    ld a, (de)
+    or a
+    jr z, @readfile
+    cp ' '
+    jr z, @terminate_arg
+    inc de
+    jr @arg_end
+@terminate_arg:
+    xor a
+    ld (de), a
+    inc de
 @readfile:
+    push de              ; preserve next argument
+    ex de, hl            ; DE = filename
     call loadfile
-    ; jr nz, @readfile ; refill the buffer
+    pop de
+    jr @next_arg
 @repl:
     ; set the kb mode to block/cooked for now
     PUTS(_str_project_name, _str_project_name_end)

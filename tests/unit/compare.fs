@@ -46,3 +46,5 @@ variable fails
 
 summary
 forget __compare_tests_marker
+
+bye

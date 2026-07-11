@@ -13,7 +13,6 @@ TIMEOUT_SECONDS = 120
 IMAGE = Path(".zeal8bit/headless.img")
 EEPROM = Path(".zeal8bit/eeprom.img")
 SUITES = ("base", "math", "compare", "stack", "memory", "compile", "flow")
-HEADLESS_DIR = Path(".headless")
 SUMMARIES = {
     name: f"ALL {name.upper()} TESTS PASSED"
     for name in SUITES
@@ -158,16 +157,6 @@ def run_emulator(show_log: bool, log_file: Path | None) -> tuple[int, str]:
     return result.returncode, output
 
 
-def prepare_test_files() -> None:
-    """Create single-loader inputs containing the core library, suite, and bye."""
-    core = Path("forth.fs").read_text(encoding="utf-8")
-    HEADLESS_DIR.mkdir(exist_ok=True)
-    for name in SUITES:
-        suite = Path(f"tests/unit/{name}.fs").read_text(encoding="utf-8")
-        combined = f"{core.rstrip()}\n\n{suite.rstrip()}\n\nbye\n"
-        (HEADLESS_DIR / f"{name}.fs").write_text(combined, encoding="utf-8")
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run Zeal Forth headless tests")
     parser.add_argument("--headless-log", action="store_true", help="print emulator output")
@@ -186,11 +175,6 @@ def main() -> int:
     if not Path("bin/forth").is_file():
         return fail("build artifact missing: bin/forth")
     print(f"{GREEN}✓{NC} build artifact: bin/forth")
-
-    try:
-        prepare_test_files()
-    except OSError as exc:
-        return fail(f"could not prepare headless test files: {exc}")
 
     if shutil.which("zeal-native") is None:
         return fail("zeal-native not found in PATH")

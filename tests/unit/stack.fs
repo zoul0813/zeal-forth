@@ -54,3 +54,5 @@ variable fails
 
 summary
 forget __stack_tests_marker
+
+bye

@@ -1,6 +1,6 @@
 # Headless testing
 
-Headless tests build Zeal Forth and run all files in `tests/unit` under Zeal Native. Before boot, the runner creates ignored `.headless/*.fs` inputs containing `forth.fs`, one unit suite, and a final `bye`. This keeps loading non-nested and exits each test process cleanly. Games are not part of this suite.
+Headless tests build Zeal Forth and run all files in `tests/unit` under Zeal Native. Each invocation loads `forth.fs` followed by one unit file through the multi-file CLI, and each unit file ends with `bye` to exit cleanly. Games are not part of this suite.
 
 ## Prerequisites
 

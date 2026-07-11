@@ -33,3 +33,5 @@ decimal
 \   8 base ! 123 .
 \ Expected: unsup error, with no numeric text before error.
 \ Restore afterward with: 10 base !
+
+bye

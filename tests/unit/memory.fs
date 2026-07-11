@@ -56,3 +56,5 @@ create buf 4 allot
 
 summary
 forget __memory_tests_marker
+
+bye

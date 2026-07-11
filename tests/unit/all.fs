@@ -1,3 +1,10 @@
+\ Unit test checklist.
+\ Usage:
+\   forth forth.fs tests/unit/base.fs
+\
+\ Pass forth.fs followed by one test file. Each unit file calls bye when done.
+\
+\
 \ Unit test checklist (manual runner).
 \ Usage:
 \   loadfile "tests/unit/all.fs"
@@ -15,3 +22,4 @@
 \   loadfile "tests/unit/memory.fs"
 \   loadfile "tests/unit/compile.fs"
 \   loadfile "tests/unit/flow.fs"
+\

@@ -13,3 +13,9 @@ Then open a terminal, go to the source directory and type the following commands
 ```shell
 zde cmake
 ```
+
+Multiple Forth source files can be loaded in order from the command line:
+
+```shell
+forth forth.fs tests/unit/base.fs
+```
