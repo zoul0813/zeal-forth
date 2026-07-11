@@ -24,6 +24,9 @@ project(${target_name} ASM)
 file(GLOB ASM_INCLUDES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_LIST_DIR}/include/*.asm"
 )
+file(GLOB ASM_WORDS CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_LIST_DIR}/src/words/*.asm"
+)
 
 
 add_executable(${target_name}
@@ -39,6 +42,9 @@ add_executable(${target_name}
   )
 set_source_files_properties(src/main.asm PROPERTIES
     OBJECT_DEPENDS "${ASM_INCLUDES}"
+)
+set_source_files_properties(src/words.asm PROPERTIES
+    OBJECT_DEPENDS "${ASM_INCLUDES};${ASM_WORDS}"
 )
 
 target_link_options(${target_name} PRIVATE -v -mz80 -s -l -m -g)

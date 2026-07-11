@@ -24,13 +24,16 @@ ENDWORD "swap", word_swap
 
 ; ( n1 n2 -- n1 n2 n1 )
 WORD "over", word_over
-    POP()
-    ex de, hl
-    POP()
-    ex de, hl
-    PUSH()
-    ex de, hl
-    JP_PUSH()
+    POP()       ; DE = n2, stack still contains n1
+    ld b, d
+    ld c, e     ; BC = n2
+    PEEK()      ; DE = n1
+    ex de, hl   ; HL = n1
+    ld d, b
+    ld e, c     ; DE = n2
+    PUSH()      ; restore n2
+    ex de, hl   ; DE = n1
+    JP_PUSH()   ; copy n1
 ENDWORD "over", word_over
 
 ; ( n1 n2 n3 -- n2 n3 n1 )

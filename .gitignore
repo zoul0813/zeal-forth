@@ -3,6 +3,8 @@ build/
 debug/
 tmp/
 release/
+.zeal8bit/
+.headless/
 *.zip
 assets/*.zt[spm]
 *.tiled-session
