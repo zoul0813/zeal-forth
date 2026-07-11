@@ -8,6 +8,7 @@
 \   prompt instead.
 \
 \ Suggested order:
+\   loadfile "tests/unit/base.fs"
 \   loadfile "tests/unit/math.fs"
 \   loadfile "tests/unit/compare.fs"
 \   loadfile "tests/unit/stack.fs"

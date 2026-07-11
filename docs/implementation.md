@@ -43,6 +43,11 @@ implementation. It is based on the assembly sources in `src/`.
   - `BASE = 16`: unprefixed tokens are parsed as hexadecimal.
 - `hex` and `decimal` are immediate words that update `BASE` during
   interpretation and compilation.
+- Numeric output through `.`, `.s`, and `.rs` follows `BASE`:
+  - `BASE = 10` prints signed decimal values.
+  - `BASE = 16` prints raw 16-bit cells as uppercase hexadecimal without a
+    prefix or leading zeroes.
+  - Other base values report `unsup error` before printing a number.
 - Values must fit in a 16-bit cell; larger values trigger a numeric overflow
   error.
 - Parsed values are pushed onto the data stack.

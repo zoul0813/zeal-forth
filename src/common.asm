@@ -44,6 +44,17 @@ puts:
   ; Alters:
   ;   A, BC, DE, HL
 puti:
+    ; Numeric output supports the same bases as the input parser.
+    ld hl, (BASE)
+    ld a, h
+    or a
+    jp nz, @unsupported
+    ld a, l
+    cp 16
+    jr z, @hex
+    cp 10
+    jp nz, @unsupported
+
     ; Signed output: print '-' and convert magnitude if value is negative.
     bit 7, d
     jr z, @convert
@@ -69,6 +80,54 @@ puti:
     ld de, _str_buffer
     call dword_to_ascii_dec
 
+    jr @print_buffer
+
+@hex:
+    ; Hex output exposes the raw unsigned 16-bit cell.
+    ld hl, _str_buffer
+    ld b, 4
+    ld c, 0               ; non-zero after first emitted digit
+@hex_digit:
+    ld a, d
+    rrca
+    rrca
+    rrca
+    rrca
+    and 0x0F
+    jr nz, @hex_emit
+    ld a, c
+    or a
+    jr nz, @hex_zero
+    ld a, b
+    cp 1
+    jr nz, @hex_next
+@hex_zero:
+    xor a
+@hex_emit:
+    cp 10
+    jr c, @hex_numeric
+    add a, 'A' - 10
+    jr @hex_store
+@hex_numeric:
+    add a, '0'
+@hex_store:
+    ld (hl), a
+    inc hl
+    ld c, 1
+@hex_next:
+    sla e
+    rl d
+    sla e
+    rl d
+    sla e
+    rl d
+    sla e
+    rl d
+    djnz @hex_digit
+    ld (hl), 0
+
+@print_buffer:
+
     ; Set both HL and DE to _str_buffer
     ld hl, _str_buffer
     call strlen
@@ -88,3 +147,7 @@ puti:
     ; puts already jumps to _exit_code on error
     ex de, hl
     jp puts
+
+@unsupported:
+    ld a, ERR_UNSUPPORTED
+    jp print_error

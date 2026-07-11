@@ -71,7 +71,7 @@ Items marked with `❓` may or may not be defined
 * [x] does>     `( -- )`
 * [x] allot     `( n -- )`
 * [x] state     `( -- a-addr )` | a-addr is the address of a cell containing the compilation state flag
-* [x] base      `( -- a-addr )` | a-addr is the address of a cell containing the current numeric input base
+* [x] base      `( -- a-addr )` | a-addr is the address of the current numeric input/output base
 * [x] hex       `( -- )` | set `BASE` to 16 (immediate)
 * [x] decimal   `( -- )` | set `BASE` to 10 (immediate)
 * [x] execute   `( x-addr -- )` | execute code at x-addr

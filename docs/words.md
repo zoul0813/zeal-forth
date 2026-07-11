@@ -60,7 +60,7 @@ use the Forth convention `( before -- after )`.
 
 | Word | Stack effect | Description |
 | --- | --- | --- |
-| `.` | `( n -- )` | Print `n` in decimal, then a space. |
+| `.` | `( n -- )` | Print using `BASE`, then a space: signed decimal or raw uppercase hexadecimal. |
 | `."` | `( -- )` | Print characters until the next `"`, consuming the input stream. |
 | `emit` | `( c -- )` | Output the low byte of `c` as a character. |
 | `type` | `( c-addr n -- )` | Output `n` bytes from `c-addr`. |
@@ -99,8 +99,8 @@ use the Forth convention `( before -- after )`.
 
 | Word | Stack effect | Description |
 | --- | --- | --- |
-| `.s` | `( -- )` | Print data stack depth and contents (bottom to top). |
-| `.rs` | `( -- )` | Print return stack depth and contents (bottom to top). |
+| `.s` | `( -- )` | Print data stack depth and contents (bottom to top) using `BASE`. |
+| `.rs` | `( -- )` | Print return stack depth and contents (bottom to top) using `BASE`. |
 
 ## System
 
