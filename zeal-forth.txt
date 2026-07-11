@@ -1,10 +1,10 @@
 .TH zeal-forth 1 "08 Jan 2026" zeal-forth "zeal-forth manual"
 .SH NAME
-zeal-forth \- Short description of the project
+zeal-forth \- Forth implementation for Zeal 8-bit Computer
 .SH SYNOPSIS
 zeal-forth
 .SH DESCRIPTION
-Short description of the project
+Forth implementation for Zeal 8-bit Computer
 .SH OPTIONS
 
 .SH SEE ALSO

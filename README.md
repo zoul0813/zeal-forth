@@ -1,6 +1,6 @@
 # zeal-forth
 
-Short description of the project
+Forth implementation for Zeal 8-bit Computer
 
 ## Installation
 
@@ -11,7 +11,5 @@ Make sure that you have [ZDE](https://github.com/zoul0813/zeal-dev-environment) 
 Then open a terminal, go to the source directory and type the following commands:
 
 ```shell
-    $ zde create zealos-z88dk name={project}
-    $ cd {project}
-    $ zde cmake
+zde cmake
 ```

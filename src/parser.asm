@@ -47,6 +47,13 @@ do_next_word:
     call next_word
     jp z, print_ok
 
+    call dict_search
+    ; If A is 0, the word was found
+    or a
+    jr z, @is_word ; word found, execute
+
+    ld hl, (_curr_word)
+
     ; Try to parse the input as a number.
     ; Support optional leading '-' for signed decimal literals.
     ld a, (hl)
@@ -55,13 +62,16 @@ do_next_word:
     inc hl
     ld a, (hl)
     or a
-    jr z, @is_word          ; "-" alone is not a number
+    jr z, @not_found          ; "-" alone is not a number
     call parse_by_base
     or a
     jr z, @is_negative_number
     dec a
     jp z, numeric_overflow
-    jr @is_word             ; non-decimal value, fall-through to word lookup
+    ; jr @not_found             ; non-decimal value, fall-through to word lookup
+@not_found:
+    ld a, ERR_NOT_FOUND
+    jr print_error
 
 @parse_unsigned:
     call parse_by_base
@@ -72,7 +82,7 @@ do_next_word:
     dec a
     jp z, numeric_overflow
     ; Non-decimal value, treat as a word.
-    jr @is_word
+    jr @not_found
 
 @is_negative_number:
     ; HL = magnitude, convert to two's-complement negative in place.
@@ -80,11 +90,6 @@ do_next_word:
     jr @is_number
 
 @is_word:
-    call dict_search
-    ; If A is 0, the word was found
-    or a
-    jr nz, print_error
-
     ; HL = current entry
     inc hl
     inc hl  ; HL = dict_flags
