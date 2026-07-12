@@ -23,6 +23,7 @@ use the Forth convention `( before -- after )`.
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (lower 16 bits). |
 | `/` | `( n1 n2 -- n3 )` | Signed floored division. Division by zero raises `div0 error`. |
 | `mod` | `( n1 n2 -- n3 )` | Signed floored remainder (sign follows divisor). Division by zero raises `div0 error`. |
+| `/mod` | `( n1 n2 -- rem quot )` | Signed floored remainder and quotient. Division by zero raises `div0 error`. |
 | `u/` | `( u1 u2 -- u3 )` | Unsigned division. Division by zero raises `div0 error`. |
 | `umod` | `( u1 u2 -- u3 )` | Unsigned remainder. Division by zero raises `div0 error`. |
 | `u/mod` | `( u1 u2 -- urem uquot )` | Unsigned remainder and quotient. Division by zero raises `div0 error`. |
@@ -53,6 +54,7 @@ use the Forth convention `( before -- after )`.
 | `c!` | `( n c-addr -- )` | Store the low byte of `n` at `c-addr`. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256` (128 bytes). |
+| `s"` | `( "ccc<quote>" -- c-addr u )` | Parse a string; in a definition, compile its bytes and runtime address/length. Immediate. |
 | `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (`n * 2`). |
 | `allot` | `( n -- )` | Reserve `n` bytes starting at HERE. |
 
@@ -107,6 +109,8 @@ use the Forth convention `( before -- after )`.
 | Word | Stack effect | Description |
 | --- | --- | --- |
 | `bye` | `( -- )` | Exit the interpreter. |
+| `syscall` | `( dev cmd param num -- status )` | Invoke ZealOS syscall `num`. Low bytes select device, command, and syscall. |
+| `ioctl` | `( dev cmd param -- status )` | Invoke ZealOS syscall 7 (`IOCTL`). |
 
 ## Reserved words
 
@@ -121,7 +125,8 @@ Reserved words are primarily compiler/control words (many are compile-only).
 | `until` | `( C: dest -- )` | Compile `branch0` back to `dest`. Immediate + compile-only. |
 | `while` | `( C: dest -- dest orig )` | Compile `if` inside a `begin` loop. Immediate + compile-only. |
 | `repeat` | `( C: dest orig -- )` | Compile back-edge to `dest`, patch `orig`. Immediate + compile-only. |
-| `do` | `( C: -- orig-exit dest )` | Compile counted-loop setup and zero-trip exit. Immediate + compile-only. |
+| `do` | `( C: -- orig-exit dest )` | Compile counted-loop setup. Unlike `?do`, always enter once. Immediate + compile-only. |
+| `?do` | `( C: -- orig-exit dest )` | Compile counted-loop setup with a zero-trip check. Immediate + compile-only. |
 | `loop` | `( C: orig-exit dest -- )` | Compile increment/test/back-edge and loop unwind. Immediate + compile-only. |
 | `+loop` | `( C: orig-exit dest -- )` | Compile variable-step counted-loop update/test/back-edge and unwind. Immediate + compile-only. Runtime consumes step `( n -- )`. |
 | `i` | `( -- n )` | Push current loop index. Reserved runtime word. |
@@ -204,15 +209,19 @@ hex EA .      \ prints 234
 decimal 234 . \ prints 234
 ```
 
-## Words defined in forth.fs (when loaded)
+## Words defined in forth.fs
 
-The following words are defined in `forth.fs`. They are not built in, but
-become available after loading that file.
+These words are not present at boot. They become available only after loading
+`forth.fs`, either from command line or with `loadfile "forth.fs"`.
+
+### General-purpose library words
 
 | Word | Stack effect | Description |
 | --- | --- | --- |
 | `cr` | `( -- )` | Emit a newline (LF). |
 | `space` | `( -- )` | Emit a single space. |
+| `spaces` | `( n -- )` | Emit `n` spaces. |
+| `constant` | `( x "name" -- )` | Define `name` to return `x`. |
 | `cell+` | `( a-addr1 -- a-addr2 )` | Advance by one cell. |
 | `cell-` | `( a-addr1 -- a-addr2 )` | Move back by one cell. |
 | `char+` | `( c-addr1 -- c-addr2 )` | Advance by one byte. |
@@ -232,8 +241,37 @@ become available after loading that file.
 | `1+` | `( n -- n+1 )` | Increment by one. |
 | `1-` | `( n -- n-1 )` | Decrement by one. |
 | `free` | `( -- n )` | Remaining free bytes in the heap (`64511 here -`). |
+| `seed` | `( -- a-addr )` | Address of random-number state, initialized to `12345`. |
+| `rand16` | `( -- u )` | Return next 16-bit pseudorandom value and update `seed`. |
 | `marker` | `( -- 0 )` | Placeholder marker word (currently returns 0). |
 
-Note: `forth.fs` also defines a handful of temporary/dummy words for
-dictionary stress testing (e.g. `x`, `y`, `z`, `foo`, `bar`). These are repeated
-many times in the file and are omitted here.
+### ZealOS and screen words
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `vctl` | `( cmd param -- status )` | Send an `IOCTL` command to standard output. |
+| `set-cursor` | `( x y -- )` | Set text cursor coordinates. |
+| `get-cursor` | `( -- x y )` | Return text cursor coordinates. |
+| `set-colors` | `( bg fg -- )` | Set background and foreground colors. |
+| `clrscr` | `( -- )` | Clear screen. |
+| `reset-screen` | `( -- )` | Reset screen. |
+| `screen-size` | `( -- w h )` | Return screen width and height. |
+| `ms` | `( n -- )` | Sleep for `n` milliseconds through ZealOS syscall 18. |
+
+`_cursor_xy` and `_area_buf` are internal storage words used by screen helpers.
+They remain dictionary-visible because `forth.fs` creates them.
+
+### Demonstration words
+
+These examples and interactive demos also load into dictionary, but are not
+general-purpose library API.
+
+| Word | Stack effect | Description |
+| --- | --- | --- |
+| `test-begin-until` | `( -- )` | Print 1 through 5 using `begin`/`until`. |
+| `test-begin-while-repeat` | `( -- )` | Print 0 through 4 using `begin`/`while`/`repeat`. |
+| `counter` | `( limit start -- )` | Print a counted range using `do`/`loop`. |
+| `slash` | `( -- c )` | Return slash or backslash at random. |
+| `10print` | `( -- )` | Emit 40 rows of 80 random slash characters. |
+| `10print-key` | `( -- )` | Emit random slash characters until key press. |
+| `wait-key` | `( -- )` | Wait for and discard one key press. |

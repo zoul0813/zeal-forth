@@ -8,15 +8,16 @@ Headless tests build Zeal Forth and run all files in `tests/unit` under Zeal Nat
 - A `zeal-native` build supporting `--headless --no-reset`
 - `.zeal8bit/headless.img` and `.zeal8bit/eeprom.img`
 
-The emulator images are local resources and are ignored by Git. Known-good copies can be copied from the sibling `zeal-cc/.zeal8bit` directory:
+The emulator images are local resources and are ignored by Git.
 
-```shell
-mkdir -p .zeal8bit
-cp ../zeal-cc/.zeal8bit/headless.img .zeal8bit/
-cp ../zeal-cc/.zeal8bit/eeprom.img .zeal8bit/
-```
+`headless.img` is a custom ZealOS kernel build for headless testing. Build the
+kernel using [`tests/setup/os.headless.conf`](tests/setup/os.headless.conf) as
+the kernel configuration; it enables host filesystem access and UART output and
+disables video output.
 
-The EEPROM image must boot ZShell with a `B:/autoexec.zs` that sets `H:/bin` in `PATH` and runs `exec h:/test.zs`.
+The EEPROM image must boot ZShell with `B:/autoexec.zs`. Its source is
+[`tests/setup/autoexec.zs`](tests/setup/autoexec.zs); it adds `H:/bin` to `PATH`
+and runs `exec h:/test.zs`.
 
 ## Running tests
 
