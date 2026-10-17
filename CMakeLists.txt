@@ -13,8 +13,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/debug)
 
-# Ensure the bin directory exists
-file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+# Ensure the build and staging directories exist
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} "${CMAKE_CURRENT_LIST_DIR}/bin")
 
 set(ZOS_TOOLCHAIN z88dk)
 include($ENV{ZOS_PATH}/cmake/zos_init.cmake)
@@ -48,7 +48,7 @@ set_source_files_properties(src/words.asm PROPERTIES
 )
 
 target_link_options(${target_name} PRIVATE -v -mz80 -s -l -m -g)
-target_link_libraries(${target_name} -L$ENV{ZOS_PATH}/kernel_headers/z88dk-z80asm/lib -lstrutils)
+target_link_libraries(${target_name} -L$ENV{ZOS_PATH}/sdk/z88dk-z80asm/lib -lstrutils)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 set(OUTPUT_BIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<TARGET_FILE_BASE_NAME:${target_name}>_TEXT.bin")
