@@ -84,6 +84,20 @@ create buf 4 allot
 ." [ @ ] full stack: " t-full-fetch 44031 = report
 ." [ c@ ] full stack: " t-full-cfetch 255 = report
 
+\ Native read/add/store consumes increment and address in that order.
+: t-plus-store 1 vm +! ;
+0 vm ! 1234 7 vm +!
+." [ +! ] interpreted order and sentinel: " vm @ 7 = >r 1234 = r> and report
+255 vm ! t-plus-store
+." [ +! ] compiled byte carry: " vm @ 256 = report
+-1 vm ! t-plus-store
+." [ +! ] wrap: " vm @ 0 = report
+-32768 vm ! -1 vm +!
+." [ +! ] negative increment: " vm @ 32767 = report
+43981 buf ! 4660 buf 2 + ! 1 buf +!
+." [ +! ] little endian: " buf c@ 206 = >r buf 1 + c@ 171 = r> and report
+." [ +! ] neighbor unchanged: " buf 2 + @ 4660 = report
+
 : summary ( -- )
   fails @ 0 = if
     ." ALL MEMORY TESTS PASSED" cr

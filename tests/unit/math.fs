@@ -108,6 +108,26 @@ variable fails
 ." [ + ] signed boundary: " t-add-signed -32768 = report
 ." [ - ] signed boundary: " t-sub-signed 32767 = report
 
+\ Native increment/decrement need no spare data slot.
+: t-inc 1+ ;
+: t-dec 1- ;
+." [ 1+ ] interpreted carry: " 255 1+ 256 = report
+." [ 1- ] interpreted borrow: " 256 1- 255 = report
+." [ 1+ ] wrap: " -1 t-inc 0 = report
+." [ 1- ] wrap: " 0 t-dec -1 = report
+." [ 1+ ] signed boundary: " 32767 t-inc -32768 = report
+." [ 1- ] signed boundary: " -32768 t-dec 32767 = report
+." [ 1+ ] deeper sentinel: " 1234 255 t-inc 256 = >r 1234 = r> and report
+." [ 1- ] deeper sentinel: " 1234 256 t-dec 255 = >r 1234 = r> and report
+: t-full-inc
+  1023 0 do 0 loop -1 1+ >r drop 1022 0 do drop loop r>
+;
+: t-full-dec
+  1023 0 do 0 loop 0 1- >r drop 1022 0 do drop loop r>
+;
+." [ 1+ ] full stack: " t-full-inc 0 = report
+." [ 1- ] full stack: " t-full-dec -1 = report
+
 : summary ( -- )
   fails @ 0 = if
     ." ALL MATH TESTS PASSED" cr

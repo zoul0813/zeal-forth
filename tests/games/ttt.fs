@@ -1,5 +1,5 @@
 \ Tic-Tac-Toe for current Zeal Forth.
-\ Assumes forth.fs is loaded (for `constant`, `1+`, `1-`, `cr`).
+\ Assumes forth.fs is loaded (for `cr`).
 \
 \ Run:
 \   loadfile "forth.fs"

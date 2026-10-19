@@ -38,6 +38,28 @@ WORD "-", word_minus
     ret
 ENDWORD "-", word_minus
 
+; ( x -- x+1 ) Increment with 16-bit wraparound and no temporary slot.
+WORD "1+", word_one_plus
+    STACK_REQUIRE(1)
+    inc (hl)
+    ret nz
+    inc hl
+    inc (hl)
+    ret
+ENDWORD "1+", word_one_plus
+
+; ( x -- x-1 ) Decrement with 16-bit wraparound and no temporary slot.
+WORD "1-", word_one_minus
+    STACK_REQUIRE(1)
+    ld a, (hl)
+    dec (hl)
+    or a
+    ret nz
+    inc hl
+    dec (hl)
+    ret
+ENDWORD "1-", word_one_minus
+
 ; ( n1 n2 -- n3 )
 WORD "*", word_mul
     POP()   ; DE = n2

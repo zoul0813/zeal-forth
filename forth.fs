@@ -2,9 +2,6 @@
 
 ." Loading forth.fs "
 
-\ Defining words
-: constant create , does> @ ;
-
 \ Text words
 
 : cr 10 emit ;
@@ -85,10 +82,6 @@ create _area_buf 4 allot
 : 0> 0 > ;
 : 0<> 0 <> ;
 
-\ Math helpers
-
-: 1+ 1 + ;
-: 1- 1 - ;
 \ next buffer
 
 \ System ( -- n )

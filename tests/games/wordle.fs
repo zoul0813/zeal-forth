@@ -1,5 +1,5 @@
 \ Wordle-style game for current Zeal Forth.
-\ Assumes forth.fs is loaded (for `constant`, `1+`, `1-`, `cr`, `rand16`).
+\ Assumes forth.fs is loaded (for `cr`, `rand16`).
 \
 \ Feedback:
 \ - Green  letter: correct spot

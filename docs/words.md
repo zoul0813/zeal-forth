@@ -20,6 +20,8 @@ use the Forth convention `( before -- after )`.
 | --- | --- | --- |
 | `+` | `( n1 n2 -- n1+n2 )` | Add the top two stack items (16-bit wraparound). |
 | `-` | `( n1 n2 -- n1-n2 )` | Subtract the top two stack items (16-bit wraparound). |
+| `1+` | `( x -- x+1 )` | Increment by one (16-bit wraparound; no spare stack slot needed). |
+| `1-` | `( x -- x-1 )` | Decrement by one (16-bit wraparound; no spare stack slot needed). |
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (lower 16 bits). |
 | `2*` | `( x -- doubled-x )` | Shift a 16-bit cell left one bit, discarding overflow. |
 | `2/` | `( n -- halved-n )` | Arithmetic right shift by one bit, preserving the sign bit (rounds negative odd values down). |
@@ -53,6 +55,7 @@ use the Forth convention `( before -- after )`.
 | `@` | `( a-addr -- x )` | Fetch a 16-bit cell from memory. |
 | `c@` | `( c-addr -- c )` | Fetch a char from `c-addr`. |
 | `!` | `( x a-addr -- )` | Store a 16-bit cell to memory. |
+| `+!` | `( n a-addr -- )` | Add `n` to the 16-bit cell at `a-addr`, modulo 65536. Checks both operands before changing stack or memory; not interrupt-atomic. |
 | `c!` | `( n c-addr -- )` | Store the low byte of `n` at `c-addr`. |
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256` (128 bytes). |
@@ -79,6 +82,8 @@ use the Forth convention `( before -- after )`.
 | Word | Stack effect | Description |
 | --- | --- | --- |
 | `create` | `( "name" -- )` | Define a word that pushes its storage address. |
+| `constant` | `( x "name" -- )` | Define a word that pushes `x` directly. |
+| `array` | `( count "name" -- )` | Allocate uninitialized cell storage; child `( index -- a-addr )` computes `base + index*2`, modulo 65536, without index bounds checks. |
 | `variable` | `( "name" -- )` | Define a word that pushes its storage address and allocates 1 cell. |
 | `:` | `( "<spaces>name" -- )` | Start compiling a new word definition. |
 | `;` | `( -- )` | End the current word definition and return to immediate mode. |
@@ -91,6 +96,22 @@ use the Forth convention `( before -- after )`.
 | `c,` | `( c -- )` | Store `c` at HERE, advance HERE by one byte. |
 | `forget` | `( "<spaces>name" -- )` | Forget `name` and everything defined after it. |
 | `words` | `( -- )` | Print all words in the dictionary (space-delimited). |
+
+Native `constant` and `array` preflight operands, name length, and total allocation
+before consuming operands or changing `HERE` or `LATEST`. Definitions must end at
+or below `__Z80_STACK_tail` (64511); allocation failure prints `dictovf error`.
+Array counts must be 0..32767; invalid counts print `numovf error`. Zero-length
+arrays allocate no element storage. Existing dictionary allocation words retain
+their current behavior.
+
+```forth
+48 array xs
+123 7 xs !
+7 xs @ .        \ prints 123
+42 constant answer
+answer .        \ prints 42
+1 7 xs +!
+```
 
 ## Return Stack
 
@@ -237,7 +258,6 @@ These words are not present at boot. They become available only after loading
 | `cr` | `( -- )` | Emit a newline (LF). |
 | `space` | `( -- )` | Emit a single space. |
 | `spaces` | `( n -- )` | Emit `n` spaces. |
-| `constant` | `( x "name" -- )` | Define `name` to return `x`. |
 | `cell+` | `( a-addr1 -- a-addr2 )` | Advance by one cell. |
 | `cell-` | `( a-addr1 -- a-addr2 )` | Move back by one cell. |
 | `char+` | `( c-addr1 -- c-addr2 )` | Advance by one byte. |
@@ -254,8 +274,6 @@ These words are not present at boot. They become available only after loading
 | `0<` | `( n -- flag )` | True if negative. |
 | `0>` | `( n -- flag )` | True if positive. |
 | `0<>` | `( n -- flag )` | True if non-zero. |
-| `1+` | `( n -- n+1 )` | Increment by one. |
-| `1-` | `( n -- n-1 )` | Decrement by one. |
 | `free` | `( -- n )` | Remaining free bytes in the heap (`64511 here -`). |
 | `seed` | `( -- a-addr )` | Address of random-number state, initialized to `12345`. |
 | `rand16` | `( -- u )` | Return next 16-bit pseudorandom value and update `seed`. |

@@ -94,6 +94,34 @@ word_store_char_de_hl:
     ret
 ENDWORD "c!", word_store_char
 
+; ( n a-addr -- ) Add n to the cell at a-addr, modulo 65536.
+WORD "+!", word_plus_store
+    STACK_REQUIRE(2)
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ex de, hl ; HL = increment, DE = stack pointer after consuming operands
+    ld a, (bc)
+    add a, l
+    ld l, a
+    inc bc
+    ld a, (bc)
+    adc a, h
+    ld h, a
+    ld (data_sp), de
+    ld a, h
+    ld (bc), a
+    dec bc
+    ld a, l
+    ld (bc), a
+    ret
+ENDWORD "+!", word_plus_store
+
 ; ( -- a-addr ) Put addr-of HERE on stack
 WORD "here", word_here
     ld de, (HERE)

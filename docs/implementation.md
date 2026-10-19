@@ -98,7 +98,7 @@ failures).
 
 Current short-form messages and meanings:
 
-- `numovf`: Numeric overflow (parsed literal did not fit 16-bit cell).
+- `numovf`: Numeric overflow (literal did not fit a cell, or array count was negative or too large).
 - `unclosed`: Unterminated quoted string (no closing `"` before buffer end).
 - `stkovf`: Stack overflow (data/return stack push exceeded bounds).
 - `stkunf`: Stack underflow (data/return stack pop/peek on empty/corrupt stack).
@@ -108,6 +108,7 @@ Current short-form messages and meanings:
 - `lenovf`: Input line too long for `loadfile` chunk parser (no newline in full chunk).
 - `imbal`: Unbalanced compile-time control structures at `;`.
 - `div0`: Division by zero in `/`, `mod`, or `/mod`.
+- `dictovf`: Native `constant` or `array` definition would exceed the dictionary allocation limit.
 - `'token' not found`: Dictionary lookup failed for the current input token.
 
 ## Compilation model (current)

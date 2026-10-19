@@ -192,7 +192,7 @@ print_error: ; TODO: implement error lookup
 
     neg ; errs are negative
 
-    ; Table handles ERR_NUMERIC_OVERFLOW..ERR_UNSUPPORTED (1..ERR_TABLE_LAST)
+    ; Table handles ERR_NUMERIC_OVERFLOW..ERR_DICT_OVERFLOW (1..ERR_TABLE_LAST)
     or a
     jr z, @unknown
     cp ERR_TABLE_LAST + 1

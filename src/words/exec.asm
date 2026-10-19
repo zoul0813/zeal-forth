@@ -11,6 +11,7 @@ _begin_new_word:
     jp nz, @has_name
     ERROR(ERR_MISSING_NAME)
 @has_name:
+_begin_named_word:
     call CREATE_HEADER
     ld hl, (HERE)
     ld d, h
@@ -20,6 +21,97 @@ _begin_new_word:
     call DICT_W ; write the CFA as dict_body???
     ret
 ;
+
+; Begin a native definition with a six-byte child stub and DE data bytes.
+; Preflight the complete allocation before changing the dictionary or stack.
+_begin_native_word:
+    push de
+    call next_word
+    jp z, @missing_name
+    ld hl, (_curr_len)
+    ld a, h
+    or a
+    jp nz, @long_name
+    ld a, l
+    cp 32
+    jp nc, @long_name
+    ld bc, 12 ; prev, flags, name terminator, CFA, and six-byte stub
+    add hl, bc
+    pop de
+    add hl, de
+    jp c, @overflow
+    ld de, (HERE)
+    add hl, de
+    jp c, @overflow
+    ld de, __Z80_STACK_tail
+    or a
+    sbc hl, de
+    jp c, _begin_named_word
+    jp z, _begin_named_word
+@overflow:
+    ERROR(ERR_DICT_OVERFLOW)
+@missing_name:
+    ERROR(ERR_MISSING_NAME)
+@long_name:
+    ERROR(ERR_TOO_LONG)
+
+; ( x "name" -- ) Define a child that pushes its value directly.
+WORD "constant", word_constant
+    STACK_REQUIRE(1)
+    ld de, 0
+    call _begin_native_word
+    POP()
+    DICT_INS(0x11) ; LD DE,value
+    call DICT_W
+    DICT_JP(pushdata)
+    ret
+ENDWORD "constant", word_constant
+
+; ( count "name" -- ) Define an unchecked cell array with uninitialized storage.
+WORD "array", word_array
+    STACK_REQUIRE(1)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    bit 7, d ; negative counts and doubled-size overflow are invalid
+    jr nz, @invalid_count
+    sla e
+    rl d
+    call _begin_native_word
+    POP()
+    sla e
+    rl d
+    push de ; storage byte count
+    ld hl, (HERE)
+    ld de, 6
+    add hl, de ; base follows the LD DE,base / JP runtime stub
+    ex de, hl
+    DICT_INS(0x11)
+    call DICT_W
+    DICT_JP(array_runtime)
+    pop de
+    jp _word_allot_de
+@invalid_count:
+    ERROR(ERR_NUMERIC_OVERFLOW)
+ENDWORD "array", word_array
+
+; Child runtime: DE = storage base, ( index -- base + index*2 ).
+; No temporary data slot or data_sp update is needed.
+array_runtime:
+    STACK_REQUIRE(1)
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    dec hl
+    sla c
+    rl b
+    ex de, hl
+    add hl, bc
+    ex de, hl
+    ld (hl), e
+    inc hl
+    ld (hl), d
+    ret
 
 ; Runtime helper for DOES>; patches the child entry from return stack
 ; Input: DE = does>-code address

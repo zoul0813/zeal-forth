@@ -45,6 +45,9 @@ _err_unbalanced_control:
 _err_div_by_zero:
     DEFB "div0", 0
 
+_err_dict_overflow:
+    DEFB "dictovf", 0
+
 _err_string_table:
     ; index 0 => ERR_NUMERIC_OVERFLOW (-1)
     DEFW _err_error_numeric_overflow
@@ -66,6 +69,8 @@ _err_string_table:
     DEFW _err_unbalanced_control
     ; index 9 => ERR_DIV_BY_ZERO (-10)
     DEFW _err_div_by_zero
+    ; index 10 => ERR_DICT_OVERFLOW (-11)
+    DEFW _err_dict_overflow
 
 
 
