@@ -21,6 +21,8 @@ use the Forth convention `( before -- after )`.
 | `+` | `( n1 n2 -- n1+n2 )` | Add the top two stack items (16-bit wraparound). |
 | `-` | `( n1 n2 -- n1-n2 )` | Subtract the top two stack items (16-bit wraparound). |
 | `*` | `( n1 n2 -- n1*n2 )` | Multiply the top two stack items (lower 16 bits). |
+| `2*` | `( x -- doubled-x )` | Shift a 16-bit cell left one bit, discarding overflow. |
+| `2/` | `( n -- halved-n )` | Arithmetic right shift by one bit, preserving the sign bit (rounds negative odd values down). |
 | `/` | `( n1 n2 -- n3 )` | Signed floored division. Division by zero raises `div0 error`. |
 | `mod` | `( n1 n2 -- n3 )` | Signed floored remainder (sign follows divisor). Division by zero raises `div0 error`. |
 | `/mod` | `( n1 n2 -- rem quot )` | Signed floored remainder and quotient. Division by zero raises `div0 error`. |
@@ -55,7 +57,7 @@ use the Forth convention `( before -- after )`.
 | `here` | `( -- a-addr )` | Return the current HERE pointer. |
 | `pad` | `( -- c-addr )` | Return a transient buffer at `HERE + 256` (128 bytes). |
 | `s"` | `( "ccc<quote>" -- c-addr u )` | Parse a string; in a definition, compile its bytes and runtime address/length. Immediate. |
-| `cells` | `( n1 -- n2 )` | Convert a cell count to bytes (`n * 2`). |
+| `cells` | `( n1 -- n2 )` | Convert a cell count to bytes using `2*` (16-bit wraparound). |
 | `allot` | `( n -- )` | Reserve `n` bytes starting at HERE. |
 
 ## I/O + Text

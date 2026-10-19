@@ -34,6 +34,22 @@ WORD "*", word_mul
     JP_PUSH()
 ENDWORD "*", word_mul
 
+; ( x -- doubled-x ) Shift one bit left, discarding overflow.
+WORD "2*", word_two_star
+    POP()
+    sla e
+    rl d
+    JP_PUSH()
+ENDWORD "2*", word_two_star
+
+; ( n -- halved-n ) Arithmetic shift right, preserving the sign bit.
+WORD "2/", word_two_slash
+    POP()
+    sra d
+    rr e
+    JP_PUSH()
+ENDWORD "2/", word_two_slash
+
 ; ( n1 n2 -- n3 )
 WORD "/", word_div
     POP()   ; DE = n2

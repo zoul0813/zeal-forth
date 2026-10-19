@@ -111,9 +111,7 @@ ENDWORD_FLAGS "does>", word_does, RESERVED | IMMEDIATE
 
 ; ( n1 -- n2 )  n2 is the size in address units of n1 cells.
 WORD "cells", word_cells
-    ld de, CELL_SIZE
-    PUSH()
-    jp word_mul ; Tail-call
+    jp word_two_star ; Tail-call: a cell is two bytes.
 ENDWORD "cells", word_cells
 
 ; (n -- ) Reserve n bytes of data space (from `here`)
