@@ -94,6 +94,20 @@ variable fails
 ." [ / ] 65535 255 -> -1: "       65535 255 / -1 = report
 ." [ mod ] 65535 256 -> 255: "    65535 256 mod 255 = report
 
+\ Carry, borrow, wraparound, operand order, and deeper cells in compiled code.
+: t-add-boundary 1234 65535 1 + 0 = >r 1234 = r> and ;
+: t-sub-boundary 1234 0 1 - -1 = >r 1234 = r> and ;
+: t-add-carry 255 1 + ;
+: t-sub-borrow 256 1 - ;
+: t-add-signed 32767 1 + ;
+: t-sub-signed -32768 1 - ;
+." [ + ] wrap and sentinel: " t-add-boundary report
+." [ - ] wrap and sentinel: " t-sub-boundary report
+." [ + ] byte carry: " t-add-carry 256 = report
+." [ - ] byte borrow: " t-sub-borrow 255 = report
+." [ + ] signed boundary: " t-add-signed -32768 = report
+." [ - ] signed boundary: " t-sub-signed 32767 = report
+
 : summary ( -- )
   fails @ 0 = if
     ." ALL MATH TESTS PASSED" cr

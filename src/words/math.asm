@@ -2,26 +2,40 @@
 
 ; ( n n -- n+n ) Add top two stack items
 WORD "+", word_plus
-    POP()   ; DE = n1
-    ex de, hl   ; HL = n1
-    POP()   ; DE = n2
-    add hl, de
-    ex de, hl
-
-    JP_PUSH()
+    STACK_REQUIRE(2)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld a, (hl)
+    add a, e
+    ld (hl), a
+    inc hl
+    ld a, (hl)
+    adc a, d
+    ld (hl), a
+    dec hl
+    ld (data_sp), hl
+    ret
 ENDWORD "+", word_plus
 
 ; ( n1 n2 -- n1-n2 ) Subtract top two stack items
 WORD "-", word_minus
-    POP()   ; DE = n2
-    ex de, hl   ; HL = n2
-    POP()   ; DE = n1
-    ex de, hl   ; DE = n2, HL = n1
-
-    or a
-    sbc hl, de
-    ex de, hl
-    JP_PUSH()
+    STACK_REQUIRE(2)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld a, (hl)
+    sub e
+    ld (hl), a
+    inc hl
+    ld a, (hl)
+    sbc a, d
+    ld (hl), a
+    dec hl
+    ld (data_sp), hl
+    ret
 ENDWORD "-", word_minus
 
 ; ( n1 n2 -- n3 )
@@ -36,18 +50,21 @@ ENDWORD "*", word_mul
 
 ; ( x -- doubled-x ) Shift one bit left, discarding overflow.
 WORD "2*", word_two_star
-    POP()
-    sla e
-    rl d
-    JP_PUSH()
+    STACK_REQUIRE(1)
+    sla (hl)
+    inc hl
+    rl (hl)
+    ret
 ENDWORD "2*", word_two_star
 
 ; ( n -- halved-n ) Arithmetic shift right, preserving the sign bit.
 WORD "2/", word_two_slash
-    POP()
-    sra d
-    rr e
-    JP_PUSH()
+    STACK_REQUIRE(1)
+    inc hl
+    sra (hl)
+    dec hl
+    rr (hl)
+    ret
 ENDWORD "2/", word_two_slash
 
 ; ( n1 n2 -- n3 )

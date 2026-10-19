@@ -119,6 +119,39 @@
     pop hl
   ENDM
 
+  ; Load the top cell address and require count input cells.
+  ; Checks precede all mutations. Alters A, flags, HL; preserves BC and DE.
+  MACRO STACK_REQUIRE count
+    LOCAL ready, underflow
+    ld hl, (data_sp)
+    ld a, h
+    cp (_data_stack_end - 2 * count + 1) >> 8
+    jr c, ready
+    jr nz, underflow
+    ld a, l
+    cp (_data_stack_end - 2 * count + 1) & 0xFF
+    jr c, ready
+underflow:
+    ERROR(ERR_STACK_UNDERFLOW)
+ready:
+  ENDM
+
+  ; Require room for count additional cells after STACK_REQUIRE.
+  ; Preserves HL, BC and DE. Alters A and flags.
+  MACRO STACK_ROOM count
+    LOCAL ready, overflow
+    ld a, h
+    cp (data_stack + 2 * count) >> 8
+    jr c, overflow
+    jr nz, ready
+    ld a, l
+    cp (data_stack + 2 * count) & 0xFF
+    jr nc, ready
+overflow:
+    ERROR(ERR_STACK_OVERFLOW)
+ready:
+  ENDM
+
   ; @brief Push 16-bit value onto data stack
   ;
   ; Parameters:

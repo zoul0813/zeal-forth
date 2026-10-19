@@ -58,6 +58,32 @@ create buf 4 allot
 ." [ pad ] pad-here -> 256: "            t-pad-rel 256 = report
 ." [ create ] body addr fetch: "         t-create-fetch 777 = report
 
+\ Independent byte layout checks avoid masking matching store/fetch mistakes.
+: t-layout
+  1234 43981 buf !
+  buf c@ 205 = >r buf 1 + c@ 171 = >r 1234 = r> and r> and
+;
+: t-byte
+  1234 511 buf c! buf c@ 255 = >r
+  buf 1 + c@ 171 = >r 1234 = r> and r> and
+;
+: t-fetch-sentinel 1234 buf @ 44031 = >r 1234 = r> and ;
+." [ ! ] byte order and sentinel: " t-layout report
+." [ c! c@ ] truncate, zero extend, preserve neighbor: " t-byte report
+." [ @ ] both bytes and sentinel: " t-fetch-sentinel report
+: t-full-fetch
+  wipe
+  1023 0 do 0 loop
+  buf @ >r drop 1022 0 do drop loop r>
+;
+: t-full-cfetch
+  wipe
+  1023 0 do 0 loop
+  buf c@ >r drop 1022 0 do drop loop r>
+;
+." [ @ ] full stack: " t-full-fetch 44031 = report
+." [ c@ ] full stack: " t-full-cfetch 255 = report
+
 : summary ( -- )
   fails @ 0 = if
     ." ALL MEMORY TESTS PASSED" cr

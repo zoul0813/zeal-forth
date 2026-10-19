@@ -44,6 +44,35 @@ variable fails
 ." [ >r r> ] -> 10: "            t-r 10 = report
 ." [ wipe ] leaves stack clean: " t-wipe 7 = report
 
+\ Exact order checks consume results top first; retain a deeper sentinel.
+: t-order ( -- flag )
+  1234 257 514 771 rot
+  257 = >r 771 = >r 514 = >r 1234 = r> and r> and r> and
+;
+." [ rot ] exact order and sentinel: " t-order report
+: t-swap-order ( -- flag )
+  1234 257 514 swap 257 = >r 514 = >r 1234 = r> and r> and
+;
+." [ swap ] exact order and sentinel: " t-swap-order report
+: t-over-order ( -- flag )
+  1234 257 514 over 257 = >r 514 = >r 257 = >r 1234 = r> and r> and r> and
+;
+." [ over ] exact order and sentinel: " t-over-order report
+
+\ LOOP needs a temporary data slot. Fill the last cells outside the loop.
+: fill-stack 1021 0 do 0 loop ;
+: drain-stack 1021 0 do drop loop ;
+: t-full-swap fill-stack 257 514 771 swap >r >r >r drain-stack r> r> r> ;
+." [ swap ] full stack: " t-full-swap 514 = >r 771 = >r 257 = r> and r> and report
+: t-full-rot fill-stack 257 514 771 rot >r >r >r drain-stack r> r> r> ;
+." [ rot ] full stack: " t-full-rot 257 = >r 771 = >r 514 = r> and r> and report
+: t-last-dup fill-stack 257 514 dup >r >r >r drain-stack r> r> r> ;
+." [ dup ] last free slot: " t-last-dup 514 = >r 514 = >r 257 = r> and r> and report
+: t-last-over fill-stack 257 514 over >r >r >r drain-stack r> r> r> ;
+." [ over ] last free slot: " t-last-over 257 = >r 514 = >r 257 = r> and r> and report
+: t-full-drop fill-stack 257 514 771 drop >r >r drain-stack r> r> ;
+." [ drop ] full stack: " t-full-drop 514 = >r 257 = r> and report
+
 : summary ( -- )
   fails @ 0 = if
     ." ALL STACK TESTS PASSED" cr

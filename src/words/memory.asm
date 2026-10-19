@@ -25,34 +25,48 @@ word_s_quote_runtime:
 
 ; ( a-addr -- x ) Fetch a cell from a-addr
 WORD "@", word_fetch
-    POP()
-
+    STACK_REQUIRE(1)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
     ld a, (de)
-    ld l, a
+    ld c, a
     inc de
     ld a, (de)
-    ld h, a
-    ex de, hl
-
-    JP_PUSH()
+    ld (hl), a
+    dec hl
+    ld (hl), c
+    ret
 ENDWORD "@", word_fetch
 
 ; ( c-addr -- c ) Fetch a char from c-addr
 WORD "c@", word_fetch_char
-    POP()
+    STACK_REQUIRE(1)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
     ld a, (de)
-    ld l, a
-    ld h, 0
-    ex de, hl
-    JP_PUSH()
+    ld (hl), 0
+    dec hl
+    ld (hl), a
+    ret
 ENDWORD "c@", word_fetch_char
 
     PUBLIC word_store_de_hl
 ; ( x a-addr -- ) Store x in cell a-addr
 WORD "!", word_store
-    POP()
-    ex de, hl ; HL has address
-    POP() ; DE has value
+    STACK_REQUIRE(2)
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld (data_sp), hl
+    ld h, b
+    ld l, c
 word_store_de_hl:
     ld (hl), e
     inc hl
@@ -64,9 +78,17 @@ ENDWORD "!", word_store
     PUBLIC word_store_char_de_hl
 ; ( n c-addr -- ) Store char n in a-addr
 WORD "c!", word_store_char
-    POP()
-    ex de, hl ; HL has address
-    POP() ; DE has value
+    STACK_REQUIRE(2)
+    ld c, (hl)
+    inc hl
+    ld b, (hl)
+    inc hl
+    ld e, (hl)
+    inc hl
+    inc hl
+    ld (data_sp), hl
+    ld h, b
+    ld l, c
 word_store_char_de_hl:
     ld (hl), e
     ret

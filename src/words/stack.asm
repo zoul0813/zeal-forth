@@ -2,55 +2,95 @@
 
 ; ( n -- n n ) Duplicate top stack item
 WORD "dup", word_dup
-    PEEK()  ; DE = n
-    JP_PUSH()
+    STACK_REQUIRE(1)
+    STACK_ROOM(1)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    dec hl
+    dec hl
+    ld (hl), d
+    dec hl
+    ld (hl), e
+    ld (data_sp), hl
+    ret
 ENDWORD "dup", word_dup
 
 ; ( n -- ) Drop top stack item
 WORD "drop", word_drop
-    JP_POP()
+    STACK_REQUIRE(1)
+    inc hl
+    inc hl
+    ld (data_sp), hl
+    ret
 ENDWORD "drop", word_drop
 
 ; ( n1 n2 -- n2 n1 )
 WORD "swap", word_swap
-    POP() ; DE = n2
-    ex de, hl ; HL = n2
-    POP() ; DE = n1
-    ex de, hl ; DE = n2, HL = n1
-    PUSH() ; push n2
-    ex de, hl
-    JP_PUSH() ; push n1
+    STACK_REQUIRE(2)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    inc hl
+    ld c, (hl)
+    ld (hl), e
+    inc hl
+    ld b, (hl)
+    ld (hl), d
+    dec hl
+    dec hl
+    ld (hl), b
+    dec hl
+    ld (hl), c
+    ret
 ENDWORD "swap", word_swap
 
 ; ( n1 n2 -- n1 n2 n1 )
 WORD "over", word_over
-    POP()       ; DE = n2, stack still contains n1
-    ld b, d
-    ld c, e     ; BC = n2
-    PEEK()      ; DE = n1
-    ex de, hl   ; HL = n1
-    ld d, b
-    ld e, c     ; DE = n2
-    PUSH()      ; restore n2
-    ex de, hl   ; DE = n1
-    JP_PUSH()   ; copy n1
+    STACK_REQUIRE(2)
+    STACK_ROOM(1)
+    inc hl
+    inc hl
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    dec hl
+    dec hl
+    dec hl
+    dec hl
+    ld (hl), d
+    dec hl
+    ld (hl), e
+    ld (data_sp), hl
+    ret
 ENDWORD "over", word_over
 
 ; ( n1 n2 n3 -- n2 n3 n1 )
 WORD "rot", word_rot
-    POP()   ; DE = n3
-    ld b, d
-    ld c, e     ; BC = n3
-    POP()   ; DE = n2
-    ex de, hl   ; HL = n2
-    POP()   ; DE = n1
-    ex de, hl   ; HL = n1, DE = n2
-    PUSH()  ; push n2
-    ld d, b
-    ld e, c     ; DE = n3
-    PUSH()  ; push n3
-    ex de, hl   ; HL = n3, DE = n1
-    JP_PUSH()  ; push n1
+    STACK_REQUIRE(3)
+    ld e, (hl)
+    inc hl
+    ld d, (hl) ; DE = n3
+    inc hl
+    ld c, (hl)
+    ld (hl), e
+    inc hl
+    ld b, (hl) ; BC = n2
+    ld (hl), d
+    inc hl
+    ld e, (hl)
+    ld (hl), c
+    inc hl
+    ld d, (hl) ; DE = n1
+    ld (hl), b
+    dec hl
+    dec hl
+    dec hl
+    dec hl
+    ld (hl), d
+    dec hl
+    ld (hl), e
+    ret
 ENDWORD "rot", word_rot
 
 WORD "wipe", word_wipe

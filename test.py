@@ -211,6 +211,13 @@ def main() -> int:
         print(f"{RED}Headless suite failed{NC}")
         return 1
     print(f"{GREEN}All headless suites passed{NC}")
+
+    header("Checked Primitive Recovery and Cycles")
+    checks = subprocess.run(
+        [sys.executable, "tests/checked_primitives.py"], check=False
+    )
+    if checks.returncode:
+        return fail("checked primitive regression tests failed")
     return 0
 
 
