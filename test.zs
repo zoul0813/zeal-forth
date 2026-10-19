@@ -28,5 +28,9 @@ echo === FORTH-TEST-BEGIN:flow ===
 forth h:/forth.fs h:/tests/unit/flow.fs
 echo === FORTH-TEST-END:flow ===
 
+echo === FORTH-TEST-BEGIN:ports ===
+forth h:/forth.fs h:/tests/unit/ports.fs
+echo === FORTH-TEST-END:ports ===
+
 echo === FORTH-TESTS-COMPLETE ===
 reset

@@ -111,6 +111,20 @@ use the Forth convention `( before -- after )`.
 | `bye` | `( -- )` | Exit the interpreter. |
 | `syscall` | `( dev cmd param num -- status )` | Invoke ZealOS syscall `num`. Low bytes select device, command, and syscall. |
 | `ioctl` | `( dev cmd param -- status )` | Invoke ZealOS syscall 7 (`IOCTL`). |
+| `p@` | `( port -- byte )` | Read an unsigned byte (0–255) from a full 16-bit Z80 port address. |
+| `p!` | `( byte port -- )` | Write the low byte of a cell to a full 16-bit Z80 port address. |
+
+Port I/O accesses hardware directly, without a ZealOS call. The port address
+uses all 16 bits; some Zeal devices use upper address bits when reading.
+These words do not select video banks or manage interrupts. Device-specific
+Forth helpers must handle those requirements and restore any hardware state
+they change.
+
+```forth
+hex
+00F0 p@ .       \ Read the current MMU page 0 mapping; do not change it.
+decimal
+```
 
 ## Reserved words
 

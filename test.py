@@ -12,7 +12,7 @@ from pathlib import Path
 TIMEOUT_SECONDS = 120
 IMAGE = Path(".zeal8bit/headless.img")
 EEPROM = Path(".zeal8bit/eeprom.img")
-SUITES = ("base", "math", "compare", "stack", "memory", "compile", "flow")
+SUITES = ("base", "math", "compare", "stack", "memory", "compile", "flow", "ports")
 SUMMARIES = {
     name: f"ALL {name.upper()} TESTS PASSED"
     for name in SUITES

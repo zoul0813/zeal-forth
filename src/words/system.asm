@@ -142,3 +142,23 @@ WORD "ioctl", word_ioctl
     PUSH()
     jp word_syscall
 ENDWORD "ioctl", word_ioctl
+
+; ( port -- byte ) Read one byte using the full 16-bit Z80 port address.
+WORD "p@", word_port_fetch
+    POP()          ; DE = port
+    ld b, d
+    ld c, e        ; BC = full port address
+    in e, (c)
+    ld d, 0        ; return an unsigned byte, never a sign-extended cell
+    JP_PUSH()
+ENDWORD "p@", word_port_fetch
+
+; ( byte port -- ) Write the low byte using the full 16-bit port address.
+WORD "p!", word_port_store
+    POP()          ; DE = port
+    ld b, d
+    ld c, e        ; BC is preserved by POP()
+    POP()          ; DE = value; only E is written
+    out (c), e
+    ret
+ENDWORD "p!", word_port_store
