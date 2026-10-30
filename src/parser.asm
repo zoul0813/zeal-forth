@@ -169,7 +169,7 @@ compile_number:
     jp do_next_word
 ;
 
-; @brief Print "  ok"
+; @brief Print " ok" followed by a newline
 print_ok:
     ; Suppress "ok" while processing file input chunks.
     ld a, (_file_fd)

@@ -6,7 +6,7 @@ _str_project_name:
 _str_project_name_end:
 
 _str_ok:
-    DEFB "ok\n", 0
+    DEFB " ok\n", 0
 _str_ok_end:
 
 _str_prompt:
